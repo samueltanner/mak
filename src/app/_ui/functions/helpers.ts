@@ -1,10 +1,14 @@
 type GenericObject = Record<string, any>
 import chroma from "chroma-js"
 
-import { Theme, ThemeShades, ThemePalette } from "../types/theme-types"
+import {
+  Theme,
+  ThemeInput,
+  ThemeShades,
+  ThemeVariantInput,
+} from "../types/theme-types"
 import {
   defaultThemeShades,
-  uiDefaultTheme,
   uiDefaultThemePaletteInput,
   uiThemeVariants,
   uiThemes,
@@ -12,7 +16,6 @@ import {
 import {
   NestedPaletteInput,
   OvaiUiPaletteInput,
-  Palette,
   PaletteVariantInput,
   VerbosePaletteInput,
 } from "../types/default-types"
@@ -23,7 +26,6 @@ import {
   uiVariants,
   uiVerboseTextVariants,
 } from "../constants/defaults/default-constants"
-import { ThemeInput } from "../types/ui-types"
 
 export const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
@@ -118,14 +120,16 @@ export const separatePalettes = (paletteInput: OvaiUiPaletteInput) => {
     }
   }
 
-  for (const theme of uiVerboseTextVariants) {
-    const themeValue = (paletteInput as VerbosePaletteInput)[theme]
+  for (const themeName of uiThemes) {
+    const themeValue = (paletteInput as VerbosePaletteInput)[
+      `${themeName}Theme`
+    ]
+    console.log({ themeName, themeValue })
     if (!theme && themeValue) {
-      themePalette[theme] = themeValue
+      themePalette[themeName] = themeValue as ThemeVariantInput
     }
   }
 
-  console.log({ colorPalette, textPalette, borderPalette, themePalette })
   return {
     colorPalette,
     textPalette,
@@ -156,10 +160,10 @@ export const getThemeShades = ({
     (altDiffs as ThemeShades) || (defaultThemeShades as ThemeShades)
   const targetThemeKey =
     defaultTheme === "dark"
-      ? "darkTheme"
+      ? "dark"
       : defaultTheme === "light"
-      ? "lightTheme"
-      : "customTheme"
+      ? "light"
+      : "custom"
 
   const originalDefaultBaseShade = shadesObj?.[targetThemeKey]?.primary
   const baseDefaultShade = altBaseShade || originalDefaultBaseShade
@@ -171,7 +175,7 @@ export const getThemeShades = ({
   const variants = shadesObj?.[targetThemeKey]
 
   const primaryShade =
-    variants?.primary || defaultThemeShades?.darkTheme?.primary || 500
+    variants?.primary || defaultThemeShades?.dark?.primary || 500
   const baseDiff = primaryShade + globalDiff
   const secondaryDiff = variants?.secondary || 0 + globalDiff
   const tertiaryDiff = variants?.tertiary || 0 + globalDiff

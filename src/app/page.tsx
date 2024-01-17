@@ -23,9 +23,6 @@ const palette: OvaiUiPaletteInput = {
   dangerBorder: "red-300",
   primaryText: "zinc-900",
   secondaryText: "zinc-50",
-  theme: {
-    dark: "blue-800",
-  },
   darkTheme: "zinc-800",
   lightTheme: "white",
 }
