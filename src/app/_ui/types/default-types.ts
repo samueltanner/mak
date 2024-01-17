@@ -1,14 +1,26 @@
-import { ThemeInput, ThemePalette, VerboseThemeVariant } from "./theme-types"
+import {
+  ThemeInput,
+  MakUiThemePalette,
+  VerboseThemeVariant,
+  MakUiThemeVariants,
+} from "./theme-types"
+
+export type SimpleRecord = Record<string, any>
 
 export type Interaction = "base" | "hover" | "click"
 
 export type RootInteraction = "baseRoot" | "hoverRoot" | "clickRoot"
 
-export type InteractionOutput = Interaction | RootInteraction
+export type MakUiInteractionOutput = Interaction | RootInteraction
 
-export type State = "default" | "active" | "disabled" | "focused" | "selected"
+export type MakUiState =
+  | "default"
+  | "active"
+  | "disabled"
+  | "focused"
+  | "selected"
 
-export type Variant =
+export type MakUiVariant =
   | "primary"
   | "secondary"
   | "tertiary"
@@ -53,7 +65,7 @@ export type VerboseBorderVariant =
   | "customBorder"
 
 export type VerboseVariant =
-  | Variant
+  | MakUiVariant
   | VerboseColorVariant
   | VerboseTextVariant
   | VerboseBorderVariant
@@ -61,30 +73,20 @@ export type VerboseVariant =
 
 export type NestedPaletteVariant = "color" | "text" | "border" | "theme"
 
-export type MakUiNestedPalette = {
-  color: Palette
-  text: Palette
-  border: Palette
-  theme: ThemePalette
-}
-export type Interactions = {
+export type MakUiInteractions = {
   [Key in Interaction]: string
 }
 
-export type InteractionOutputs = {
-  [Key in InteractionOutput]: string
+export type MakUiStates = {
+  [Key in MakUiInteractionOutput]: string
 }
 
-export type States = {
-  [Key in State]: InteractionOutputs
+export type MakUiVariants = {
+  [Key in MakUiState]: MakUiStates
 }
 
-export type Variants = {
-  [Key in Variant]: States
-}
-
-export type Palette = {
-  [Key in Variant]: Variants
+export type MakUiPalette = {
+  [Key in MakUiVariant]: MakUiVariants
 }
 
 export type StateInput =
@@ -98,11 +100,11 @@ export type StateInput =
 export type VariantInput =
   | string
   | {
-      [Key in State]?: StateInput
+      [Key in MakUiState]?: StateInput
     }
 
 export type PaletteVariantInput = {
-  [Key in Variant]?: VariantInput
+  [Key in MakUiVariant]?: VariantInput
 }
 
 export type VerbosePaletteInput = {
@@ -118,10 +120,33 @@ export type NestedPaletteInput = {
 
 export type MakUiPaletteInput = VerbosePaletteInput & NestedPaletteInput
 
+export type MakUiActiveThemePalette = MakUiThemeVariants & {
+  text: MakUiPalette
+}
+
+export type MakUiNestedPalette = {
+  color: MakUiPalette
+  text: MakUiPalette
+  border: MakUiPalette
+  theme: MakUiThemePalette
+}
+
 export type InteractionShades = {
   [Key in Interaction]: number
 }
 
 export type StateShades = {
-  [Key in State]: InteractionShades
+  [Key in MakUiState]: InteractionShades
+}
+
+export type TWColorHelperResponse = {
+  absolute: boolean
+  isTwColor: boolean
+  color: string
+  shade: number | undefined
+  autoShade: boolean
+  opacity: number
+  colorString: string
+  rootString: string
+  hex: string
 }

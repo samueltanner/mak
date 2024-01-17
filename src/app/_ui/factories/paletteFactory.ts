@@ -1,7 +1,4 @@
-import { defaultColors, paletteVariants } from "../constants/ui-constants"
-
 import {
-  getTheme,
   isObject,
   separatePalettes,
   getThemeShades,
@@ -13,16 +10,15 @@ import {
   Interaction,
   MakUiNestedPalette,
   MakUiPaletteInput,
-  Palette,
-  State,
-  States,
-  Variant,
+  MakUiPalette,
+  MakUiStates,
+  MakUiVariant,
 } from "../types/default-types"
 import {
   uiDefaultThemePaletteInput,
   uiThemes,
 } from "../constants/defaults/theme-constants"
-import { ThemePalette, ThemeVariant } from "../types/theme-types"
+import { MakUiThemePalette, ThemeVariant } from "../types/theme-types"
 import {
   uiDefaultColorPaletteInput,
   uiDefaultTextPaletteInput,
@@ -38,14 +34,13 @@ export const paletteFactory = ({
 }) => {
   const { colorPalette, textPalette, borderPalette, themePalette } =
     separatePalettes(paletteInput)
-  let colorPaletteObject = {} as Palette
-  let textPaletteObject = {} as Palette
-  let borderPaletteObject = {} as Palette
-  let themePaletteObject = {} as ThemePalette
+  let colorPaletteObject = {} as MakUiPalette
+  let textPaletteObject = {} as MakUiPalette
+  let borderPaletteObject = {} as MakUiPalette
+  let themePaletteObject = {} as MakUiThemePalette
 
   for (const theme of uiThemes) {
     const providedVariant = themePalette?.[theme]
-    // const theme = getTheme(themeVariant)
 
     if (typeof providedVariant === "string") {
       const providedClassName = handleTypeString(providedVariant)
@@ -184,8 +179,8 @@ export const paletteFactory = ({
       }
 
       for (const state of uiStates) {
-        const providedVariant = targetPalette?.[variant] as Variant
-        const providedState = providedVariant?.[state as keyof Variant]
+        const providedVariant = targetPalette?.[variant] as MakUiVariant
+        const providedState = providedVariant?.[state as keyof MakUiVariant]
 
         if (typeof providedState === "string") {
           const { colorString: variantColorString } =
@@ -200,7 +195,7 @@ export const paletteFactory = ({
           }
         } else if (isObject(providedState)) {
           const classNames = getConstructedClassNames({
-            interactions: colorPalette?.[variant] as States,
+            interactions: colorPalette?.[variant] as MakUiStates,
             state: "all",
           })
 

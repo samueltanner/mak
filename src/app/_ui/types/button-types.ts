@@ -1,3 +1,12 @@
+export type MakUiButtonConfig = {
+  [key: string]: string | undefined
+  borderRadius?: string
+  borderWidth?: string
+  borderStyle?: string
+  className?: string
+  text?: string
+}
+
 export type ButtonVariants = {
   [key: string]: ButtonStates
   primary: ButtonStates
@@ -29,37 +38,3 @@ export type ButtonSubStates = {
   clickedBorder: string
 }
 
- let classNameObj = {
-   default: {
-     color: "",
-     border: "",
-     hover: "",
-     hoverBorder: "",
-     clicked: "",
-     clickedBorder: "",
-   },
-   active: {
-     color: "",
-     border: "",
-     hover: "",
-     hoverBorder: "",
-     clicked: "",
-     clickedBorder: "",
-   },
-   selected: {
-     color: "",
-     border: "",
-     hover: "",
-     hoverBorder: "",
-     clicked: "",
-     clickedBorder: "",
-   },
-   disabled: {
-     color: "",
-     border: "",
-     hover: "",
-     hoverBorder: "",
-     clicked: "",
-     clickedBorder: "",
-   },
- }

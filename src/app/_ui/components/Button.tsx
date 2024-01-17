@@ -1,14 +1,16 @@
 "use client"
 import { forwardRef, useEffect, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
-import { MakUiButtonConfig, useMakUi } from "../context/MakUiContext"
+import { useMakUi } from "../context/MakUiContext"
 import {
-  ElementState,
   MakUiNestedPalette,
   MakUiPalette,
-  ColorPaletteVariant,
-} from "../types/ui-types"
-// import { textThemeStyling } from "../globalComponentStyles"
+  MakUiState,
+  MakUiStates,
+  MakUiVariant,
+  MakUiVariants,
+} from "../types/default-types"
+import { MakUiButtonConfig } from "../types/button-types"
 
 interface ButtonProps {
   text?: string
@@ -22,7 +24,7 @@ interface ButtonProps {
   danger?: boolean
   info?: boolean
   custom?: boolean
-  buttonType?: ColorPaletteVariant | undefined
+  buttonType?: MakUiVariant | undefined
 
   textPrimary?: boolean
   textSecondary?: boolean
@@ -33,7 +35,7 @@ interface ButtonProps {
   textDanger?: boolean
   textInfo?: boolean
   textCustom?: boolean
-  textType?: ColorPaletteVariant | undefined
+  textType?: MakUiVariant | undefined
 
   borderPrimary?: boolean
   borderSecondary?: boolean
@@ -44,12 +46,12 @@ interface ButtonProps {
   borderDanger?: boolean
   borderInfo?: boolean
   borderCustom?: boolean
-  borderType?: ColorPaletteVariant | undefined
+  borderType?: MakUiVariant | undefined
 
   active?: boolean
   disabled?: boolean
   focused?: boolean
-  buttonState?: ElementState
+  buttonState?: MakUiState | undefined
 
   textClassName?: string
   border?: boolean
@@ -74,11 +76,10 @@ interface ButtonProps {
   iconSide?: "left" | "right"
   wrapButtonText?: boolean
   keepStatusVisible?: boolean
-  baseColorsObject?: MakUiPalette
 }
 
 type ButtonStates = {
-  state: ElementState
+  state: MakUiState
   disabled: boolean
   loading: boolean
   selected: boolean
@@ -99,31 +100,29 @@ const buttonClassName = ({
   border,
   customClassName,
   customTextClassName,
-  baseColorsObject,
   buttonConfig,
   palette,
   showFocusRing = true,
 }: {
   text: boolean
-  buttonStyle: ColorPaletteVariant
-  textStyle: ColorPaletteVariant
-  borderStyle: ColorPaletteVariant
+  buttonStyle: MakUiVariant
+  textStyle: MakUiVariant
+  borderStyle: MakUiVariant
   buttonStates: ButtonStates
   width: string
   outlined?: boolean
   border?: boolean
   customClassName?: string
   customTextClassName?: string
-  baseColorsObject: MakUiPalette
   buttonConfig: MakUiButtonConfig
-  palette?: MakUiNestedPalette
+  palette: MakUiNestedPalette
   showFocusRing?: boolean
 }) => {
-  const {
-    text: textPalette,
-    border: borderPalette,
-    color: colorPalette,
-  } = palette
+  const textPalette = palette.text
+  const colorPalette = palette.color
+  const borderPalette = palette.border
+  const themePalette = palette.theme
+
   const {
     state: buttonState,
     disabled,
@@ -199,7 +198,7 @@ const Button = forwardRef(
       textCustom = false,
       textType = undefined,
 
-      // Button States
+      // Button MakUiStates
       active = false,
       selected = false,
       disabled = false,
@@ -223,17 +222,16 @@ const Button = forwardRef(
       icon = undefined,
       iconSide = "left",
       wrapButtonText = false,
-      baseColorsObject = undefined,
       keepStatusVisible = false,
     } = buttonProps
 
     const { palette, buttonConfig } = useMakUi()
 
-    if (palette && baseColorsObject) {
-      throw new Error(
-        "Colors Conflict, please provide your color schema either to the MakUiProvider or to the Button component, but not both."
-      )
-    }
+    // if (palette) {
+    //   throw new Error(
+    //     "Colors Conflict, please provide your color schema either to the MakUiProvider or to the Button component, but not both."
+    //   )
+    // }
 
     const status = isLoading || isError || isSuccess
     const [showStatus, setShowStatus] = useState<boolean>(!!status)
@@ -327,7 +325,6 @@ const Button = forwardRef(
       border,
       customClassName: className,
       customTextClassName: textClassName,
-      baseColorsObject,
       buttonConfig,
       palette,
     })

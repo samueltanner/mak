@@ -1,8 +1,8 @@
 import {
-  Variant,
-  State,
+  MakUiVariant,
+  MakUiState,
   Interaction,
-  Palette,
+  MakUiPalette,
   MakUiPaletteInput,
   VerboseTextVariant,
   VerboseBorderVariant,
@@ -20,7 +20,7 @@ export const uiPaletteVariants: NestedPaletteVariant[] = [
   "border",
   // "theme",
 ]
-export const uiVariants: Variant[] = [
+export const uiVariants: MakUiVariant[] = [
   "primary",
   "secondary",
   "tertiary",
@@ -68,7 +68,7 @@ export const uiVerboseColorVariants: VerboseColorVariant[] = [
   "customColor",
 ]
 
-export const uiStates: State[] = [
+export const uiStates: MakUiState[] = [
   "active",
   "default",
   "disabled",

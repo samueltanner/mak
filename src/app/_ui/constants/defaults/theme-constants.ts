@@ -1,13 +1,13 @@
 import {
-  Theme,
-  ThemePalette,
+  MakUiTheme,
+  MakUiThemePalette,
   ThemeShades,
   ThemeVariant,
   ThemeInput,
   VerboseThemeVariant,
 } from "../../types/theme-types"
 
-export const uiThemes: Theme[] = ["dark", "light", "custom"]
+export const uiThemes: MakUiTheme[] = ["dark", "light", "custom"]
 export const uiVerboseThemes: VerboseThemeVariant[] = [
   "darkTheme",
   "lightTheme",
@@ -21,24 +21,36 @@ export const uiThemeVariants: ThemeVariant[] = [
   "custom",
 ]
 
-export const uiDefaultThemePaletteInput: ThemeInput = {
+export const uiDefaultThemePaletteInput: MakUiThemePalette = {
   dark: {
-    primary: "zinc-950",
-    secondary: "zinc-800",
-    tertiary: "zinc-700",
+    primary: "zinc-950/100",
+    primaryRoot: "zinc-950",
+    secondary: "zinc-800/100",
+    secondaryRoot: "zinc-800",
+    tertiary: "zinc-700/100",
+    tertiaryRoot: "zinc-700",
     custom: "zinc-950",
+    customRoot: "zinc-950",
   },
   light: {
-    primary: "zinc-50",
-    secondary: "zinc-100",
-    tertiary: "zinc-200",
-    custom: "zinc-50",
+    primary: "zinc-50/100",
+    primaryRoot: "zinc-50",
+    secondary: "zinc-100/100",
+    secondaryRoot: "zinc-100",
+    tertiary: "zinc-200/100",
+    tertiaryRoot: "zinc-200",
+    custom: "zinc-50/100",
+    customRoot: "zinc-50",
   },
   custom: {
-    primary: "red-500",
-    secondary: "blue-500",
-    tertiary: "white",
-    custom: "red-500",
+    primary: "red-500/100",
+    primaryRoot: "red-500",
+    secondary: "blue-500/100",
+    secondaryRoot: "blue-500",
+    tertiary: "white/100",
+    tertiaryRoot: "white",
+    custom: "red-500/100",
+    customRoot: "red-500",
   },
 }
 

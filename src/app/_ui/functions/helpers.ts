@@ -2,7 +2,7 @@ type GenericObject = Record<string, any>
 import chroma from "chroma-js"
 
 import {
-  Theme,
+  MakUiTheme,
   ThemeInput,
   ThemeShades,
   ThemeVariantInput,
@@ -13,20 +13,18 @@ import {
   uiThemes,
 } from "../constants/defaults/theme-constants"
 import {
-  Interaction,
-  InteractionOutput,
-  InteractionOutputs,
-  Interactions,
+  MakUiInteractions,
   NestedPaletteInput,
   MakUiPaletteInput,
   PaletteVariantInput,
-  State,
-  StateInput,
+  MakUiState,
   StateShades,
-  States,
-  Variant,
-  Variants,
+  MakUiStates,
   VerbosePaletteInput,
+  TWColorHelperResponse,
+  MakUiVariants,
+  MakUiPalette,
+  SimpleRecord,
 } from "../types/default-types"
 import {
   absoluteRegex,
@@ -38,7 +36,12 @@ import {
   uiStates,
   uiVariants,
 } from "../constants/defaults/default-constants"
-import { TWColorHelperResponse } from "../types/ui-types"
+import colors from "tailwindcss/colors"
+import twConfig from "../../../../tailwind.config"
+import { root } from "postcss"
+
+type DefaultColors = typeof colors
+type TailwindCustomColors = Record<string, Record<string, string>>
 
 export const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
@@ -151,7 +154,7 @@ export const separatePalettes = (paletteInput: MakUiPaletteInput) => {
   }
 }
 
-export const getTheme = (input: string): Theme => {
+export const getTheme = (input: string): MakUiTheme => {
   if (!input) return "dark"
   input = input.toLowerCase()
   if (input.includes("dark")) return "dark"
@@ -167,7 +170,7 @@ export const getThemeShades = ({
 }: {
   altBaseShade?: number
   altDiffs?: ThemeShades
-  defaultTheme?: Theme
+  defaultTheme?: MakUiTheme
 }) => {
   const shadesObj =
     (altDiffs as ThemeShades) || (defaultThemeShades as ThemeShades)
@@ -240,7 +243,7 @@ export const getShades = ({
       click: Math.max(50, Math.min(clickDiff, 950)),
       clickRoot: Math.max(50, Math.min(clickDiff, 950)),
     }
-    shadesResponseObj[state as State] = altStateShadesObject
+    shadesResponseObj[state as MakUiState] = altStateShadesObject
   }
   return shadesResponseObj
 }
@@ -250,54 +253,54 @@ export const getConstructedClassNames = ({
   color,
   state = "default",
 }: {
-  interactions?: Interactions | States
-  state?: State | "all"
+  interactions?: MakUiVariants | MakUiStates
+  state?: MakUiState | "all"
   color?: string
   type?: "default" | "theme"
 }) => {
   const states = state === "all" ? uiStates : [state]
-  let relativeClassNamesResponse: States = {
-    default: {} as InteractionOutputs,
-    active: {} as InteractionOutputs,
-    selected: {} as InteractionOutputs,
-    disabled: {} as InteractionOutputs,
-    focused: {} as InteractionOutputs,
+  let relativeClassNamesResponse: MakUiVariants = {
+    default: {} as MakUiStates,
+    active: {} as MakUiStates,
+    selected: {} as MakUiStates,
+    disabled: {} as MakUiStates,
+    focused: {} as MakUiStates,
   }
 
   const variantObjectKey = Object.keys(interactions || {}).find((key) => {
-    return uiStates.includes(key as State)
-  }) as State
+    return uiStates.includes(key as MakUiState)
+  }) as MakUiState
 
   if (variantObjectKey) {
-    interactions as States
+    interactions as MakUiVariants
   } else {
-    interactions as Interactions
+    interactions as MakUiInteractions
   }
 
   if (variantObjectKey) {
     relativeClassNamesResponse = {
       ...relativeClassNamesResponse,
-      ...(interactions as Interactions),
+      ...(interactions as MakUiInteractions),
     }
   } else if (state !== "all") {
     relativeClassNamesResponse = {
       ...relativeClassNamesResponse,
       [state]: {
         ...interactions,
-      } as Interactions,
+      } as MakUiInteractions,
     }
   }
 
   const getColorString = () => {
     if (color) return color
-    if ((interactions as Interactions)?.["base"])
-      return (interactions as Interactions)?.["base"]
+    if ((interactions as MakUiStates)?.["base"])
+      return (interactions as MakUiStates)?.["base"]
 
     if (
       !!variantObjectKey &&
-      (interactions as States)?.[variantObjectKey]?.["base"]
+      (interactions as MakUiVariants)?.[variantObjectKey]?.["base"]
     ) {
-      return (interactions as States)?.[variantObjectKey]?.["base"]
+      return (interactions as MakUiVariants)?.[variantObjectKey]?.["base"]
     }
     if (isObject(interactions) && Object.values(interactions)[0]) {
       return Object.values(interactions)[0]
@@ -339,7 +342,7 @@ export const getConstructedClassNames = ({
     }
   }
 
-  return relativeClassNamesResponse as States
+  return relativeClassNamesResponse
 }
 
 export const getOpacity = ({
@@ -407,6 +410,7 @@ export const twColorHelper = ({
       opacity: value,
       colorString: `${absoluteColor}${string}`,
       rootString: `${absoluteColor}`,
+      hex: colorString === "white" ? colors["white"] : colors["black"],
     }
   } else {
     const colorArr = colorString.split("-")
@@ -438,6 +442,12 @@ export const twColorHelper = ({
       override: opacity,
     })
 
+    const hex = getTwHex({
+      color,
+      shade: Number(variableShade),
+      absolute: false,
+    })
+
     const isTwColor = !!color && !!variableShade
     return {
       absolute: false,
@@ -448,6 +458,7 @@ export const twColorHelper = ({
       color: color || (uiDefaultColorPaletteInput.primary! as string),
       colorString: `${color}-${variableShade}${opacityObj.string}`,
       rootString: `${color}-${variableShade}`,
+      hex,
     }
   }
 }
@@ -466,3 +477,109 @@ export const handleTypeString = (
     opacity,
   })
 }
+
+export const getTwHex = ({
+  colorString,
+  color,
+  shade,
+  absolute,
+}: {
+  colorString?: string
+  shade?: number
+  color?: string
+  absolute?: boolean
+}): string => {
+  const black = colors["black"]
+  const white = colors["white"]
+  const handleAbsolute = (absoluteColor: string) => {
+    return absoluteColor === "white" ? white : black
+  }
+
+  const getParsedShade = (shade: number) => {
+    if (!shade) return 500
+    if (shade < 50) return 50
+    if (shade > 950) return 950
+    const nearestMultipleOfShade = nearestMultiple(shade, 100)
+    return nearestMultipleOfShade
+  }
+
+  const getDefaultColorGroup = (color: keyof DefaultColors) => {
+    const defaultColorGroup = colors[color as keyof DefaultColors] as
+      | Record<string, string>
+      | undefined
+    return defaultColorGroup
+  }
+
+  const getHex = (
+    defaultColorGroup: SimpleRecord | undefined,
+    parsedShade: number,
+    rootColor: string,
+    rootShade: number
+  ): string => {
+    if (defaultColorGroup && typeof defaultColorGroup === "object") {
+      const defaultHex = defaultColorGroup[parsedShade]
+      if (defaultHex) return defaultHex
+      return black
+    } else {
+      const tailwindCustomColors = twConfig?.theme
+        ?.colors as TailwindCustomColors
+
+      const [colorGroup, colorSubGroup] = rootColor.split("-")
+      const customColorHex =
+        tailwindCustomColors?.[rootColor]?.[rootShade!] ||
+        tailwindCustomColors?.[colorGroup]?.[colorSubGroup]?.[rootShade!] ||
+        black
+
+      return customColorHex
+    }
+  }
+
+  if (!colorString && !color) return black
+
+  if (
+    absolute ||
+    colorString === "white" ||
+    (colorString === "black" && typeof colorString === "string")
+  ) {
+    return handleAbsolute(colorString as string)
+  }
+
+  if (!colorString && color && shade) {
+    const parsedShade = getParsedShade(shade)
+    const defaultColorGroup = getDefaultColorGroup(color as keyof DefaultColors)
+    const hex = getHex(defaultColorGroup, parsedShade, color, shade)
+    return hex
+  }
+
+  if (colorString) {
+    const { color, shade, absolute } = handleTypeString(colorString)
+
+    if (absolute) return handleAbsolute(color)
+
+    if (!color || !shade) return black
+
+    const parsedShade = getParsedShade(shade)
+    const defaultColorGroup = getDefaultColorGroup(color as keyof DefaultColors)
+    const hex = getHex(defaultColorGroup, parsedShade, color, shade)
+    return hex
+  }
+
+  return black
+}
+
+export const detectSystemTheme = () => {
+  if (typeof window === "undefined") return "dark"
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+  return systemTheme.matches ? "dark" : "light"
+}
+
+export const getColorContrast = (colorA: string, colorB: string) => {
+  const colorAContrast = chroma.contrast(colorA, "white")
+  const colorBContrast = chroma.contrast(colorB, "white")
+  return colorAContrast > colorBContrast ? colorA : colorB
+}
+
+export const getActiveThemeTextPalette = (
+  theme: MakUiTheme,
+  textPalette: MakUiPalette
+) => {}

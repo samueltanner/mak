@@ -1,6 +1,7 @@
+"use client"
 import { forwardRef, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { BiChevronDown, BiChevronUp } from "react-icons/bi"
+import { BiChevronUp } from "react-icons/bi"
 import { useMakUi } from "../context/MakUiContext"
 
 export const rootLevelBackgroundStyling = "bg-zinc-50 dark:bg-zinc-900"
@@ -201,13 +202,13 @@ const Dropdown = ({
   const triggerRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const hiddenDropdownRef = useRef<HTMLDivElement>(null)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false)
   const [position, setPosition] = useState<Position>({
     top: 0,
     right: 0,
   })
-  const { palette } = useMakUi()
-  const { text, theme } = palette
+  const { palette, activeTheme } = useMakUi()
+  const { text } = palette
 
   if (!labelLeft && !labelRight) {
     labelLeft = true
@@ -388,16 +389,16 @@ const Dropdown = ({
       </div>
       <AnimatePresence>
         <motion.div
-          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${theme.light.primary}`}
+          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activeTheme.primary}`}
           variants={menuVariants}
           initial="hidden"
           animate={dropdownOpen ? "visible" : "exit"}
           exit="exit"
           style={position}
           ref={dropdownRef}
-          key={"dropdown"}
+          key={`dropdown`}
         >
-          {children && dropdownOpen && (
+          {children && (
             <DropdownElement
               key={"dropdown-children"}
               options={options}

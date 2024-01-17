@@ -1,4 +1,4 @@
-import { ThemePalette } from "../types/theme-types"
+import { MakUiThemePalette } from "../types/theme-types"
 import { states, variants } from "./nested-ui-constants"
 
 export const paletteKeys = ["Color", "Text", "Border", "Background"] //"Background"
@@ -15,7 +15,7 @@ export const defaultColors = {
   custom: "zinc",
 }
 
-export const defaultThemeColors: ThemePalette = {
+export const defaultThemeColors: MakUiThemePalette = {
   darkTheme: {
     primary: "zinc-950",
     primaryRoot: "zinc-950",
@@ -238,7 +238,7 @@ export const defaultNestedThemeVariants = {
   custom: defaultThemeSubVariants,
 }
 
-export const defaultBackgroundPalette: ThemePalette = {
+export const defaultBackgroundPalette: MakUiThemePalette = {
   darkTheme: defaultThemeSubVariants,
   lightTheme: defaultThemeSubVariants,
   customTheme: defaultThemeSubVariants,

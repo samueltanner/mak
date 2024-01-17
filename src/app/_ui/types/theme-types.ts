@@ -1,4 +1,4 @@
-export type Theme = "dark" | "light" | "custom"
+export type MakUiTheme = "dark" | "light" | "custom"
 export type VerboseThemeVariant = "darkTheme" | "lightTheme" | "customTheme"
 
 export type ThemeVariant = "primary" | "secondary" | "tertiary" | "custom"
@@ -11,12 +11,12 @@ export type ThemeRootVariant =
 
 export type ThemeVariantOutput = ThemeVariant | ThemeRootVariant
 
-export type ThemeVariants = {
+export type MakUiThemeVariants = {
   [Key in ThemeVariantOutput]: string
 }
 
-export type ThemePalette = {
-  [Key in Theme]: ThemeVariants
+export type MakUiThemePalette = {
+  [Key in MakUiTheme]: MakUiThemeVariants
 }
 
 export type ThemeVariantInput =
@@ -29,7 +29,7 @@ export type ThemeVariantInput =
     }
 
 export type ThemeInput = {
-  [Key in Theme]?: string | ThemeVariantInput
+  [Key in MakUiTheme]?: string | ThemeVariantInput
 }
 
 export type ThemeVariantShades = {
@@ -37,5 +37,5 @@ export type ThemeVariantShades = {
 }
 
 export type ThemeShades = {
-  [Key in Theme]: ThemeVariantShades
+  [Key in MakUiTheme]: ThemeVariantShades
 }
