@@ -12,7 +12,7 @@ import { Dropdown } from "./_ui/components/Dropdown"
 import { OvaiUiPaletteInput } from "./_ui/types/default-types"
 
 const palette: OvaiUiPaletteInput = {
-  primary: "red",
+  primary: "zinc",
   secondary: "ovai-teal",
   secondaryBorder: "ovai-teal-400",
   tertiary: "zinc-800",
@@ -23,8 +23,16 @@ const palette: OvaiUiPaletteInput = {
   dangerBorder: "red-300",
   primaryText: "zinc-900",
   secondaryText: "zinc-50",
-  darkTheme: "zinc-800",
-  lightTheme: "white",
+  theme: {
+    dark: {
+      primary: "black",
+    },
+    light: {
+      primary: "blue-100",
+    },
+  },
+  // darkTheme: "zinc-800",
+  // lightTheme: "blue-100",
 }
 
 export default function Home() {

@@ -10,22 +10,30 @@ import {
 import {
   defaultThemeShades,
   uiDefaultThemePaletteInput,
-  uiThemeVariants,
   uiThemes,
 } from "../constants/defaults/theme-constants"
 import {
+  InteractionOutput,
+  InteractionOutputs,
   NestedPaletteInput,
   OvaiUiPaletteInput,
   PaletteVariantInput,
+  State,
+  StateShades,
+  States,
   VerbosePaletteInput,
 } from "../types/default-types"
 import {
+  absoluteRegex,
   uiDefaultBorderPaletteInput,
   uiDefaultColorPaletteInput,
+  uiDefaultShades,
   uiDefaultTextPaletteInput,
+  uiInteractions,
+  uiStates,
   uiVariants,
-  uiVerboseTextVariants,
 } from "../constants/defaults/default-constants"
+import { TWColorHelperResponse } from "../types/ui-types"
 
 export const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
@@ -93,10 +101,10 @@ export const separatePalettes = (paletteInput: OvaiUiPaletteInput) => {
 
   const { color, text, border, theme } = paletteInput as NestedPaletteInput
 
-  colorPalette = mergeWithFallback(color || {}, colorPalette)
-  textPalette = mergeWithFallback(text || {}, textPalette)
-  borderPalette = mergeWithFallback(border || {}, borderPalette)
-  themePalette = mergeWithFallback(theme || {}, themePalette)
+  colorPalette = { ...color }
+  textPalette = { ...text }
+  borderPalette = { ...border }
+  themePalette = { ...theme }
 
   for (const colorVariant of uiVariants) {
     const colorValue =
@@ -124,7 +132,7 @@ export const separatePalettes = (paletteInput: OvaiUiPaletteInput) => {
     const themeValue = (paletteInput as VerbosePaletteInput)[
       `${themeName}Theme`
     ]
-    console.log({ themeName, themeValue })
+
     if (!theme && themeValue) {
       themePalette[themeName] = themeValue as ThemeVariantInput
     }
@@ -158,12 +166,7 @@ export const getThemeShades = ({
 }) => {
   const shadesObj =
     (altDiffs as ThemeShades) || (defaultThemeShades as ThemeShades)
-  const targetThemeKey =
-    defaultTheme === "dark"
-      ? "dark"
-      : defaultTheme === "light"
-      ? "light"
-      : "custom"
+  const targetThemeKey = defaultTheme || "dark"
 
   const originalDefaultBaseShade = shadesObj?.[targetThemeKey]?.primary
   const baseDefaultShade = altBaseShade || originalDefaultBaseShade
@@ -176,10 +179,17 @@ export const getThemeShades = ({
 
   const primaryShade =
     variants?.primary || defaultThemeShades?.dark?.primary || 500
+
   const baseDiff = primaryShade + globalDiff
-  const secondaryDiff = variants?.secondary || 0 + globalDiff
-  const tertiaryDiff = variants?.tertiary || 0 + globalDiff
-  const customDiff = variants?.custom || 0 + globalDiff
+  const secondaryDiff = variants?.secondary
+    ? variants?.secondary + baseDiff
+    : 0 + globalDiff
+  const tertiaryDiff = variants?.tertiary
+    ? variants?.tertiary + baseDiff
+    : 0 + globalDiff
+  const customDiff = variants?.custom
+    ? variants?.custom + baseDiff
+    : 0 + globalDiff
 
   const shadesResponseObj = {
     primary: Math.max(50, Math.min(baseDiff, 950)),
@@ -189,4 +199,259 @@ export const getThemeShades = ({
   }
 
   return shadesResponseObj
+}
+
+export const getShades = ({
+  altBaseShade,
+  altDiffs,
+}: {
+  altBaseShade?: number
+  altDiffs?: StateShades
+} = {}) => {
+  const shadesObj =
+    (altDiffs as StateShades) || (uiDefaultShades as StateShades)
+  const originalDefaultBaseShade =
+    shadesObj?.default?.base || uiDefaultShades.default!.base!
+  const baseDefaultShade = altBaseShade || originalDefaultBaseShade
+  const globalDiff =
+    baseDefaultShade === originalDefaultBaseShade
+      ? 0
+      : baseDefaultShade - originalDefaultBaseShade
+
+  let shadesResponseObj = {
+    ...shadesObj,
+  }
+  for (const [state, interactions] of Object.entries(shadesObj)) {
+    const stateBaseShade = interactions.base
+    const baseDiff = stateBaseShade! + globalDiff
+    const hoverDiff = interactions.hover! + globalDiff
+    const clickDiff = interactions.click! + globalDiff
+
+    let altStateShadesObject = {
+      base: Math.max(50, Math.min(baseDiff, 950)),
+      baseRoot: Math.max(50, Math.min(baseDiff, 950)),
+      hover: Math.max(50, Math.min(hoverDiff, 950)),
+      hoverRoot: Math.max(50, Math.min(hoverDiff, 950)),
+      click: Math.max(50, Math.min(clickDiff, 950)),
+      clickRoot: Math.max(50, Math.min(clickDiff, 950)),
+    }
+    shadesResponseObj[state] = altStateShadesObject
+  }
+  return shadesResponseObj
+}
+
+export const getConstructedClassNames = ({
+  interactions,
+  color,
+  state = "default",
+}: {
+  interactions?: InteractionAndVariantInput
+  state?: State | "all"
+  color?: string
+  type?: "default" | "theme"
+}) => {
+  const states = state === "all" ? uiStates : [state]
+  let relativeClassNamesResponse: States = {
+    default: {} as InteractionOutputs,
+    active: {} as InteractionOutputs,
+    selected: {} as InteractionOutputs,
+    disabled: {} as InteractionOutputs,
+    focused: {} as InteractionOutputs,
+  }
+
+  const variantObjectKey = Object.keys(interactions || {}).find((key) => {
+    return uiStates.includes(key as State)
+  }) as Interaction
+
+  if (variantObjectKey) {
+    relativeClassNamesResponse = {
+      ...relativeClassNamesResponse,
+      ...(interactions as Interactions),
+    }
+  } else if (state !== "all") {
+    relativeClassNamesResponse = {
+      ...relativeClassNamesResponse,
+      [state]: {
+        ...interactions,
+      } as Interactions,
+    }
+  }
+
+  const getColorString = () => {
+    if (color) return color
+    if (interactions?.["base"]) return interactions?.["base"]
+    if (interactions?.[variantObjectKey]?.["base"]) {
+      return interactions?.[variantObjectKey]?.["base"]
+    }
+    // if (
+    //   !!variantObjectKey &&
+    //   isObject(interactions?.[variantObjectKey]) &&
+    //   interactions?.[variantObjectKey]?.["base"]
+    // ) {
+    //   return interactions?.[variantObjectKey]?.["base"]
+    // }
+    if (isObject(interactions) && Object.values(interactions)[0]) {
+      return Object.values(interactions)[0]
+    }
+  }
+
+  const globalDefaultColor = twColorHelper({
+    colorString: getColorString(),
+  })
+
+  for (const state of states) {
+    for (const interaction of uiInteractions) {
+      if (
+        !Object.keys(relativeClassNamesResponse[state]).includes(interaction)
+      ) {
+        const updatedColorString = twColorHelper({
+          colorString: globalDefaultColor.colorString,
+          shade: getShades({
+            altBaseShade: globalDefaultColor.shade,
+          })[state][interaction],
+          opacity: 100,
+        })
+
+        relativeClassNamesResponse[state][interaction] =
+          updatedColorString.colorString
+        relativeClassNamesResponse[state][`${interaction}Root`] =
+          updatedColorString.rootString
+      } else {
+        const updatedColorString = twColorHelper({
+          colorString: relativeClassNamesResponse[state][interaction],
+        })
+        relativeClassNamesResponse[state][interaction] =
+          updatedColorString.colorString
+        relativeClassNamesResponse[state][`${interaction}Root`] =
+          updatedColorString.rootString
+      }
+    }
+  }
+
+  return relativeClassNamesResponse
+}
+
+export const getOpacity = ({
+  opacityValue,
+  override,
+}: {
+  opacityValue?: string | number | null | undefined
+  override?: string | number
+}): {
+  string: string
+  value: number
+} => {
+  if (override !== undefined) {
+    return {
+      string: `/${nearestMultiple(Number(override), 5)}`,
+      value: Number(override),
+    }
+  }
+
+  let opacityNum = 100
+
+  if (typeof opacityValue === "string") {
+    opacityNum = Number(opacityValue)
+  } else if (opacityValue === undefined || opacityValue === null) {
+    opacityNum = 100
+  } else if (opacityValue === 0) {
+    opacityNum = 0
+  } else {
+    opacityNum = Number(opacityValue) || 100
+  }
+  const opacityString = `/${nearestMultiple(opacityNum, 5)}`
+  return {
+    string: opacityString,
+    value: opacityNum,
+  }
+}
+
+export const twColorHelper = ({
+  colorString,
+  opacity,
+  shade,
+}: {
+  colorString?: string | undefined | null
+  opacity?: number | string | undefined | null
+  shade?: number | string | undefined | null
+}): TWColorHelperResponse => {
+  if (!colorString) colorString = `${uiDefaultColorPaletteInput.primary}-500`
+  const isAbsoluteColor =
+    absoluteRegex.test(colorString) ||
+    colorString === "white" ||
+    colorString === "black"
+  if (isAbsoluteColor) {
+    const [absoluteColor, absoluteOpacity] = colorString.split("/")
+    const { string, value } = getOpacity({
+      opacityValue: absoluteOpacity,
+      override: opacity,
+    })
+
+    return {
+      absolute: true,
+      isTwColor: true,
+      color: absoluteColor,
+      shade: undefined,
+      autoShade: false,
+      opacity: value,
+      colorString: `${absoluteColor}${string}`,
+      rootString: `${absoluteColor}`,
+    }
+  } else {
+    const colorArr = colorString.split("-")
+
+    const lastElement = colorArr[colorArr.length - 1]
+    let shadeAndOpacity
+    let color
+    let variableShade
+    let variableOpacity
+    let autoShade = false
+    if (lastElement.includes("/")) {
+      shadeAndOpacity = colorArr.pop()
+      const shadeAndOpacityArr = shadeAndOpacity?.split("/")
+      color = colorArr.join("-")
+      autoShade = !!shadeAndOpacityArr?.[0]
+      variableShade = shade || shadeAndOpacityArr?.[0]
+      variableOpacity = shadeAndOpacityArr?.[1].replace(/\D/g, "")
+    } else {
+      const includesShade = Number(lastElement) > 0
+      autoShade = !includesShade
+      shade = includesShade ? colorArr.pop() : shade || 500
+      variableShade = shade
+      variableOpacity = 100
+      color = colorArr.join("-")
+    }
+
+    const opacityObj = getOpacity({
+      opacityValue: variableOpacity,
+      override: opacity,
+    })
+
+    const isTwColor = !!color && !!variableShade
+    return {
+      absolute: false,
+      isTwColor,
+      opacity: opacityObj.value,
+      shade: Number(variableShade),
+      autoShade,
+      color: color || (uiDefaultColorPaletteInput.primary! as string),
+      colorString: `${color}-${variableShade}${opacityObj.string}`,
+      rootString: `${color}-${variableShade}`,
+    }
+  }
+}
+
+export const handleTypeString = (
+  providedState: string,
+  opacityOverride?: number
+) => {
+  const hasOpacity = providedState.includes("/")
+  const color = hasOpacity ? providedState.split("/")[0] : providedState
+  const opacity = hasOpacity
+    ? providedState.split("/")[1]
+    : opacityOverride || undefined
+  return twColorHelper({
+    colorString: color,
+    opacity,
+  })
 }

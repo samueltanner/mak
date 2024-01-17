@@ -106,7 +106,7 @@ export type NestedPaletteInput = {
   theme?: ThemeInput
 }
 
-export type OvaiUiPaletteInput = VerbosePaletteInput | NestedPaletteInput
+export type OvaiUiPaletteInput = VerbosePaletteInput & NestedPaletteInput
 
 export type InteractionShades = {
   [Key in Interaction]: number

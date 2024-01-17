@@ -10,6 +10,9 @@ import {
   StateShades,
 } from "../../types/default-types"
 
+export const absoluteRegex =
+  /^((white|black)\/\[*0*(?:[0-9][0-9]?|100)%*\]*|(white|black))$/
+
 export const uiVariants: Variant[] = [
   "primary",
   "secondary",
@@ -93,7 +96,6 @@ export const uiDefaultTextPaletteInput: OvaiUiPaletteInput = {
   info: "zinc-900",
   custom: "zinc-900",
 }
-
 
 export const uiDefaultShades: StateShades = {
   default: {

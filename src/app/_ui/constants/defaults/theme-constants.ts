@@ -50,15 +50,15 @@ export const defaultThemeShades: ThemeShades = {
     custom: 950,
   },
   light: {
-    primary: 950,
-    secondary: 800,
-    tertiary: 700,
-    custom: 950,
+    primary: 50,
+    secondary: 100,
+    tertiary: 200,
+    custom: 300,
   },
   custom: {
-    primary: 950,
-    secondary: 800,
-    tertiary: 700,
-    custom: 950,
+    primary: 500,
+    secondary: 500,
+    tertiary: 500,
+    custom: 500,
   },
 }

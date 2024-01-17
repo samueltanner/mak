@@ -1,20 +1,10 @@
-import { deepEqual, mergeWithFallback } from "@/helpers/functions"
-import React, {
-  createContext,
-  use,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import React, { createContext, useMemo } from "react"
 import {
   ThemePalette,
   BorderPalette,
   OvaiUiNestedPalette,
   OvaiUiPalette,
-  OvaiUiPaletteInput,
   ColorPalette,
-  PaletteInput,
   TextPalette,
 } from "../types/ui-types"
 import { paletteFactory } from "../factories/paletteFactory"
@@ -22,30 +12,9 @@ import {
   defaultThemeColors,
   defaultBorderPalette,
   defaultColorPalette,
-  defaultNestedPalette,
-  defaultPalettes,
   defaultTextPalette,
 } from "../constants/ui-constants"
-
-type OvaiUIPaddingAndMarginConfig = {
-  [key: string]: string
-  h?: string
-  w?: string
-  p?: string
-  px?: string
-  py?: string
-  pt?: string
-  pb?: string
-  pl?: string
-  pr?: string
-  m?: string
-  mx?: string
-  my?: string
-  mt?: string
-  mb?: string
-  ml?: string
-  mr?: string
-}
+import { OvaiUiPaletteInput } from "../types/default-types"
 
 export interface OvaiUiButtonConfig extends OvaiUIPaddingAndMarginConfig {
   [key: string]: string
@@ -75,7 +44,7 @@ interface OvaiUiContext {
 type ProviderProps = {
   children: React.ReactNode
   palette?: OvaiUiPaletteInput
-  customButtonConfig?: OvaiUiButtonConfig
+  customButtonConfig?: OvaiUiPaletteInput
 }
 
 const OvaiUiContext = createContext<OvaiUiContext | undefined>(undefined)
