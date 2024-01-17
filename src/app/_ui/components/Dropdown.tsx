@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { BiChevronDown, BiChevronUp } from "react-icons/bi"
-import { useOvaiUi } from "../context/OvaiUiContext"
+import { useMakUi } from "../context/MakUiContext"
 
 export const rootLevelBackgroundStyling = "bg-zinc-50 dark:bg-zinc-900"
 export const rootLevelMenuStyling =
@@ -59,7 +59,7 @@ const DropdownElement = forwardRef(
   ) => {
     const {
       palette: { theme },
-    } = useOvaiUi()
+    } = useMakUi()
     const isSelect = (
       option: string | number | { label: string; value: string }
     ) => {
@@ -206,7 +206,7 @@ const Dropdown = ({
     top: 0,
     right: 0,
   })
-  const { palette } = useOvaiUi()
+  const { palette } = useMakUi()
   const { text, theme } = palette
 
   if (!labelLeft && !labelRight) {

@@ -6,40 +6,37 @@ import Modal, {
 } from "./_ui/components/Modal"
 import Button from "./_ui/components/Button"
 import { useState } from "react"
-import { OvaiUiProvider } from "./_ui/context/OvaiUiContext"
-import { DropdownElementTrigger } from "./_ui/DropDownContainer"
+import { MakUiProvider } from "./_ui/context/MakUiContext"
 import { Dropdown } from "./_ui/components/Dropdown"
-import { OvaiUiPaletteInput } from "./_ui/types/default-types"
+import { MakUiPaletteInput } from "./_ui/types/default-types"
 
-const palette: OvaiUiPaletteInput = {
-  primary: "zinc",
-  secondary: "ovai-teal",
-  secondaryBorder: "ovai-teal-400",
-  tertiary: "zinc-800",
-  tertiaryBorder: "zinc-600",
-  success: "blue",
-  successBorder: "blue-300",
-  danger: "red",
-  dangerBorder: "red-300",
-  primaryText: "zinc-900",
-  secondaryText: "zinc-50",
-  theme: {
-    dark: {
-      primary: "black",
-    },
-    light: {
-      primary: "blue-100",
-    },
-  },
-  // darkTheme: "zinc-800",
-  // lightTheme: "blue-100",
+const palette: MakUiPaletteInput = {
+  // primary: "blue",
+  // secondary: "teal",
+  // secondaryBorder: "teal-400",
+  // tertiary: "zinc-800",
+  // tertiaryBorder: "zinc-600",
+  // success: "blue",
+  // successBorder: "blue-300",
+  // danger: "red",
+  // dangerBorder: "red-300",
+  // primaryText: "zinc-900",
+  // secondaryText: "zinc-50",
+  // theme: {
+  //   dark: {
+  //     primary: "black",
+  //   },
+  //   light: {
+  //     primary: "blue-100",
+  //   },
+  // },
 }
 
 export default function Home() {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <OvaiUiProvider palette={palette}>
+      <MakUiProvider palette={palette}>
         <div>
           <Dropdown icon={<span>trigger</span>}>
             <ul>
@@ -66,7 +63,7 @@ export default function Home() {
         >
           Open Modal
         </Button>
-      </OvaiUiProvider>
+      </MakUiProvider>
     </main>
   )
 }

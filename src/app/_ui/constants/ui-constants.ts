@@ -1,15 +1,4 @@
-import {
-  Interactions,
-  OvaiUiNestedPalette,
-  States,
-  Variants,
-} from "../types/nested-ui-types"
-import {
-  Theme,
-  ThemePalette,
-  ThemeVariant,
-  ThemeVariants,
-} from "../types/theme-types"
+import { ThemePalette } from "../types/theme-types"
 import { states, variants } from "./nested-ui-constants"
 
 export const paletteKeys = ["Color", "Text", "Border", "Background"] //"Background"
@@ -258,7 +247,7 @@ export const defaultBackgroundPalette: ThemePalette = {
 export const defaultColorPalette = variants
 export const defaultTextPalette = textVariants
 export const defaultBorderPalette = borderVariants
-export const defaultPalettes: OvaiUiPalette = {
+export const defaultPalettes: MakUiPalette = {
   ...defaultColorPalette,
   ...defaultTextPalette,
   ...defaultBorderPalette,

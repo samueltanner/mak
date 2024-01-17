@@ -33,7 +33,7 @@ export type BorderPaletteVariant =
 
 export type ThemePaletteVariant = "darkTheme" | "lightTheme" | "customTheme"
 export type NestedThemePaletteVariant = "dark" | "light" | "custom"
-export type OvaiUiPaletteVariant =
+export type MakUiPaletteVariant =
   | ColorPaletteVariant
   | TextPaletteVariant
   | BorderPaletteVariant
@@ -123,12 +123,12 @@ export type NestedDefaultPalette = {
   }
 }
 
-export type OvaiUiPalette = ColorPalette &
+export type MakUiPalette = ColorPalette &
   TextPalette &
   BorderPalette &
   ThemePalette
 
-export type OvaiUiNestedPalette = {
+export type MakUiNestedPalette = {
   color: NestedDefaultPalette
   text: NestedDefaultPalette
   border: NestedDefaultPalette
@@ -150,8 +150,8 @@ export type ThemeShades = {
   }
 }
 
-export type OvaiUiPaletteInput = {
-  [key in OvaiUiPaletteVariant]?: PaletteInput &
+export type MakUiPaletteInput = {
+  [key in MakUiPaletteVariant]?: PaletteInput &
     TextPaletteInput &
     BorderPaletteInput &
     ThemePaletteInput

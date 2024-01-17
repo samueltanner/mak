@@ -1,10 +1,4 @@
-import {
-  defaultColors,
-  paletteVariants,
-  elementStates,
-  paletteKeys,
-  defaultThemeColors,
-} from "../constants/ui-constants"
+import { defaultColors, paletteVariants } from "../constants/ui-constants"
 
 import {
   getTheme,
@@ -15,15 +9,32 @@ import {
   twColorHelper,
   getConstructedClassNames,
 } from "../functions/helpers"
-import { OvaiUiPaletteInput, Palette } from "../types/default-types"
-import { uiThemes } from "../constants/defaults/theme-constants"
+import {
+  Interaction,
+  MakUiNestedPalette,
+  MakUiPaletteInput,
+  Palette,
+  State,
+  States,
+  Variant,
+} from "../types/default-types"
+import {
+  uiDefaultThemePaletteInput,
+  uiThemes,
+} from "../constants/defaults/theme-constants"
 import { ThemePalette, ThemeVariant } from "../types/theme-types"
-import { uiVariants } from "../constants/defaults/default-constants"
+import {
+  uiDefaultColorPaletteInput,
+  uiDefaultTextPaletteInput,
+  uiPaletteVariants,
+  uiStates,
+  uiVariants,
+} from "../constants/defaults/default-constants"
 
 export const paletteFactory = ({
   paletteInput,
 }: {
-  paletteInput: OvaiUiPaletteInput
+  paletteInput: MakUiPaletteInput
 }) => {
   const { colorPalette, textPalette, borderPalette, themePalette } =
     separatePalettes(paletteInput)
@@ -31,8 +42,6 @@ export const paletteFactory = ({
   let textPaletteObject = {} as Palette
   let borderPaletteObject = {} as Palette
   let themePaletteObject = {} as ThemePalette
-
-  console.log({ colorPalette })
 
   for (const theme of uiThemes) {
     const providedVariant = themePalette?.[theme]
@@ -118,7 +127,7 @@ export const paletteFactory = ({
         existingDarkPrimary ||
         existingLightPrimary ||
         existingCustomPrimary ||
-        defaultThemeColors[theme]
+        uiDefaultThemePaletteInput[theme]
 
       const themeShades = getThemeShades({
         defaultTheme: theme,
@@ -138,28 +147,27 @@ export const paletteFactory = ({
     }
   }
 
-  for (const variant of uiVariants) {
-    for (const key of paletteKeys) {
+  for (const uiVariant of uiPaletteVariants) {
+    for (const variant of uiVariants) {
       const targetPalette =
-        key === "Color"
+        uiVariant === "color"
           ? colorPalette
-          : key === "Text"
+          : uiVariant === "text"
           ? textPalette
-          : key === "Border"
+          : uiVariant === "border"
           ? borderPalette
           : colorPalette
 
       const targetPaletteObject =
-        key === "Color"
+        uiVariant === "color"
           ? colorPaletteObject
-          : key === "Text"
+          : uiVariant === "text"
           ? textPaletteObject
-          : key === "Border"
+          : uiVariant === "border"
           ? borderPaletteObject
-          : {}
+          : colorPaletteObject
 
-      const variantKey = key === "Color" ? variant : `${variant}${key}`
-      const providedVariant = targetPalette?.[variantKey]
+      const providedVariant = targetPalette?.[variant]
 
       if (typeof providedVariant === "string") {
         const { colorString: variantColorString } =
@@ -168,13 +176,16 @@ export const paletteFactory = ({
           color: variantColorString,
           state: "all",
         })
-        targetPaletteObject[variantKey] = {
+
+        targetPaletteObject[variant] = {
+          ...targetPaletteObject[variant],
           ...classNames,
         }
       }
 
-      for (const state of elementStates) {
-        const providedState = targetPalette?.[variantKey]?.[state]
+      for (const state of uiStates) {
+        const providedVariant = targetPalette?.[variant] as Variant
+        const providedState = providedVariant?.[state as keyof Variant]
 
         if (typeof providedState === "string") {
           const { colorString: variantColorString } =
@@ -183,71 +194,62 @@ export const paletteFactory = ({
             color: variantColorString,
             state: "all",
           })
-          targetPaletteObject[variantKey] = {
+          targetPaletteObject[variant] = {
+            ...targetPaletteObject[variant],
             ...classNames,
           }
         } else if (isObject(providedState)) {
           const classNames = getConstructedClassNames({
-            interactions: colorPalette?.[variantKey] as VariantInputObject,
+            interactions: colorPalette?.[variant] as States,
             state: "all",
           })
 
-          targetPaletteObject[variantKey] = {
+          targetPaletteObject[variant] = {
+            ...targetPaletteObject[variant],
             ...classNames,
           }
         }
       }
       if (!colorPaletteObject?.[variant]) {
         const classNames = getConstructedClassNames({
-          color: defaultColors[variant],
+          color: uiDefaultColorPaletteInput[variant] as Interaction,
           state: "all",
         })
         colorPaletteObject[variant] = {
+          ...targetPaletteObject[variant],
           ...classNames,
         }
       }
-      if (!textPaletteObject?.[`${variant}Text`]) {
-        textPaletteObject[`${variant}Text`] = {
+      if (!borderPaletteObject?.[variant]) {
+        borderPaletteObject[variant] = {
           ...colorPaletteObject?.[variant],
         }
       }
-      if (!borderPaletteObject?.[`${variant}Border`]) {
-        borderPaletteObject[`${variant}Border`] = {
-          ...colorPaletteObject?.[variant],
+      if (!textPaletteObject?.[variant]) {
+        const classNames = getConstructedClassNames({
+          color: uiDefaultTextPaletteInput[variant] as Interaction,
+          state: "all",
+        })
+        textPaletteObject[variant] = {
+          ...targetPaletteObject[variant],
+          ...classNames,
         }
       }
     }
   }
 
-  const nestedPaletteObject = () => {
-    const nestedPaletteObject = {
-      color: {},
-      text: {},
-      border: {},
-      theme: {},
-    }
-    for (const variant of paletteVariants) {
-      nestedPaletteObject.color[variant] = colorPaletteObject[variant]
-      nestedPaletteObject.text[variant] = textPaletteObject[`${variant}Text`]
-      nestedPaletteObject.border[variant] =
-        borderPaletteObject[`${variant}Border`]
-    }
-
-    for (const themeVariant of uiThemes) {
-      nestedPaletteObject.theme[getTheme(themeVariant)] =
-        themePaletteObject[themeVariant]
-    }
-    return nestedPaletteObject
+  const nestedPaletteObject: MakUiNestedPalette = {
+    color: colorPaletteObject,
+    text: textPaletteObject,
+    border: borderPaletteObject,
+    theme: themePaletteObject,
   }
-
-  console.log("colorPaletteObject", colorPaletteObject)
 
   return {
     colorPaletteObject,
     textPaletteObject,
     borderPaletteObject,
-    themePaletteObject: nestedPaletteObject().theme,
-    nestedPaletteObject: nestedPaletteObject(),
-    twParse: twColorHelper,
+    themePaletteObject,
+    nestedPaletteObject,
   }
 }

@@ -2,39 +2,30 @@ import React, { createContext, useMemo } from "react"
 import {
   ThemePalette,
   BorderPalette,
-  OvaiUiNestedPalette,
-  OvaiUiPalette,
+  MakUiNestedPalette,
+  MakUiPalette,
   ColorPalette,
   TextPalette,
 } from "../types/ui-types"
 import { paletteFactory } from "../factories/paletteFactory"
+import { MakUiPaletteInput } from "../types/default-types"
 import {
-  defaultThemeColors,
-  defaultBorderPalette,
-  defaultColorPalette,
-  defaultTextPalette,
-} from "../constants/ui-constants"
-import { OvaiUiPaletteInput } from "../types/default-types"
+  uiDefaultBorderPaletteInput,
+  uiDefaultColorPaletteInput,
+  uiDefaultTextPaletteInput,
+} from "../constants/defaults/default-constants"
+import { uiDefaultThemePaletteInput } from "../constants/defaults/theme-constants"
 
-export interface OvaiUiButtonConfig extends OvaiUIPaddingAndMarginConfig {
-  [key: string]: string
-  borderRadius?: string
-  borderWidth?: string
-  borderStyle?: string
-  className?: string
-  text?: string
-}
-
-export const defaultButtonConfig: OvaiUiButtonConfig = {
+export const defaultButtonConfig: MakUiButtonConfig = {
   className:
     "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold border border-2",
 }
 
-interface OvaiUiContext {
-  palette: OvaiUiNestedPalette
-  palettes: OvaiUiPalette
-  buttonConfig: OvaiUiButtonConfig
-  // setButtonConfig: (config: OvaiUiButtonConfig) => void
+interface MakUiContext {
+  palette: MakUiNestedPalette
+  palettes: MakUiPalette
+  buttonConfig: MakUiButtonConfig
+  // setButtonConfig: (config: MakUiButtonConfig) => void
   colorPalette: ColorPalette
   textPalette: TextPalette
   borderPalette: BorderPalette
@@ -43,22 +34,22 @@ interface OvaiUiContext {
 
 type ProviderProps = {
   children: React.ReactNode
-  palette?: OvaiUiPaletteInput
-  customButtonConfig?: OvaiUiPaletteInput
+  palette?: MakUiPaletteInput
+  customButtonConfig?: MakUiPaletteInput
 }
 
-const OvaiUiContext = createContext<OvaiUiContext | undefined>(undefined)
+const MakUiContext = createContext<MakUiContext | undefined>(undefined)
 
-export const OvaiUiProvider = ({
+export const MakUiProvider = ({
   children,
-  palette: paletteInput,
+  palette: paletteInput = {},
   customButtonConfig,
 }: ProviderProps) => {
   if (!customButtonConfig) customButtonConfig = defaultButtonConfig
   // const [palette, setPalette] =
-  //   useState<OvaiUiNestedPalette>(defaultNestedPalette)
+  //   useState<MakUiNestedPalette>(defaultNestedPalette)
   // const [combinedPalettes, setCombinedPalettes] =
-  //   useState<OvaiUiPalette>(defaultPalettes)
+  //   useState<MakUiPalette>(defaultPalettes)
   // const [colorPalette, setColorPalette] =
   //   useState<ColorPalette>(defaultColorPalette)
   // const [textPalette, setTextPalette] =
@@ -68,32 +59,34 @@ export const OvaiUiProvider = ({
   // const [themePalette, setThemePalette] =
   //   useState<ThemePalette>(defaultThemeColors)
   // const [buttonConfig, setButtonConfig] =
-  //   useState<OvaiUiButtonConfig>(customButtonConfig)
+  //   useState<MakUiButtonConfig>(customButtonConfig)
 
   const palettesMemo = useMemo(() => {
     console.log("UI CONTEXT palettesMemo useMemo")
 
     const {
-      colorPaletteObject = defaultColorPalette,
-      textPaletteObject = defaultTextPalette,
-      borderPaletteObject = defaultBorderPalette,
-      themePaletteObject = defaultThemeColors,
-      nestedPaletteObject = defaultNestedPalette,
+      colorPaletteObject = uiDefaultColorPaletteInput,
+      textPaletteObject = uiDefaultTextPaletteInput,
+      borderPaletteObject = uiDefaultBorderPaletteInput,
+      themePaletteObject = uiDefaultThemePaletteInput,
+      nestedPaletteObject = {},
     } = paletteFactory({ paletteInput }) || {}
 
+    console.log("nestedPaletteObject", nestedPaletteObject)
+
     return {
-      buttonConfig: customButtonConfig as OvaiUiButtonConfig,
+      buttonConfig: customButtonConfig as MakUiButtonConfig,
       colorPalette: colorPaletteObject as ColorPalette,
       textPalette: textPaletteObject as TextPalette,
       borderPalette: borderPaletteObject as BorderPalette,
       themePalette: themePaletteObject as ThemePalette,
-      palette: nestedPaletteObject as OvaiUiNestedPalette,
+      palette: nestedPaletteObject as MakUiNestedPalette,
       palettes: {
         ...textPaletteObject,
         ...colorPaletteObject,
         ...borderPaletteObject,
         ...themePaletteObject,
-      } as OvaiUiPalette,
+      } as MakUiPalette,
     }
   }, [paletteInput])
 
@@ -103,8 +96,8 @@ export const OvaiUiProvider = ({
   }, [palettesMemo])
 
   // const [palette, setPalette] =
-  //   useState<OvaiUiNestedPalette>(defaultNestedPalette)
-  // const [palettes, setPalettes] = useState<OvaiUiPalette>(defaultPalettes)
+  //   useState<MakUiNestedPalette>(defaultNestedPalette)
+  // const [palettes, setPalettes] = useState<MakUiPalette>(defaultPalettes)
   // const [colorPalette, setColorPalette] =
   //   useState<ColorPalette>(defaultColorPalette)
   // const [textPalette, setTextPalette] =
@@ -114,7 +107,7 @@ export const OvaiUiProvider = ({
   // const [themePalette, setThemePalette] =
   //   useState<ThemePalette>(defaultThemeColors)
 
-  // const paletteInputRef = useRef<OvaiUiPaletteInput>(null)
+  // const paletteInputRef = useRef<MakUiPaletteInput>(null)
 
   // useEffect(() => {
   //   if (paletteInput) {
@@ -159,15 +152,13 @@ export const OvaiUiProvider = ({
   //   themePalette,
   // }
 
-  return (
-    <OvaiUiContext.Provider value={value}>{children}</OvaiUiContext.Provider>
-  )
+  return <MakUiContext.Provider value={value}>{children}</MakUiContext.Provider>
 }
 
-export const useOvaiUi = () => {
-  const context = React.useContext(OvaiUiContext)
+export const useMakUi = () => {
+  const context = React.useContext(MakUiContext)
   if (context === undefined) {
-    throw new Error("useOvaiUi must be used within a OvaiUiProvider")
+    throw new Error("useMakUi must be used within a MakUiProvider")
   }
   return context
 }

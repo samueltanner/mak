@@ -1,11 +1,11 @@
 "use client"
 import { forwardRef, useEffect, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
-import { OvaiUiButtonConfig, useOvaiUi } from "../context/OvaiUiContext"
+import { MakUiButtonConfig, useMakUi } from "../context/MakUiContext"
 import {
   ElementState,
-  OvaiUiNestedPalette,
-  OvaiUiPalette,
+  MakUiNestedPalette,
+  MakUiPalette,
   ColorPaletteVariant,
 } from "../types/ui-types"
 // import { textThemeStyling } from "../globalComponentStyles"
@@ -74,7 +74,7 @@ interface ButtonProps {
   iconSide?: "left" | "right"
   wrapButtonText?: boolean
   keepStatusVisible?: boolean
-  baseColorsObject?: OvaiUiPalette
+  baseColorsObject?: MakUiPalette
 }
 
 type ButtonStates = {
@@ -114,9 +114,9 @@ const buttonClassName = ({
   border?: boolean
   customClassName?: string
   customTextClassName?: string
-  baseColorsObject: OvaiUiPalette
-  buttonConfig: OvaiUiButtonConfig
-  palette?: OvaiUiNestedPalette
+  baseColorsObject: MakUiPalette
+  buttonConfig: MakUiButtonConfig
+  palette?: MakUiNestedPalette
   showFocusRing?: boolean
 }) => {
   const {
@@ -227,11 +227,11 @@ const Button = forwardRef(
       keepStatusVisible = false,
     } = buttonProps
 
-    const { palette, buttonConfig } = useOvaiUi()
+    const { palette, buttonConfig } = useMakUi()
 
     if (palette && baseColorsObject) {
       throw new Error(
-        "Colors Conflict, please provide your color schema either to the OvaiUiProvider or to the Button component, but not both."
+        "Colors Conflict, please provide your color schema either to the MakUiProvider or to the Button component, but not both."
       )
     }
 

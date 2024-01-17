@@ -13,14 +13,19 @@ import {
   uiThemes,
 } from "../constants/defaults/theme-constants"
 import {
+  Interaction,
   InteractionOutput,
   InteractionOutputs,
+  Interactions,
   NestedPaletteInput,
-  OvaiUiPaletteInput,
+  MakUiPaletteInput,
   PaletteVariantInput,
   State,
+  StateInput,
   StateShades,
   States,
+  Variant,
+  Variants,
   VerbosePaletteInput,
 } from "../types/default-types"
 import {
@@ -93,7 +98,7 @@ export const mergeWithFallback = (
   return { ...result, ...primary }
 }
 
-export const separatePalettes = (paletteInput: OvaiUiPaletteInput) => {
+export const separatePalettes = (paletteInput: MakUiPaletteInput) => {
   let colorPalette = uiDefaultColorPaletteInput as PaletteVariantInput
   let textPalette = uiDefaultTextPaletteInput as PaletteVariantInput
   let borderPalette = uiDefaultBorderPaletteInput as PaletteVariantInput
@@ -235,7 +240,7 @@ export const getShades = ({
       click: Math.max(50, Math.min(clickDiff, 950)),
       clickRoot: Math.max(50, Math.min(clickDiff, 950)),
     }
-    shadesResponseObj[state] = altStateShadesObject
+    shadesResponseObj[state as State] = altStateShadesObject
   }
   return shadesResponseObj
 }
@@ -245,7 +250,7 @@ export const getConstructedClassNames = ({
   color,
   state = "default",
 }: {
-  interactions?: InteractionAndVariantInput
+  interactions?: Interactions | States
   state?: State | "all"
   color?: string
   type?: "default" | "theme"
@@ -261,7 +266,13 @@ export const getConstructedClassNames = ({
 
   const variantObjectKey = Object.keys(interactions || {}).find((key) => {
     return uiStates.includes(key as State)
-  }) as Interaction
+  }) as State
+
+  if (variantObjectKey) {
+    interactions as States
+  } else {
+    interactions as Interactions
+  }
 
   if (variantObjectKey) {
     relativeClassNamesResponse = {
@@ -279,24 +290,24 @@ export const getConstructedClassNames = ({
 
   const getColorString = () => {
     if (color) return color
-    if (interactions?.["base"]) return interactions?.["base"]
-    if (interactions?.[variantObjectKey]?.["base"]) {
-      return interactions?.[variantObjectKey]?.["base"]
+    if ((interactions as Interactions)?.["base"])
+      return (interactions as Interactions)?.["base"]
+
+    if (
+      !!variantObjectKey &&
+      (interactions as States)?.[variantObjectKey]?.["base"]
+    ) {
+      return (interactions as States)?.[variantObjectKey]?.["base"]
     }
-    // if (
-    //   !!variantObjectKey &&
-    //   isObject(interactions?.[variantObjectKey]) &&
-    //   interactions?.[variantObjectKey]?.["base"]
-    // ) {
-    //   return interactions?.[variantObjectKey]?.["base"]
-    // }
     if (isObject(interactions) && Object.values(interactions)[0]) {
       return Object.values(interactions)[0]
     }
   }
 
+  const colorString = getColorString()
+
   const globalDefaultColor = twColorHelper({
-    colorString: getColorString(),
+    colorString: colorString,
   })
 
   for (const state of states) {
@@ -328,7 +339,7 @@ export const getConstructedClassNames = ({
     }
   }
 
-  return relativeClassNamesResponse
+  return relativeClassNamesResponse as States
 }
 
 export const getOpacity = ({
@@ -336,7 +347,7 @@ export const getOpacity = ({
   override,
 }: {
   opacityValue?: string | number | null | undefined
-  override?: string | number
+  override?: string | number | null | undefined
 }): {
   string: string
   value: number

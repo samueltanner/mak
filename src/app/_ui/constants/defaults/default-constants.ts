@@ -3,16 +3,23 @@ import {
   State,
   Interaction,
   Palette,
-  OvaiUiPaletteInput,
+  MakUiPaletteInput,
   VerboseTextVariant,
   VerboseBorderVariant,
   VerboseColorVariant,
   StateShades,
+  NestedPaletteVariant,
 } from "../../types/default-types"
 
 export const absoluteRegex =
   /^((white|black)\/\[*0*(?:[0-9][0-9]?|100)%*\]*|(white|black))$/
 
+export const uiPaletteVariants: NestedPaletteVariant[] = [
+  "color",
+  "text",
+  "border",
+  // "theme",
+]
 export const uiVariants: Variant[] = [
   "primary",
   "secondary",
@@ -62,16 +69,16 @@ export const uiVerboseColorVariants: VerboseColorVariant[] = [
 ]
 
 export const uiStates: State[] = [
-  "default",
   "active",
-  "selected",
+  "default",
   "disabled",
   "focused",
+  "selected",
 ]
 
 export const uiInteractions: Interaction[] = ["base", "hover", "click"]
 
-export const uiDefaultColorPaletteInput: OvaiUiPaletteInput = {
+export const uiDefaultColorPaletteInput: MakUiPaletteInput = {
   primary: "blue",
   secondary: "green",
   tertiary: "yellow",
@@ -85,7 +92,7 @@ export const uiDefaultColorPaletteInput: OvaiUiPaletteInput = {
 
 export const uiDefaultBorderPaletteInput = uiDefaultColorPaletteInput
 
-export const uiDefaultTextPaletteInput: OvaiUiPaletteInput = {
+export const uiDefaultTextPaletteInput: MakUiPaletteInput = {
   primary: "zinc-900",
   secondary: "zinc-100",
   tertiary: "zinc-900",
@@ -97,6 +104,8 @@ export const uiDefaultTextPaletteInput: OvaiUiPaletteInput = {
   custom: "zinc-900",
 }
 
+export const uiDefaultPalette = ""
+
 export const uiDefaultShades: StateShades = {
   default: {
     base: 500,
@@ -104,23 +113,23 @@ export const uiDefaultShades: StateShades = {
     click: 700,
   },
   active: {
-    base: 500,
-    hover: 600,
-    click: 700,
+    base: 400,
+    hover: 500,
+    click: 600,
   },
   selected: {
-    base: 500,
-    hover: 600,
-    click: 700,
+    base: 400,
+    hover: 500,
+    click: 600,
   },
   disabled: {
-    base: 500,
-    hover: 600,
-    click: 700,
+    base: 300,
+    hover: 300,
+    click: 300,
   },
   focused: {
     base: 500,
-    hover: 600,
+    hover: 700,
     click: 700,
   },
 }
