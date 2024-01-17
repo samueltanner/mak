@@ -6,8 +6,8 @@ import {
   ElementState,
   OvaiUiNestedPalette,
   OvaiUiPalette,
-  PaletteVariant,
-} from "../_types/ui-types"
+  ColorPaletteVariant,
+} from "../types/ui-types"
 // import { textThemeStyling } from "../globalComponentStyles"
 
 interface ButtonProps {
@@ -22,7 +22,7 @@ interface ButtonProps {
   danger?: boolean
   info?: boolean
   custom?: boolean
-  buttonType?: PaletteVariant | undefined
+  buttonType?: ColorPaletteVariant | undefined
 
   textPrimary?: boolean
   textSecondary?: boolean
@@ -33,7 +33,7 @@ interface ButtonProps {
   textDanger?: boolean
   textInfo?: boolean
   textCustom?: boolean
-  textType?: PaletteVariant | undefined
+  textType?: ColorPaletteVariant | undefined
 
   borderPrimary?: boolean
   borderSecondary?: boolean
@@ -44,7 +44,7 @@ interface ButtonProps {
   borderDanger?: boolean
   borderInfo?: boolean
   borderCustom?: boolean
-  borderType?: PaletteVariant | undefined
+  borderType?: ColorPaletteVariant | undefined
 
   active?: boolean
   disabled?: boolean
@@ -105,9 +105,9 @@ const buttonClassName = ({
   showFocusRing = true,
 }: {
   text: boolean
-  buttonStyle: PaletteVariant
-  textStyle: PaletteVariant
-  borderStyle: PaletteVariant
+  buttonStyle: ColorPaletteVariant
+  textStyle: ColorPaletteVariant
+  borderStyle: ColorPaletteVariant
   buttonStates: ButtonStates
   width: string
   outlined?: boolean

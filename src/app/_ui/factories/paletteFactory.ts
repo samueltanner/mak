@@ -1,21 +1,4 @@
 import {
-  ColorPalette,
-  TWColorHelperResponse,
-  ElementInteractions,
-  ElementInteractionShadesInput,
-  ElementState,
-  StateShades,
-  InteractionInput,
-  VariantInputObject,
-  TextPalette,
-  BorderPalette,
-  OvaiUiPaletteInput,
-  ThemePalette,
-  ThemePaletteVariant,
-  ThemeSubVariantShadeInput,
-  ThemeShades,
-} from "../_types/ui-types"
-import {
   defaultColors,
   paletteVariants,
   elementStates,
@@ -23,71 +6,21 @@ import {
   defaultStateShades,
   paletteKeys,
   themeVariants,
-  defaultThemeShades,
   defaultThemeColors,
-} from "../_constants/ui-constants"
+} from "../constants/ui-constants"
 
 import {
   getTheme,
   isObject,
   nearestMultiple,
   separatePalettes,
-} from "../_functions/helpers"
-import {
-  Interaction,
-  InteractionAndVariantInput,
-  State,
-  VariantInput,
-  VariantsInput,
-} from "../_types/ui-input-types"
-import { Interactions, States, Variants } from "../_types/nested-ui-types"
+  getThemeShades,
+} from "../functions/helpers"
+import { InteractionAndVariantInput } from "../types/ui-input-types"
+import { Interactions, States } from "../types/nested-ui-types"
 
 const absoluteRegex =
   /^((white|black)\/\[*0*(?:[0-9][0-9]?|100)%*\]*|(white|black))$/
-
-const getThemeShades = ({
-  altBaseShade,
-  altDiffs,
-  defaultTheme = "dark",
-}: {
-  altBaseShade?: number
-  altDiffs?: ThemeSubVariantShadeInput
-  defaultTheme?: "dark" | "light" | "custom"
-}) => {
-  const shadesObj =
-    (altDiffs as ThemeShades) || (defaultThemeShades as ThemeShades)
-  const targetThemeKey =
-    defaultTheme === "dark"
-      ? "darkTheme"
-      : defaultTheme === "light"
-      ? "lightTheme"
-      : "customTheme"
-
-  const originalDefaultBaseShade = shadesObj?.[targetThemeKey]?.primary
-  const baseDefaultShade = altBaseShade || originalDefaultBaseShade
-  const globalDiff =
-    baseDefaultShade === originalDefaultBaseShade
-      ? 0
-      : baseDefaultShade - originalDefaultBaseShade
-
-  const variants = shadesObj?.[targetThemeKey]
-
-  const primaryShade =
-    variants?.primary || defaultThemeShades?.darkTheme?.primary || 500
-  const baseDiff = primaryShade + globalDiff
-  const secondaryDiff = variants?.secondary || 0 + globalDiff
-  const tertiaryDiff = variants?.tertiary || 0 + globalDiff
-  const customDiff = variants?.custom || 0 + globalDiff
-
-  const shadesResponseObj = {
-    primary: Math.max(50, Math.min(baseDiff, 950)),
-    secondary: Math.max(50, Math.min(secondaryDiff, 950)),
-    tertiary: Math.max(50, Math.min(tertiaryDiff, 950)),
-    custom: Math.max(50, Math.min(customDiff, 950)),
-  }
-
-  return shadesResponseObj
-}
 
 const getShades = ({
   altBaseShade,

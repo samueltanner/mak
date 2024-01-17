@@ -5,7 +5,7 @@ import {
   ThemeVariants,
   Themes,
   Variants,
-} from "../_types/nested-ui-types"
+} from "../types/nested-ui-types"
 export const interactions: Interactions = {
   base: "",
   baseRoot: "",

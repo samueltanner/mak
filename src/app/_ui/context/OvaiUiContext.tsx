@@ -16,8 +16,8 @@ import {
   ColorPalette,
   PaletteInput,
   TextPalette,
-} from "../_types/ui-types"
-import { paletteFactory } from "../_factories/paletteFactory"
+} from "../types/ui-types"
+import { paletteFactory } from "../factories/paletteFactory"
 import {
   defaultThemeColors,
   defaultBorderPalette,
@@ -25,7 +25,7 @@ import {
   defaultNestedPalette,
   defaultPalettes,
   defaultTextPalette,
-} from "../_constants/ui-constants"
+} from "../constants/ui-constants"
 
 type OvaiUIPaddingAndMarginConfig = {
   [key: string]: string

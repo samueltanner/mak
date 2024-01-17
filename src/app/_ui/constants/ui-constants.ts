@@ -1,32 +1,15 @@
 import {
-  ElementInteractionState,
-  ElementState,
-  OvaiUiPalette,
-  ColorPalette,
-  BorderPaletteVariant,
-  TextPaletteVariant,
-  PaletteVariant,
-  StateShades,
-  TextPalette,
-  BorderPalette,
-  ThemePalette,
-  ElementStates,
-  ElementInteractions,
-  ThemePaletteVariant,
-  ThemeSubVariants,
-  ThemeShades,
-  ThemePaletteSubVariant,
-  NestedDefaultPalette,
-  TextPaletteInput,
-  ThemePaletteInput,
-  BorderPaletteInput,
-} from "../_types/ui-types"
-import {
   Interactions,
   OvaiUiNestedPalette,
   States,
   Variants,
-} from "../_types/nested-ui-types"
+} from "../types/nested-ui-types"
+import {
+  Theme,
+  ThemePalette,
+  ThemeVariant,
+  ThemeVariants,
+} from "../types/theme-types"
 import { states, variants } from "./nested-ui-constants"
 
 export const paletteKeys = ["Color", "Text", "Border", "Background"] //"Background"
@@ -100,20 +83,7 @@ export const defaultBorderColors: BorderPaletteInput = {
   customBorder: "zinc",
 }
 
-export const themeVariants: ThemePaletteVariant[] = [
-  "darkTheme",
-  "lightTheme",
-  "customTheme",
-]
-
-export const backgroundSubVariants: ThemePaletteSubVariant[] = [
-  "primary",
-  "secondary",
-  "tertiary",
-  "custom",
-]
-
-export const paletteVariants: PaletteVariant[] = [
+export const paletteVariants: ColorPaletteVariant[] = [
   "primary",
   "secondary",
   "tertiary",

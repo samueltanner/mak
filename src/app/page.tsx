@@ -9,8 +9,9 @@ import { useState } from "react"
 import { OvaiUiProvider } from "./_ui/context/OvaiUiContext"
 import { DropdownElementTrigger } from "./_ui/DropDownContainer"
 import { Dropdown } from "./_ui/components/Dropdown"
+import { OvaiUiPaletteInput } from "./_ui/types/ui-types"
 
-const palette = {
+const palette: OvaiUiPaletteInput = {
   primary: "blue",
   primaryBorder: "blue-300",
   secondary: "ovai-teal",

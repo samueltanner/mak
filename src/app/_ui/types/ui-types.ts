@@ -1,4 +1,4 @@
-export type PaletteVariant =
+export type ColorPaletteVariant =
   | "primary"
   | "secondary"
   | "tertiary"
@@ -34,7 +34,7 @@ export type BorderPaletteVariant =
 export type ThemePaletteVariant = "darkTheme" | "lightTheme" | "customTheme"
 export type NestedThemePaletteVariant = "dark" | "light" | "custom"
 export type OvaiUiPaletteVariant =
-  | PaletteVariant
+  | ColorPaletteVariant
   | TextPaletteVariant
   | BorderPaletteVariant
   | ThemePaletteVariant
@@ -93,7 +93,7 @@ export type ElementInteractions = {
 }
 
 export type ColorPalette = {
-  [key in PaletteVariant]?: ElementStates
+  [key in ColorPaletteVariant]?: ElementStates
 }
 
 export type TextPalette = {
@@ -116,7 +116,7 @@ export type NestedThemePalette = {
 }
 
 export type NestedDefaultPalette = {
-  [key in PaletteVariant]: {
+  [key in ColorPaletteVariant]: {
     [key in ElementState]: {
       [key in ElementInteractionState]: string
     }
@@ -150,13 +150,15 @@ export type ThemeShades = {
   }
 }
 
-export type OvaiUiPaletteInput = PaletteInput &
-  TextPaletteInput &
-  BorderPaletteInput &
-  ThemePaletteInput
+export type OvaiUiPaletteInput = {
+  [key in OvaiUiPaletteVariant]?: PaletteInput &
+    TextPaletteInput &
+    BorderPaletteInput &
+    ThemePaletteInput
+}
 
 export type PaletteInput = {
-  [key in PaletteVariant]?: VariantInput
+  [key in ColorPaletteVariant]?: VariantInput
 }
 
 export type TextPaletteInput = {
@@ -171,7 +173,9 @@ export type ThemePaletteInput = {
   [key in ThemePaletteVariant]?: ThemeInput
 }
 
-export type ThemeInput = string | ThemeInputObject
+export type ThemeInput = {
+  [Key in Theme]?: string | ThemeVariantInput
+}
 
 export type VariantInput = string | VariantInputObject
 
