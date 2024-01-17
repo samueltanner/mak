@@ -1,9 +1,4 @@
-import {
-  ThemeVariantInput,
-  ThemeInput,
-  VerboseThemeVariant,
-  Theme,
-} from "./theme-types"
+import { ThemeInput, VerboseThemeVariant } from "./theme-types";
 
 export type Interaction = "base" | "hover" | "click"
 
@@ -112,3 +107,11 @@ export type NestedPaletteInput = {
 }
 
 export type OvaiUiPaletteInput = VerbosePaletteInput | NestedPaletteInput
+
+export type InteractionShades = {
+  [Key in Interaction]: number
+}
+
+export type StateShades = {
+  [Key in State]: InteractionShades
+}

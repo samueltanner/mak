@@ -1,19 +1,29 @@
 type GenericObject = Record<string, any>
 import chroma from "chroma-js"
+
+import { Theme, ThemeShades, ThemePalette } from "../types/theme-types"
 import {
-  BorderPalette,
-  BorderPaletteVariant,
-  ColorPalette,
-  ElementStates,
-  OvaiUiPalette,
+  defaultThemeShades,
+  uiDefaultTheme,
+  uiDefaultThemePaletteInput,
+  uiThemeVariants,
+  uiThemes,
+} from "../constants/defaults/theme-constants"
+import {
+  NestedPaletteInput,
   OvaiUiPaletteInput,
-  OvaiUiPaletteVariant,
-  ColorPaletteVariant,
-  TextPalette,
-  TextPaletteVariant,
-  ThemePalette,
-  ThemeVariant,
-} from "../types/ui-types"
+  Palette,
+  PaletteVariantInput,
+  VerbosePaletteInput,
+} from "../types/default-types"
+import {
+  uiDefaultBorderPaletteInput,
+  uiDefaultColorPaletteInput,
+  uiDefaultTextPaletteInput,
+  uiVariants,
+  uiVerboseTextVariants,
+} from "../constants/defaults/default-constants"
+import { ThemeInput } from "../types/ui-types"
 
 export const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
@@ -55,24 +65,67 @@ export const nearestMultiple = (num: number, multiple: number) => {
   return remainder === 0 ? num : num + multiple - remainder
 }
 
-export const separatePalettes = (palette: OvaiUiPaletteInput) => {
-  const colorPalette = {} as ColorPalette
-  const textPalette = {} as TextPalette
-  const borderPalette = {} as BorderPalette
-  const themePalette = {} as ThemePalette
+export const mergeWithFallback = (
+  primary: Record<string, any>,
+  ...fallbacks: Array<Record<string, any> | undefined>
+): Record<string, any> => {
+  let result: Record<string, any> = {}
 
-  Object.keys(palette).forEach((key) => {
-    const value = palette[key as keyof OvaiUiPaletteInput] as ElementStates
-    if (key.includes("Text")) {
-      textPalette[key as keyof TextPalette] = value
-    } else if (key.includes("Border")) {
-      borderPalette[key as keyof BorderPalette] = value
-    } else if (key.includes("ThemeVariant")) {
-      themePalette[key as keyof ThemePalette] = value
-    } else {
-      colorPalette[key as keyof ColorPalette] = value
-    }
+  fallbacks.forEach((fallback) => {
+    if (isObject(fallback) && !isEmptyObject(fallback))
+      Object.keys(fallback).forEach((key) => {
+        if (result[key] === undefined) {
+          result[key] = fallback[key]
+        }
+      })
   })
+
+  return { ...result, ...primary }
+}
+
+export const separatePalettes = (paletteInput: OvaiUiPaletteInput) => {
+  let colorPalette = uiDefaultColorPaletteInput as PaletteVariantInput
+  let textPalette = uiDefaultTextPaletteInput as PaletteVariantInput
+  let borderPalette = uiDefaultBorderPaletteInput as PaletteVariantInput
+  let themePalette = uiDefaultThemePaletteInput as ThemeInput
+
+  const { color, text, border, theme } = paletteInput as NestedPaletteInput
+
+  colorPalette = mergeWithFallback(color || {}, colorPalette)
+  textPalette = mergeWithFallback(text || {}, textPalette)
+  borderPalette = mergeWithFallback(border || {}, borderPalette)
+  themePalette = mergeWithFallback(theme || {}, themePalette)
+
+  for (const colorVariant of uiVariants) {
+    const colorValue =
+      (paletteInput as VerbosePaletteInput)[colorVariant] ||
+      (paletteInput as VerbosePaletteInput)[`${colorVariant}Color`]
+    const borderValue =
+      (paletteInput as VerbosePaletteInput)[`${colorVariant}Border`] ||
+      (paletteInput as VerbosePaletteInput)[colorVariant]
+    const textValue = (paletteInput as VerbosePaletteInput)[
+      `${colorVariant}Text`
+    ]
+
+    if (!color && colorValue) {
+      colorPalette[colorVariant] = colorValue
+    }
+    if (!border && borderValue) {
+      borderPalette[colorVariant] = borderValue
+    }
+    if (!text && textValue) {
+      textPalette[colorVariant] = textValue
+    }
+  }
+
+  for (const theme of uiVerboseTextVariants) {
+    const themeValue = (paletteInput as VerbosePaletteInput)[theme]
+    if (!theme && themeValue) {
+      themePalette[theme] = themeValue
+    }
+  }
+
+  console.log({ colorPalette, textPalette, borderPalette, themePalette })
   return {
     colorPalette,
     textPalette,
@@ -81,7 +134,7 @@ export const separatePalettes = (palette: OvaiUiPaletteInput) => {
   }
 }
 
-export const getTheme = (input: string) => {
+export const getTheme = (input: string): Theme => {
   if (!input) return "dark"
   input = input.toLowerCase()
   if (input.includes("dark")) return "dark"
@@ -96,8 +149,8 @@ export const getThemeShades = ({
   defaultTheme = "dark",
 }: {
   altBaseShade?: number
-  altDiffs?: ThemeSubVariantShadeInput
-  defaultTheme?: "dark" | "light" | "custom"
+  altDiffs?: ThemeShades
+  defaultTheme?: Theme
 }) => {
   const shadesObj =
     (altDiffs as ThemeShades) || (defaultThemeShades as ThemeShades)
