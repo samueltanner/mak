@@ -4,6 +4,7 @@ import {
   MakUiNestedPalette,
   MakUiPaletteInput,
   MakUiPalette,
+  MakUiActiveThemePalette,
 } from "../types/default-types"
 import {
   uiDefaultBorderPaletteInput,
@@ -17,12 +18,7 @@ import {
   MakUiThemePalette,
   MakUiThemeVariants,
 } from "../types/theme-types"
-import {
-  detectSystemTheme,
-  getColorContrast,
-  getTwHex,
-  twColorHelper,
-} from "../functions/helpers"
+import { detectSystemTheme } from "../functions/helpers";
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:
@@ -59,9 +55,6 @@ export const MakUiProvider = ({
 
   const detectedSystemTheme: MakUiTheme =
     defaultTheme === "system" ? detectSystemTheme() : defaultTheme
-  const defaultDetectedTheme = uiDefaultThemePaletteInput[detectedSystemTheme]
-  const defaultDetectedThemePrimary = defaultDetectedTheme.primaryRoot
-  const defaultDetectedTextPrimary = uiDefaultTextPaletteInput.primary!
 
   // const { hex: primaryHex } = twColorHelper({
   //   colorString:
@@ -76,9 +69,10 @@ export const MakUiProvider = ({
   const [buttonConfig, setButtonConfig] =
     useState<MakUiButtonConfig>(customButtonConfig)
 
-  const [activeTheme, setActiveTheme] = useState<MakUiThemeVariants>(
-    uiDefaultThemePaletteInput[detectedSystemTheme] as MakUiThemeVariants
-  )
+  const [activeTheme, setActiveTheme] = useState<MakUiActiveThemePalette>({
+    ...uiDefaultThemePaletteInput[detectedSystemTheme],
+    text: uiDefaultTextPaletteInput,
+  })
 
   const palettesMemo = useMemo(() => {
     console.log("UI CONTEXT palettesMemo useMemo")
@@ -98,8 +92,8 @@ export const MakUiProvider = ({
       nestedPaletteObject = defaultNestedPalette,
     } = paletteFactory({ paletteInput }) || {}
 
+    console.log(textPaletteObject)
     return {
-      buttonConfig: customButtonConfig as MakUiButtonConfig,
       colorPalette: colorPaletteObject as MakUiPalette,
       textPalette: textPaletteObject as MakUiPalette,
       borderPalette: borderPaletteObject as MakUiPalette,
@@ -110,7 +104,7 @@ export const MakUiProvider = ({
 
   useEffect(() => {
     if (detectedSystemTheme && palettesMemo.themesPalette) {
-      setActiveTheme(palettesMemo.themesPalette[detectedSystemTheme])
+      // setActiveTheme(palettesMemo.themesPalette[detectedSystemTheme])
     }
   }, [palettesMemo, defaultTheme, detectedSystemTheme])
 
@@ -118,6 +112,7 @@ export const MakUiProvider = ({
     console.log("UI CONTEXT useMemo")
     return {
       ...palettesMemo,
+      buttonConfig,
       setButtonConfig,
       systemTheme: detectedSystemTheme,
       activeTheme,

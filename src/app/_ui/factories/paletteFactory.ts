@@ -222,7 +222,8 @@ export const paletteFactory = ({
       }
       if (!textPaletteObject?.[variant]) {
         const classNames = getConstructedClassNames({
-          color: uiDefaultTextPaletteInput[variant] as Interaction,
+          color: uiDefaultTextPaletteInput?.[variant].default
+            .base as Interaction,
           state: "all",
         })
         textPaletteObject[variant] = {

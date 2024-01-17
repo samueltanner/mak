@@ -389,7 +389,8 @@ export const twColorHelper = ({
   opacity?: number | string | undefined | null
   shade?: number | string | undefined | null
 }): TWColorHelperResponse => {
-  if (!colorString) colorString = `${uiDefaultColorPaletteInput.primary}-500`
+  if (!colorString) colorString = `${uiDefaultColorPaletteInput?.primary}-500`
+
   const isAbsoluteColor =
     absoluteRegex.test(colorString) ||
     colorString === "white" ||
