@@ -4,10 +4,9 @@ import { AnimatePresence, motion } from "framer-motion"
 import { BiChevronUp } from "react-icons/bi"
 import { useMakUi } from "../context/MakUiContext"
 
-export const rootLevelBackgroundStyling = "bg-zinc-50 dark:bg-zinc-900"
+export const rootLevelBackgroundStyling = ""
 export const rootLevelMenuStyling =
-  "rounded-lg border-2 border-zinc-400 dark:border-zinc-700" +
-  rootLevelBackgroundStyling
+  "rounded-lg border-2" + rootLevelBackgroundStyling
 
 export const textThemeStyling = "text-zinc-800 dark:text-zinc-100"
 
@@ -389,7 +388,7 @@ const Dropdown = ({
       </div>
       <AnimatePresence>
         <motion.div
-          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activePalette.primary}`}
+          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activePalette.theme.secondary}`}
           variants={menuVariants}
           initial="hidden"
           animate={dropdownOpen ? "visible" : "exit"}

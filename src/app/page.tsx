@@ -6,64 +6,43 @@ import Modal, {
 } from "./_ui/components/Modal"
 import Button from "./_ui/components/Button"
 import { useState } from "react"
-import { MakUiProvider } from "./_ui/context/MakUiContext"
+import { MakUiProvider, useMakUi } from "./_ui/context/MakUiContext"
 import { Dropdown } from "./_ui/components/Dropdown"
 import { MakUiPaletteInput } from "./_ui/types/default-types"
 
-const palette: MakUiPaletteInput = {
-  primary: "mak-teal-500",
-  secondary: "teal",
-  secondaryBorder: "teal-400",
-  tertiary: "zinc-800",
-  tertiaryBorder: "zinc-600",
-  success: "blue",
-  successBorder: "blue-300",
-  danger: "red",
-  dangerBorder: "red-300",
-  primaryText: "zinc-900",
-  secondaryText: "zinc-50",
-  theme: {
-    dark: {
-      primary: "zinc-950",
-    },
-    light: {
-      primary: "zinc-50",
-    },
-  },
-}
-
 export default function Home() {
   const [modalIsOpen, setModalIsOpen] = useState(false)
+  const { activePalette } = useMakUi()
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <MakUiProvider palette={palette}>
-        <div>
-          <Dropdown icon={<span>trigger</span>}>
+      <div>
+        <Dropdown icon={<span>trigger</span>}>
+          <span className="flex h-full w-full ">
             <ul>
               <li>Element 1</li>
               <li>Element 2</li>
               <li>Element 3</li>
             </ul>
-          </Dropdown>
-          <Modal
-            isOpen={modalIsOpen}
-            onClose={() => {
-              setModalIsOpen(false)
-            }}
-          >
-            <ModalHeader>header</ModalHeader>
-            <ModalContent>content</ModalContent>
-            <ModalFooter>footer</ModalFooter>
-          </Modal>
-        </div>
-        <Button
-          onClick={() => {
-            setModalIsOpen(true)
+          </span>
+        </Dropdown>
+        <Modal
+          isOpen={modalIsOpen}
+          onClose={() => {
+            setModalIsOpen(false)
           }}
         >
-          Open Modal
-        </Button>
-      </MakUiProvider>
+          <ModalHeader>header</ModalHeader>
+          <ModalContent>content</ModalContent>
+          <ModalFooter>footer</ModalFooter>
+        </Modal>
+      </div>
+      <Button
+        onClick={() => {
+          setModalIsOpen(true)
+        }}
+      >
+        Open Modal
+      </Button>
     </main>
   )
 }

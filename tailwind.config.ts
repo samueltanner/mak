@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss"
+const plugin = require("tailwindcss/plugin")
 
 const config: Config = {
   content: [
@@ -34,24 +35,24 @@ const config: Config = {
     },
   ],
   theme: {
-    colors: {
-      mak: {
-        teal: {
-          50: "#e6f3f4",
-          100: "#e6f3f4",
-          200: "#acd6dc",
-          300: "#73bac3",
-          400: "#399eab",
-          500: "#008292",
-          600: "#006571",
-          700: "#004850",
-          800: "#002a2f",
-          900: "#000d0f",
-          950: "#000d0f",
+    extend: {
+      colors: {
+        mak: {
+          teal: {
+            50: "#e6f3f4",
+            100: "#e6f3f4",
+            200: "#acd6dc",
+            300: "#73bac3",
+            400: "#399eab",
+            500: "#008292",
+            600: "#006571",
+            700: "#004850",
+            800: "#002a2f",
+            900: "#000d0f",
+            950: "#000d0f",
+          },
         },
       },
-    },
-    extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -59,6 +60,18 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwindcss-animate"),
+    plugin(function ({ addUtilities }: any) {
+      /** @type {import('@types/tailwindcss').Utility} */
+      const utilities = {
+        ".fade-in-out": {
+          transition: "all 200ms ease-in-out",
+        },
+      }
+
+      addUtilities(utilities, ["responsive", "hover"]) // Variants
+    }),
+  ],
 }
 export default config

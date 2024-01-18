@@ -20,6 +20,7 @@ import {
   ThemeVariantInput,
   MakUiNestedPalette,
   MakUiActivePalette,
+  MakUiThemeVariantShades,
 } from "../types/default-types"
 import {
   absoluteRegex,
@@ -190,28 +191,34 @@ export const getThemeShades = ({
 
   const variants = shadesObj?.[targetThemeKey]
 
+  let themeShadesResponseObj: MakUiThemeVariantShades = {
+    ...shadesObj[targetThemeKey],
+  }
   const primaryShade =
     variants?.primary || uiDefaultThemeShades?.dark?.primary || 500
 
-  const baseDiff = primaryShade + globalDiff
-  const secondaryDiff = variants?.secondary
-    ? variants?.secondary + baseDiff
-    : 0 + globalDiff
-  const tertiaryDiff = variants?.tertiary
-    ? variants?.tertiary + baseDiff
-    : 0 + globalDiff
-  const customDiff = variants?.custom
-    ? variants?.custom + baseDiff
-    : 0 + globalDiff
+  for (const [variant, shade] of Object.entries(themeShadesResponseObj)) {
+    const diff =
+      targetThemeKey === "dark" ? primaryShade - shade : shade - primaryShade
 
-  const shadesResponseObj = {
-    primary: Math.max(50, Math.min(baseDiff, 950)),
-    secondary: Math.max(50, Math.min(secondaryDiff, 950)),
-    tertiary: Math.max(50, Math.min(tertiaryDiff, 950)),
-    custom: Math.max(50, Math.min(customDiff, 950)),
+    const absoluteShade =
+      targetThemeKey === "dark"
+        ? shade - globalDiff || diff
+        : shade + globalDiff || diff
+    const calculatedShade = Math.max(50, Math.min(absoluteShade, 950))
+
+    const normalizedShade =
+      shade > 50 && shade < 950
+        ? nearestMultiple(calculatedShade, 100)
+        : calculatedShade
+
+    themeShadesResponseObj = {
+      ...themeShadesResponseObj,
+      [variant]: normalizedShade,
+    }
   }
 
-  return shadesResponseObj
+  return themeShadesResponseObj
 }
 
 export const getShades = ({

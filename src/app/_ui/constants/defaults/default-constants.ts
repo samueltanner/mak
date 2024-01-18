@@ -567,9 +567,9 @@ export const uiDefaultThemePaletteInput: MakUiThemePalette = {
 export const uiDefaultThemeShades: ThemeShades = {
   dark: {
     primary: 950,
-    secondary: 800,
-    tertiary: 700,
-    custom: 950,
+    secondary: 900,
+    tertiary: 800,
+    custom: 700,
   },
   light: {
     primary: 50,
