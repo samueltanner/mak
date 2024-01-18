@@ -1,18 +1,8 @@
-import {
-  ButtonFieldConfig,
-  FieldType,
-  SelectFieldConfig,
-} from "../types/field-types"
-import { FormElement, FormErrors, FormObject } from "../types/form-types"
-import handleChange from "./handleChange"
-import { InputChangeEvent } from "../types/event-types"
-import React, { MemoExoticComponent, memo, useCallback, useEffect } from "react"
+import { ButtonFieldConfig, SelectFieldConfig } from "../types/field-types";
 import DynamicComponent from "../DynamicComponent"
 import { FieldConfig } from "../types/field-types"
-import MemoizedDynamicComponent from "../MemoizedComponent"
 import { FormAccessor } from "../useMakForm"
 import { DynamicComponentType } from "../types/component-types"
-import { isEqual, mergeWithFallback } from "./helpers"
 
 export const getComponentName = (fieldName: string) => {
   const words = fieldName.split(/[\s-_]+/)

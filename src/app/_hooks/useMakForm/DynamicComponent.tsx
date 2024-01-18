@@ -4,7 +4,6 @@ import handleChange from "./functions/handleChange"
 import { FieldConfig, OptionType } from "./types/field-types"
 import { InputChangeEvent } from "./types/event-types"
 import { mergeWithFallback } from "./functions/helpers"
-import { getComponentName } from "./functions/componentFactory"
 
 export interface DynamicComponents {
   [key: string]: (props: { [key: string]: any }) => JSX.Element

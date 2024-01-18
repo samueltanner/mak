@@ -7,7 +7,6 @@ import {
   SelectFieldConfig,
   TextFieldConfig,
 } from "../types/field-types"
-import { FormErrors, FormObject } from "../types/form-types"
 import { FormAccessor } from "../useMakForm"
 import handleChange from "./handleChange"
 

@@ -1,7 +1,7 @@
 "use client"
 import { constructDynamicComponents } from "./functions/componentFactory"
 import constructForm from "./functions/constructForm"
-import { constructInputElements } from "./functions/inputElemntFactory"
+import { constructInputElements } from "./functions/inputElementFactory"
 import { isEqual } from "./functions/helpers"
 import { FormErrors, FormObject } from "./types/form-types"
 import { useCallback, useEffect, useRef, useState } from "react"

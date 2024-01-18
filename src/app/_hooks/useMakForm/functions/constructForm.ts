@@ -1,9 +1,9 @@
 import { SelectFieldConfig } from "../types/field-types"
-import { FormErrors, FormObject, FormElement } from "../types/form-types"
+import { FormObject, FormElement } from "../types/form-types"
 import { FormAccessor } from "../useMakForm"
 
 import componentFactory from "./componentFactory"
-import inputElementFactory from "./inputElemntFactory"
+import inputElementFactory from "./inputElementFactory"
 
 const constructForm = (formAccessor: FormAccessor): FormObject => {
   const { form, setForm, setFormErrors } = formAccessor

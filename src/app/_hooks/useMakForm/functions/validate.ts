@@ -1,6 +1,5 @@
 import { SelectFieldConfig, TextFieldConfig } from "../types/field-types"
-import { FormErrors } from "../types/form-types"
-import { FormObject } from "../useMaakForm"
+import { FormErrors, FormObject } from "../types/form-types"
 
 const validateField = ({
   fieldName,

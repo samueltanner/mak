@@ -1,4 +1,3 @@
-import { HTMLInputTypeAttribute } from "react"
 import { FieldConfig, ValueOptions, FieldType, OptionType } from "./field-types"
 
 export interface FormType {

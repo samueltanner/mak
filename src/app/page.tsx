@@ -9,7 +9,7 @@ import { useState } from "react"
 import { MakUiProvider, useMakUi } from "./_hooks/useMakUi/context/MakUiContext"
 import { Dropdown } from "./_hooks/useMakUi/components/Dropdown"
 import { MakUiPaletteInput } from "./_hooks/useMakUi/types/default-types"
-import useMakForm from "./_hooks/useMaakForm/useMakForm"
+import useMakForm from "./_hooks/useMakForm/useMakForm"
 
 const formConfig = {
   first_name: {
