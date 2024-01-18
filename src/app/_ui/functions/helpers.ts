@@ -18,6 +18,8 @@ import {
   ThemeInput,
   ThemeShades,
   ThemeVariantInput,
+  MakUiNestedPalette,
+  MakUiActivePalette,
 } from "../types/default-types"
 import {
   absoluteRegex,
@@ -50,9 +52,11 @@ export const isNestedObject = (obj: GenericObject) =>
 export const constructTailwindObject = ({
   hex,
   step = 50,
+  includeNearAbsolutes = true,
 }: {
   hex: string
   step?: number
+  includeNearAbsolutes?: boolean
 }): Record<number, string> => {
   const tailwindColors: Record<number, string> = {}
 
@@ -61,8 +65,8 @@ export const constructTailwindObject = ({
 
   const colorScale = chroma.scale([lightestColor, hex, darkestColor])
 
-  const start = 100 - step
-  const end = 900 + step
+  const start = 100 - step || step
+  const end = 900
   const totalSteps = (end - start) / step
 
   for (let i = start; i <= end; i += step) {
@@ -70,6 +74,12 @@ export const constructTailwindObject = ({
     tailwindColors[i] = colorScale(scalePosition).hex()
   }
 
+  if (includeNearAbsolutes) {
+    tailwindColors[50] = lightestColor.hex()
+    tailwindColors[950] = darkestColor.hex()
+  }
+
+  console.log(`Color Family for ${hex}`, { tailwindColors })
   return tailwindColors
 }
 
@@ -573,7 +583,9 @@ export const getColorContrast = (colorA: string, colorB: string) => {
   return chroma.contrast(colorA, colorB)
 }
 
-export const getActiveThemeTextPalette = (
-  theme: MakUiTheme,
-  textPalette: MakUiPalette
-) => {}
+export const getOptimizedPalette = (
+  palette: MakUiActivePalette
+): MakUiActivePalette => {
+  console.log("palette", palette)
+  return palette
+}

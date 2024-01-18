@@ -46,9 +46,11 @@ export type ThemeShades = {
   [Key in MakUiTheme]: MakUiThemeVariantShades
 }
 
-export type MakUiActiveThemePalette = {
-  theme: MakUiThemeVariantShades
+export type MakUiActivePalette = {
+  theme: MakUiThemeVariants
   text: MakUiPalette
+  border: MakUiPalette
+  color: MakUiPalette
 }
 
 export type MakUiInteractionOutput = Interaction | RootInteraction

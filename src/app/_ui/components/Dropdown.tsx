@@ -207,7 +207,7 @@ const Dropdown = ({
     top: 0,
     right: 0,
   })
-  const { palette, activeTheme } = useMakUi()
+  const { palette, activePalette } = useMakUi()
   const { text } = palette
 
   if (!labelLeft && !labelRight) {
@@ -389,7 +389,7 @@ const Dropdown = ({
       </div>
       <AnimatePresence>
         <motion.div
-          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activeTheme.primary}`}
+          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activePalette.primary}`}
           variants={menuVariants}
           initial="hidden"
           animate={dropdownOpen ? "visible" : "exit"}

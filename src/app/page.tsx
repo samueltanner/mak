@@ -11,7 +11,7 @@ import { Dropdown } from "./_ui/components/Dropdown"
 import { MakUiPaletteInput } from "./_ui/types/default-types"
 
 const palette: MakUiPaletteInput = {
-  primary: "mak-teal",
+  primary: "mak-teal-500",
   secondary: "teal",
   secondaryBorder: "teal-400",
   tertiary: "zinc-800",
