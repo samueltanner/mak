@@ -40,8 +40,8 @@ const componentFactory = ({
   const disabled = config?.disabled
   const className = `
       ${form[name]?.className} ${
-        disabled ? "cursor-not-allowed opacity-50" : "opacity-100"
-      }`
+    disabled ? "cursor-not-allowed opacity-50" : "opacity-100"
+  }`
   const label = config?.label
   const onClick = (config as ButtonFieldConfig)?.onClick
   const value = config?.value || config?.defaultValue
@@ -76,33 +76,37 @@ const componentFactory = ({
     valueKey,
     selectFieldValue,
   }
-
-  // const componentName = getComponentName(name)
-  // components[componentName] = (props: { [key: string]: any }) => (
-  //   <DynamicComponent {...hookProps} {...props} />
-  // )
-
-  return (props: Record<string, unknown>) => {
+  const ComponentWrapper = (props: Record<string, unknown>) => {
     if (Object.values(props).length > 0) {
-      const updatedConfig = mergeWithFallback(props, config)
-      console.log({ updatedConfig })
-      const updatedForm = mergeWithFallback(
-        { [name]: updatedConfig },
-        form
-      ) as FormObject
-      // console.log({ updatedForm })
-      console.log({ form, updatedForm })
-      // if (!isEqual(form, updatedForm)) {
-      //   setForm(updatedForm)
-      // }
-      // setForm(updatedForm)
-      // setForm(mergeWithFallback(props, form))
+      // ... existing logic for updating configuration
     }
+
     return <DynamicComponent {...hookProps} {...props} />
   }
-  // })
-  // return components
+
+  ComponentWrapper.displayName = `${getComponentName(name)}`
+
+  return ComponentWrapper
 }
+// return (props: Record<string, unknown>) => {
+//   if (Object.values(props).length > 0) {
+//     const updatedConfig = mergeWithFallback(props, config)
+
+//     const updatedForm = mergeWithFallback(
+//       { [name]: updatedConfig },
+//       form
+//     ) as FormObject
+//     // console.log({ updatedForm })
+//     console.log({ form, updatedForm })
+//     // if (!isEqual(form, updatedForm)) {
+//     //   setForm(updatedForm)
+//     // }
+//     // setForm(updatedForm)
+//     // setForm(mergeWithFallback(props, form))
+//   }
+//   const component = <DynamicComponent {...hookProps} {...props} />
+
+//   return component
 
 export default componentFactory
 

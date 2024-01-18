@@ -36,7 +36,7 @@ import {
   uiThemes,
 } from "../constants/defaults/default-constants"
 import colors from "tailwindcss/colors"
-import twConfig from "../../../../tailwind.config"
+import twConfig from "../../../../../tailwind.config"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>

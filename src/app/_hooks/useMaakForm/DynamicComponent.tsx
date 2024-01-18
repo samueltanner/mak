@@ -1,10 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react"
+import React, { useState } from "react"
 
 import handleChange from "./functions/handleChange"
 import { FieldConfig, OptionType } from "./types/field-types"
-import { FormElement } from "./types/form-types"
 import { InputChangeEvent } from "./types/event-types"
 import { mergeWithFallback } from "./functions/helpers"
+import { getComponentName } from "./functions/componentFactory"
 
 export interface DynamicComponents {
   [key: string]: (props: { [key: string]: any }) => JSX.Element
@@ -106,7 +106,6 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         className={className}
         value={localValue}
         defaultValue={defaultValue || ""}
-        placeholder={placeholder}
       >
         {placeholder && (
           <option value="" disabled>

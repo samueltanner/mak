@@ -3,19 +3,54 @@ import Modal, {
   ModalContent,
   ModalFooter,
   ModalHeader,
-} from "./_ui/components/Modal"
-import Button from "./_ui/components/Button"
+} from "./_hooks/useMakUi/components/Modal"
+import Button from "./_hooks/useMakUi/components/Button"
 import { useState } from "react"
-import { MakUiProvider, useMakUi } from "./_ui/context/MakUiContext"
-import { Dropdown } from "./_ui/components/Dropdown"
-import { MakUiPaletteInput } from "./_ui/types/default-types"
+import { MakUiProvider, useMakUi } from "./_hooks/useMakUi/context/MakUiContext"
+import { Dropdown } from "./_hooks/useMakUi/components/Dropdown"
+import { MakUiPaletteInput } from "./_hooks/useMakUi/types/default-types"
+import useMakForm from "./_hooks/useMaakForm/useMakForm"
 
+const formConfig = {
+  first_name: {
+    type: "text",
+    label: "First Name",
+    placeholder: "Enter first name",
+    required: true,
+  },
+  last_name: {
+    type: "text",
+    label: "First Name",
+    placeholder: "Enter first name",
+    required: true,
+  },
+  pick: {
+    type: "select",
+    label: "Pick",
+    placeholder: "Select pick",
+    required: true,
+    options: [
+      { label: "one", value: 1 },
+      { label: "two", value: 2 },
+      { label: "three", value: 3 },
+    ],
+  },
+}
 export default function Home() {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const { activePalette } = useMakUi()
+
+  const {
+    form,
+    components: { FirstName, Pick },
+  } = useMakForm({ formConfig })
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div>
+        <FirstName
+          className={`p-2 text-${activePalette.text.primary.default.base}`}
+        />
+        <Pick />
         <Dropdown icon={<span>trigger</span>}>
           <span className="flex h-full w-full ">
             <ul>

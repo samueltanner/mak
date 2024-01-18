@@ -359,4 +359,5 @@ const DropdownElementTrigger = ({
   )
 }
 
+DropdownElement.displayName = "DropdownElement"
 export { DropdownElement, DropdownElementTrigger }

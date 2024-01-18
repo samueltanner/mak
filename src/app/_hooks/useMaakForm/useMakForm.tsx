@@ -42,7 +42,7 @@ export const useMakForm = ({ formConfig }: useMakFormProps) => {
     setForm(newForm)
     previousFormRef.current = newForm
   }
-  console.log({ formIsCurrent })
+
   const formAccessor = {
     form,
     setForm: handleSetForm,
@@ -71,17 +71,13 @@ export const useMakForm = ({ formConfig }: useMakFormProps) => {
   )
 
   useEffect(() => {
-    console.log({ form, previousFormRef: previousFormRef.current })
-    console.log(isEqual(form, previousFormRef.current))
     if (!formConfig || isEqual(form, previousFormRef.current)) return
 
     const constructedForm = constructForm(formAccessor)
-    console.log({ constructedForm })
+
     setForm(constructedForm)
     setDynamicComponents(constructDynamicComponents(formAccessor))
     setInputElements(constructInputElements(formAccessor))
-
-    console.log({ constructedForm, dynamicComponents })
 
     previousFormRef.current = constructedForm
   }, [form, formConfig])
@@ -94,8 +90,6 @@ export const useMakForm = ({ formConfig }: useMakFormProps) => {
     components: DynamicComponents
     form: FormObject
     inputElements: { [key: string]: JSX.Element }
-
-    // Each dynamic component is a function that returns a component
   }
 }
 

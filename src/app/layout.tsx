@@ -3,8 +3,8 @@
 import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import { MakUiPaletteInput } from "./_ui/types/default-types"
-import { MakUiProvider } from "./_ui/context/MakUiContext"
+import { MakUiPaletteInput } from "./_hooks/useMakUi/types/default-types"
+import { MakUiProvider } from "./_hooks/useMakUi/context/MakUiContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
