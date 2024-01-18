@@ -169,6 +169,24 @@ export type MakUiNestedPalette = {
   theme: MakUiThemePalette
 }
 
+export type MakUiSimpleNestedPalette = {
+  color: MakUiSimplePalette
+  text: MakUiSimplePalette
+  border: MakUiSimplePalette
+  theme: MakUiSimpleThemePalette
+}
+
+export type MakUiSimpleThemeVariant = {
+  [Key in ThemeVariant]: string
+}
+
+export type MakUiSimplePalette = {
+  [Key in MakUiVariant]: string
+}
+
+export type MakUiSimpleThemePalette = {
+  [Key in MakUiTheme]: MakUiSimpleThemeVariant
+}
 export type InteractionShades = {
   [Key in Interaction]: number
 }

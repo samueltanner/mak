@@ -448,7 +448,7 @@ export const twColorHelper = ({
 
     const hex = getTwHex({
       color,
-      shade: Number(variableShade),
+      shade: variableShade,
       absolute: false,
     })
 
@@ -467,21 +467,6 @@ export const twColorHelper = ({
   }
 }
 
-export const handleTypeString = (
-  providedState: string,
-  opacityOverride?: number
-) => {
-  const hasOpacity = providedState.includes("/")
-  const color = hasOpacity ? providedState.split("/")[0] : providedState
-  const opacity = hasOpacity
-    ? providedState.split("/")[1]
-    : opacityOverride || undefined
-  return twColorHelper({
-    colorString: color,
-    opacity,
-  })
-}
-
 export const getTwHex = ({
   colorString,
   color,
@@ -489,7 +474,7 @@ export const getTwHex = ({
   absolute,
 }: {
   colorString?: string
-  shade?: number
+  shade?: number | string
   color?: string
   absolute?: boolean
 }): string => {
@@ -501,8 +486,8 @@ export const getTwHex = ({
 
   const getParsedShade = (shade: number) => {
     if (!shade) return 500
-    if (shade < 50) return 50
-    if (shade > 950) return 950
+    if (shade <= 50) return 50
+    if (shade >= 950) return 950
     const nearestMultipleOfShade = nearestMultiple(shade, 100)
     return nearestMultipleOfShade
   }
@@ -548,15 +533,17 @@ export const getTwHex = ({
     return handleAbsolute(colorString as string)
   }
 
+  if (shade && typeof shade === "string") shade = Number(shade)
+
   if (!colorString && color && shade) {
-    const parsedShade = getParsedShade(shade)
+    const parsedShade = getParsedShade(shade as number)
     const defaultColorGroup = getDefaultColorGroup(color as keyof DefaultColors)
-    const hex = getHex(defaultColorGroup, parsedShade, color, shade)
+    const hex = getHex(defaultColorGroup, parsedShade, color, shade as number)
     return hex
   }
 
   if (colorString) {
-    const { color, shade, absolute } = handleTypeString(colorString)
+    const { color, shade, absolute } = twColorHelper({ colorString })
 
     if (absolute) return handleAbsolute(color)
 
@@ -578,12 +565,15 @@ export const detectSystemTheme = () => {
 }
 
 export const getColorContrast = (colorA: string, colorB: string) => {
+  if (!colorA.includes("#")) {
+    colorA = getTwHex({
+      colorString: colorA,
+    })
+  }
+  if (!colorB.includes("#")) {
+    colorB = getTwHex({
+      colorString: colorB,
+    })
+  }
   return chroma.contrast(colorA, colorB)
-}
-
-export const getOptimizedPalette = (
-  palette: MakUiActivePalette
-): MakUiActivePalette => {
-  console.log("palette", palette)
-  return palette
 }

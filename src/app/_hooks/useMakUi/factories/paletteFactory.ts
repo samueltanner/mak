@@ -2,7 +2,6 @@ import {
   isObject,
   separatePalettes,
   getThemeShades,
-  handleTypeString,
   twColorHelper,
   getConstructedClassNames,
 } from "../functions/helpers"
@@ -15,6 +14,9 @@ import {
   MakUiVariant,
   MakUiThemePalette,
   ThemeVariant,
+  MakUiSimplePalette,
+  MakUiSimpleThemePalette,
+  MakUiSimpleNestedPalette,
 } from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
@@ -34,15 +36,19 @@ export const paletteFactory = ({
   const { colorPalette, textPalette, borderPalette, themePalette } =
     separatePalettes(paletteInput)
   let colorPaletteObject = {} as MakUiPalette
+  let simpleColorPaletteObject = {} as MakUiSimplePalette
   let textPaletteObject = {} as MakUiPalette
+  let simpleTextPaletteObject = {} as MakUiSimplePalette
   let borderPaletteObject = {} as MakUiPalette
+  let simpleBorderPaletteObject = {} as MakUiSimplePalette
   let themePaletteObject = {} as MakUiThemePalette
+  let simpleThemePaletteObject = {} as MakUiSimpleThemePalette
 
   for (const theme of uiThemes) {
     const providedVariant = themePalette?.[theme]
 
     if (typeof providedVariant === "string") {
-      const providedClassName = handleTypeString(providedVariant)
+      const providedClassName = twColorHelper({ colorString: providedVariant })
       const autoShade = providedClassName.autoShade
       const relativeThemeShades = getThemeShades({
         altBaseShade: autoShade ? undefined : providedClassName.shade,
@@ -59,6 +65,10 @@ export const paletteFactory = ({
           ...themePaletteObject[theme],
           [variant]: colorString,
           [`${variant}Root`]: rootString,
+        }
+        simpleThemePaletteObject[theme] = {
+          ...simpleThemePaletteObject[theme],
+          [variant]: rootString,
         }
       }
     }
@@ -93,9 +103,14 @@ export const paletteFactory = ({
         primaryRoot: primaryRootString,
       }
 
+      simpleThemePaletteObject[theme] = {
+        ...simpleThemePaletteObject[theme],
+        primary: primaryRootString,
+      }
+
       remainingVariants.forEach((variant) => {
         const variantColor = providedVariant?.[variant]
-          ? handleTypeString(providedVariant[variant]!)
+          ? twColorHelper({ colorString: providedVariant[variant]! })
           : undefined
         const {
           colorString: variantColorString,
@@ -109,6 +124,11 @@ export const paletteFactory = ({
           ...themePaletteObject[theme],
           [variant]: variantColorString,
           [`${variant}Root`]: variantRootString,
+        }
+
+        simpleThemePaletteObject[theme] = {
+          ...simpleThemePaletteObject[theme],
+          [variant]: variantRootString,
         }
       })
     }
@@ -137,6 +157,11 @@ export const paletteFactory = ({
           [shade]: colorString,
           [`${shade}Root`]: rootString,
         }
+
+        simpleThemePaletteObject[theme] = {
+          ...simpleThemePaletteObject[theme],
+          [shade]: rootString,
+        }
       }
     }
   }
@@ -161,11 +186,24 @@ export const paletteFactory = ({
           ? borderPaletteObject
           : colorPaletteObject
 
+      const targetSimplePaletteObject =
+        uiVariant === "color"
+          ? simpleColorPaletteObject
+          : uiVariant === "text"
+          ? simpleTextPaletteObject
+          : uiVariant === "border"
+          ? simpleBorderPaletteObject
+          : simpleColorPaletteObject
+
       const providedVariant = targetPalette?.[variant]
 
       if (typeof providedVariant === "string") {
-        const { colorString: variantColorString } =
-          handleTypeString(providedVariant)
+        const {
+          colorString: variantColorString,
+          rootString: variantRootString,
+        } = twColorHelper({
+          colorString: providedVariant,
+        })
         const classNames = getConstructedClassNames({
           color: variantColorString,
           state: "all",
@@ -175,6 +213,8 @@ export const paletteFactory = ({
           ...targetPaletteObject[variant],
           ...classNames,
         }
+
+        targetSimplePaletteObject[variant] = variantRootString
       }
 
       for (const state of uiStates) {
@@ -182,8 +222,12 @@ export const paletteFactory = ({
         const providedState = providedVariant?.[state as keyof MakUiVariant]
 
         if (typeof providedState === "string") {
-          const { colorString: variantColorString } =
-            handleTypeString(providedState)
+          const {
+            colorString: variantColorString,
+            rootString: variantRootString,
+          } = twColorHelper({
+            colorString: providedState,
+          })
           const classNames = getConstructedClassNames({
             color: variantColorString,
             state: "all",
@@ -192,6 +236,7 @@ export const paletteFactory = ({
             ...targetPaletteObject[variant],
             ...classNames,
           }
+          targetSimplePaletteObject[variant] = variantRootString
         } else if (isObject(providedState)) {
           const classNames = getConstructedClassNames({
             interactions: colorPalette?.[variant] as MakUiStates,
@@ -202,6 +247,8 @@ export const paletteFactory = ({
             ...targetPaletteObject[variant],
             ...classNames,
           }
+
+          targetSimplePaletteObject[variant] = classNames.default.baseRoot
         }
       }
       if (!colorPaletteObject?.[variant]) {
@@ -213,22 +260,24 @@ export const paletteFactory = ({
           ...targetPaletteObject[variant],
           ...classNames,
         }
+        simpleColorPaletteObject[variant] = classNames.default.baseRoot
       }
       if (!borderPaletteObject?.[variant]) {
         borderPaletteObject[variant] = {
           ...colorPaletteObject?.[variant],
         }
+        simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
       }
       if (!textPaletteObject?.[variant]) {
         const classNames = getConstructedClassNames({
-          color: uiDefaultTextPaletteInput?.[variant].default
-            .base as Interaction,
+          color: uiDefaultTextPaletteInput?.[variant] as Interaction,
           state: "all",
         })
         textPaletteObject[variant] = {
           ...targetPaletteObject[variant],
           ...classNames,
         }
+        simpleTextPaletteObject[variant] = classNames.default.baseRoot
       }
     }
   }
@@ -240,11 +289,23 @@ export const paletteFactory = ({
     theme: themePaletteObject,
   }
 
+  const simpleNestedPaletteObject: MakUiSimpleNestedPalette = {
+    color: simpleColorPaletteObject,
+    text: simpleTextPaletteObject,
+    border: simpleBorderPaletteObject,
+    theme: simpleThemePaletteObject,
+  }
+
   return {
     colorPaletteObject,
+    simpleColorPaletteObject,
     textPaletteObject,
+    simpleTextPaletteObject,
     borderPaletteObject,
+    simpleBorderPaletteObject,
     themePaletteObject,
+    simpleThemePaletteObject,
     nestedPaletteObject,
+    simpleNestedPaletteObject,
   }
 }

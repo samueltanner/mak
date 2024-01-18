@@ -23,7 +23,8 @@ const palette: MakUiPaletteInput = {
   danger: "red",
   dangerBorder: "red-300",
   primaryText: "zinc-900",
-  secondaryText: "zinc-50",
+  secondaryText: "blue-50",
+  warningText: "red-500",
   theme: {
     dark: {
       primary: "zinc-950",

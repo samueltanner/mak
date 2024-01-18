@@ -7,24 +7,22 @@ import {
   MakUiActivePalette,
   MakUiTheme,
   MakUiThemePalette,
-  MakUiThemeVariants,
+  MakUiSimpleNestedPalette,
+  MakUiSimplePalette,
+  MakUiSimpleThemePalette,
 } from "../types/default-types"
 import {
   uiDefaultBorderPaletteInput,
   uiDefaultColorPaletteInput,
+  uiDefaultSimplColorPalette,
+  uiDefaultSimpleBorderPalette,
+  uiDefaultSimpleTextPalette,
+  uiDefaultSimpleThemePalette,
   uiDefaultTextPaletteInput,
   uiDefaultThemePaletteInput,
 } from "../constants/defaults/default-constants"
-
 import { MakUiButtonConfig } from "../types/button-types"
-import {} from "../types/theme-types"
-import {
-  constructTailwindObject,
-  detectSystemTheme,
-  getColorContrast,
-  getOptimizedPalette,
-  twColorHelper,
-} from "../functions/helpers"
+import { detectSystemTheme } from "../functions/helpers"
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:
@@ -47,7 +45,6 @@ type MakUiProviderProps = {
   palette?: MakUiPaletteInput
   customButtonConfig?: MakUiButtonConfig
   defaultTheme?: MakUiTheme | "system"
-  optimize?: boolean
 }
 
 const MakUiContext = createContext<MakUiContext | undefined>(undefined)
@@ -57,7 +54,6 @@ export const MakUiProvider = ({
   palette: paletteInput = {},
   customButtonConfig,
   defaultTheme = "system",
-  optimize = false,
 }: MakUiProviderProps) => {
   if (!customButtonConfig) customButtonConfig = defaultButtonConfig
   const detectedSystemTheme: MakUiTheme =
@@ -71,20 +67,38 @@ export const MakUiProvider = ({
       theme: uiDefaultThemePaletteInput,
     }
 
+    const defaultSimpleNestedPalette: MakUiSimpleNestedPalette = {
+      color: uiDefaultSimplColorPalette,
+      text: uiDefaultSimpleTextPalette,
+      border: uiDefaultSimpleBorderPalette,
+      theme: uiDefaultSimpleThemePalette,
+    }
+
     const {
       colorPaletteObject = uiDefaultColorPaletteInput,
+      simpleColorPaletteObject = uiDefaultSimplColorPalette,
       textPaletteObject = uiDefaultTextPaletteInput,
+      simpleTextPaletteObject = uiDefaultSimpleTextPalette,
       borderPaletteObject = uiDefaultBorderPaletteInput,
+      simpleBorderPaletteObject = uiDefaultSimpleBorderPalette,
       themePaletteObject = uiDefaultThemePaletteInput,
+      simpleThemePaletteObject = uiDefaultSimpleThemePalette,
       nestedPaletteObject = defaultNestedPalette,
+      simpleNestedPaletteObject = defaultSimpleNestedPalette,
     } = paletteFactory({ paletteInput }) || {}
 
+    console.log({ nestedPaletteObject })
     return {
       colorPalette: colorPaletteObject as MakUiPalette,
+      simpleColorPalette: simpleColorPaletteObject as MakUiSimplePalette,
       textPalette: textPaletteObject as MakUiPalette,
+      simpleTextPalette: simpleTextPaletteObject as MakUiSimplePalette,
       borderPalette: borderPaletteObject as MakUiPalette,
+      simpleBorderPalette: simpleBorderPaletteObject as MakUiSimplePalette,
       themesPalette: themePaletteObject as MakUiThemePalette,
+      simpleThemesPalette: simpleThemePaletteObject as MakUiSimpleThemePalette,
       palette: nestedPaletteObject as MakUiNestedPalette,
+      simplePalette: simpleNestedPaletteObject as MakUiSimpleNestedPalette,
     }
   }, [paletteInput])
 
@@ -141,10 +155,6 @@ export const MakUiProvider = ({
       activePalette,
     }
   }, [palettesMemo, activeTheme, activePalette])
-
-  // useEffect(() => {
-  //   getOptimizedPalette(activePaletteMemo)
-  // })
 
   return <MakUiContext.Provider value={value}>{children}</MakUiContext.Provider>
 }
