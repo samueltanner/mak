@@ -5,20 +5,24 @@ import {
   MakUiPaletteInput,
   MakUiPalette,
   MakUiActiveThemePalette,
+  MakUiTheme,
+  MakUiThemePalette,
+  MakUiThemeVariants,
 } from "../types/default-types"
 import {
   uiDefaultBorderPaletteInput,
   uiDefaultColorPaletteInput,
   uiDefaultTextPaletteInput,
+  uiDefaultThemePaletteInput,
 } from "../constants/defaults/default-constants"
-import { uiDefaultThemePaletteInput } from "../constants/defaults/theme-constants"
+
 import { MakUiButtonConfig } from "../types/button-types"
+import {} from "../types/theme-types"
 import {
-  MakUiTheme,
-  MakUiThemePalette,
-  MakUiThemeVariants,
-} from "../types/theme-types"
-import { detectSystemTheme } from "../functions/helpers";
+  detectSystemTheme,
+  getColorContrast,
+  twColorHelper,
+} from "../functions/helpers"
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:
@@ -33,7 +37,7 @@ interface MakUiContext {
   textPalette: MakUiPalette
   borderPalette: MakUiPalette
   themesPalette: MakUiThemePalette
-  activeTheme: MakUiThemeVariants
+  activeTheme: MakUiActiveThemePalette
 }
 
 type ProviderProps = {
@@ -49,30 +53,20 @@ export const MakUiProvider = ({
   children,
   palette: paletteInput = {},
   customButtonConfig,
-  defaultTheme = "dark",
+  defaultTheme = "system",
 }: ProviderProps) => {
   if (!customButtonConfig) customButtonConfig = defaultButtonConfig
 
   const detectedSystemTheme: MakUiTheme =
     defaultTheme === "system" ? detectSystemTheme() : defaultTheme
 
-  // const { hex: primaryHex } = twColorHelper({
-  //   colorString:
-  //     (paletteInput?.primary as string) ||
-  //     (uiDefaultColorPaletteInput?.primary as string),
-  // })
-
-  // console.log(
-  //   "color contrast",
-  //   getColorContrast(defaultDetectedThemePrimary, defaultDetectedTextPrimary)
-  // )
   const [buttonConfig, setButtonConfig] =
     useState<MakUiButtonConfig>(customButtonConfig)
 
   const [activeTheme, setActiveTheme] = useState<MakUiActiveThemePalette>({
-    ...uiDefaultThemePaletteInput[detectedSystemTheme],
-    text: uiDefaultTextPaletteInput,
-  })
+    theme: {},
+    text: {},
+  } as MakUiActiveThemePalette)
 
   const palettesMemo = useMemo(() => {
     console.log("UI CONTEXT palettesMemo useMemo")
@@ -92,7 +86,21 @@ export const MakUiProvider = ({
       nestedPaletteObject = defaultNestedPalette,
     } = paletteFactory({ paletteInput }) || {}
 
-    console.log(textPaletteObject)
+    console.log({ textPaletteObject })
+
+    const primaryText = twColorHelper({
+      colorString: textPaletteObject.secondary.default.base,
+    }).hex
+    const primaryBackground = twColorHelper({
+      colorString: themePaletteObject.light.primary,
+    }).hex
+
+    console.log({
+      primaryText,
+      primaryBackground,
+    })
+    const contrast = getColorContrast(primaryText, primaryBackground)
+    console.log("contrast", contrast)
     return {
       colorPalette: colorPaletteObject as MakUiPalette,
       textPalette: textPaletteObject as MakUiPalette,
@@ -106,10 +114,23 @@ export const MakUiProvider = ({
     if (detectedSystemTheme && palettesMemo.themesPalette) {
       // setActiveTheme(palettesMemo.themesPalette[detectedSystemTheme])
     }
+
+    // const { hex: primaryHex } = twColorHelper({
+    //   colorString:
+    //     (paletteInput?.primary as string) ||
+    //     (uiDefaultColorPaletteInput?.primary as string),
+    // })
+
+    // console.log(
+    //   "color contrast",
+    //   getColorContrast(defaultDetectedThemePrimary, defaultDetectedTextPrimary)
+    // )
   }, [palettesMemo, defaultTheme, detectedSystemTheme])
 
   const value = useMemo(() => {
     console.log("UI CONTEXT useMemo")
+    console.log("active theme memo", activeTheme)
+
     return {
       ...palettesMemo,
       buttonConfig,

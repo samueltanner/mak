@@ -164,7 +164,7 @@ export const defaultStateShades: StateShades = {
   },
 }
 
-export const defaultThemeShades: ThemeShades = {
+export const uiDefaultThemeShades: ThemeShades = {
   darkTheme: {
     primary: 950,
     primaryRoot: 950,

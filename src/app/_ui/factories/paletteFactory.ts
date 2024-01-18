@@ -13,18 +13,17 @@ import {
   MakUiPalette,
   MakUiStates,
   MakUiVariant,
+  MakUiThemePalette,
+  ThemeVariant,
 } from "../types/default-types"
-import {
-  uiDefaultThemePaletteInput,
-  uiThemes,
-} from "../constants/defaults/theme-constants"
-import { MakUiThemePalette, ThemeVariant } from "../types/theme-types"
 import {
   uiDefaultColorPaletteInput,
   uiDefaultTextPaletteInput,
   uiPaletteVariants,
   uiStates,
   uiVariants,
+  uiDefaultThemePaletteInput,
+  uiThemes,
 } from "../constants/defaults/default-constants"
 
 export const paletteFactory = ({

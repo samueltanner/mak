@@ -36,7 +36,7 @@ export default function Home() {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <MakUiProvider palette={palette} defaultTheme="system">
+      <MakUiProvider palette={palette}>
         <div>
           <Dropdown icon={<span>trigger</span>}>
             <ul>

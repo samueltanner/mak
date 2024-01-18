@@ -1,15 +1,55 @@
-import {
-  ThemeInput,
-  MakUiThemePalette,
-  VerboseThemeVariant,
-  MakUiThemeVariants,
-} from "./theme-types"
-
 export type SimpleRecord = Record<string, any>
 
 export type Interaction = "base" | "hover" | "click"
 
 export type RootInteraction = "baseRoot" | "hoverRoot" | "clickRoot"
+
+export type MakUiTheme = "dark" | "light" | "custom"
+export type VerboseThemeVariant = "darkTheme" | "lightTheme" | "customTheme"
+
+export type ThemeVariant = "primary" | "secondary" | "tertiary" | "custom"
+
+export type ThemeRootVariant =
+  | "primaryRoot"
+  | "secondaryRoot"
+  | "tertiaryRoot"
+  | "customRoot"
+
+export type ThemeVariantOutput = ThemeVariant | ThemeRootVariant
+
+export type MakUiThemeVariants = {
+  [Key in ThemeVariantOutput]: string
+}
+
+export type MakUiThemePalette = {
+  [Key in MakUiTheme]: MakUiThemeVariants
+}
+
+export type ThemeVariantInput =
+  | string
+  | {
+      primary: string
+      secondary?: string
+      tertiary?: string
+      custom?: string
+    }
+
+export type ThemeInput = {
+  [Key in MakUiTheme]?: string | ThemeVariantInput
+}
+
+export type MakUiThemeVariantShades = {
+  [Key in ThemeVariant]: number
+}
+
+export type ThemeShades = {
+  [Key in MakUiTheme]: MakUiThemeVariantShades
+}
+
+export type MakUiActiveThemePalette = {
+  theme: MakUiThemeVariantShades
+  text: MakUiPalette
+}
 
 export type MakUiInteractionOutput = Interaction | RootInteraction
 
@@ -119,10 +159,6 @@ export type NestedPaletteInput = {
 }
 
 export type MakUiPaletteInput = VerbosePaletteInput & NestedPaletteInput
-
-export type MakUiActiveThemePalette = MakUiThemeVariants & {
-  text: MakUiPalette
-}
 
 export type MakUiNestedPalette = {
   color: MakUiPalette

@@ -2,17 +2,6 @@ type GenericObject = Record<string, any>
 import chroma from "chroma-js"
 
 import {
-  MakUiTheme,
-  ThemeInput,
-  ThemeShades,
-  ThemeVariantInput,
-} from "../types/theme-types"
-import {
-  defaultThemeShades,
-  uiDefaultThemePaletteInput,
-  uiThemes,
-} from "../constants/defaults/theme-constants"
-import {
   MakUiInteractions,
   NestedPaletteInput,
   MakUiPaletteInput,
@@ -25,6 +14,10 @@ import {
   MakUiVariants,
   MakUiPalette,
   SimpleRecord,
+  MakUiTheme,
+  ThemeInput,
+  ThemeShades,
+  ThemeVariantInput,
 } from "../types/default-types"
 import {
   absoluteRegex,
@@ -35,10 +28,12 @@ import {
   uiInteractions,
   uiStates,
   uiVariants,
+  uiDefaultThemeShades,
+  uiDefaultThemePaletteInput,
+  uiThemes,
 } from "../constants/defaults/default-constants"
 import colors from "tailwindcss/colors"
 import twConfig from "../../../../tailwind.config"
-import { root } from "postcss"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
@@ -173,7 +168,7 @@ export const getThemeShades = ({
   defaultTheme?: MakUiTheme
 }) => {
   const shadesObj =
-    (altDiffs as ThemeShades) || (defaultThemeShades as ThemeShades)
+    (altDiffs as ThemeShades) || (uiDefaultThemeShades as ThemeShades)
   const targetThemeKey = defaultTheme || "dark"
 
   const originalDefaultBaseShade = shadesObj?.[targetThemeKey]?.primary
@@ -186,7 +181,7 @@ export const getThemeShades = ({
   const variants = shadesObj?.[targetThemeKey]
 
   const primaryShade =
-    variants?.primary || defaultThemeShades?.dark?.primary || 500
+    variants?.primary || uiDefaultThemeShades?.dark?.primary || 500
 
   const baseDiff = primaryShade + globalDiff
   const secondaryDiff = variants?.secondary
@@ -575,9 +570,7 @@ export const detectSystemTheme = () => {
 }
 
 export const getColorContrast = (colorA: string, colorB: string) => {
-  const colorAContrast = chroma.contrast(colorA, "white")
-  const colorBContrast = chroma.contrast(colorB, "white")
-  return colorAContrast > colorBContrast ? colorA : colorB
+  return chroma.contrast(colorA, colorB)
 }
 
 export const getActiveThemeTextPalette = (
