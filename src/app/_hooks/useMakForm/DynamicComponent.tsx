@@ -97,7 +97,6 @@ const DynamicComponent = (props: DynamicComponentProps) => {
   }
 
   if (type === "select") {
-    console.log("default", placeholder)
     return (
       <select
         onChange={handleLocalChange}
