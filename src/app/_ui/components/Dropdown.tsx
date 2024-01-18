@@ -388,7 +388,7 @@ const Dropdown = ({
       </div>
       <AnimatePresence>
         <motion.div
-          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activePalette.theme.secondary}`}
+          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activePalette?.theme?.secondary}`}
           variants={menuVariants}
           initial="hidden"
           animate={dropdownOpen ? "visible" : "exit"}

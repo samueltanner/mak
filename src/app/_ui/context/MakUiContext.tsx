@@ -60,12 +60,8 @@ export const MakUiProvider = ({
   optimize = false,
 }: MakUiProviderProps) => {
   if (!customButtonConfig) customButtonConfig = defaultButtonConfig
-
   const detectedSystemTheme: MakUiTheme =
     defaultTheme === "system" ? detectSystemTheme() : defaultTheme
-
-  const [buttonConfig, setButtonConfig] =
-    useState<MakUiButtonConfig>(customButtonConfig)
 
   const palettesMemo = useMemo(() => {
     const defaultNestedPalette = {
@@ -92,15 +88,49 @@ export const MakUiProvider = ({
     }
   }, [paletteInput])
 
-  const activePaletteMemo = useMemo(() => {
+  const handleThemeChange = () => {
     const { theme, text, border, color } = palettesMemo.palette
     return {
-      theme: theme[detectedSystemTheme],
+      theme: theme[activeTheme],
       text,
       border,
       color,
     }
-  }, [palettesMemo, defaultTheme, detectedSystemTheme])
+  }
+
+  const [activeTheme, setActiveTheme] = useState<MakUiTheme>("dark")
+  const [activePalette, setActivePalette] = useState<MakUiActivePalette>(
+    handleThemeChange()
+  )
+
+  const [buttonConfig, setButtonConfig] =
+    useState<MakUiButtonConfig>(customButtonConfig)
+
+  useEffect(() => {
+    setActivePalette(handleThemeChange())
+  }, [activeTheme])
+
+  useEffect(() => {
+    const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+
+    const handleDarkModeChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setActiveTheme("dark")
+      } else {
+        setActiveTheme("light")
+      }
+    }
+
+    darkModeMediaQuery.addEventListener("change", handleDarkModeChange)
+
+    handleDarkModeChange({
+      matches: darkModeMediaQuery.matches,
+    } as MediaQueryListEvent)
+
+    return () => {
+      darkModeMediaQuery.removeEventListener("change", handleDarkModeChange)
+    }
+  }, [])
 
   const value = useMemo(() => {
     return {
@@ -108,13 +138,13 @@ export const MakUiProvider = ({
       buttonConfig,
       setButtonConfig,
       systemTheme: detectedSystemTheme,
-      activePalette: activePaletteMemo,
+      activePalette,
     }
-  }, [palettesMemo, detectedSystemTheme, activePaletteMemo])
+  }, [palettesMemo, activeTheme, activePalette])
 
-  useEffect(() => {
-    getOptimizedPalette(activePaletteMemo)
-  })
+  // useEffect(() => {
+  //   getOptimizedPalette(activePaletteMemo)
+  // })
 
   return <MakUiContext.Provider value={value}>{children}</MakUiContext.Provider>
 }

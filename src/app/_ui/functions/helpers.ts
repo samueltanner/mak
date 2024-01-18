@@ -184,38 +184,29 @@ export const getThemeShades = ({
 
   const originalDefaultBaseShade = shadesObj?.[targetThemeKey]?.primary
   const baseDefaultShade = altBaseShade || originalDefaultBaseShade
-  const globalDiff =
-    baseDefaultShade === originalDefaultBaseShade
-      ? 0
-      : baseDefaultShade - originalDefaultBaseShade
+  const secondaryShade = shadesObj?.[targetThemeKey]?.secondary
+  const tertiaryShade = shadesObj?.[targetThemeKey]?.tertiary
+  const customShade = shadesObj?.[targetThemeKey]?.custom
+  const shadeDiffs: { [key: string]: number } = {
+    primary: 0,
+    secondary: secondaryShade - originalDefaultBaseShade,
+    tertiary: tertiaryShade - originalDefaultBaseShade,
+    custom: customShade - originalDefaultBaseShade,
+  }
 
   const variants = shadesObj?.[targetThemeKey]
+
+  const primaryShade =
+    variants?.primary || uiDefaultThemeShades?.dark?.primary || 500
 
   let themeShadesResponseObj: MakUiThemeVariantShades = {
     ...shadesObj[targetThemeKey],
   }
-  const primaryShade =
-    variants?.primary || uiDefaultThemeShades?.dark?.primary || 500
-
-  for (const [variant, shade] of Object.entries(themeShadesResponseObj)) {
-    const diff =
-      targetThemeKey === "dark" ? primaryShade - shade : shade - primaryShade
-
-    const absoluteShade =
-      targetThemeKey === "dark"
-        ? shade - globalDiff || diff
-        : shade + globalDiff || diff
-    const calculatedShade = Math.max(50, Math.min(absoluteShade, 950))
-
-    const normalizedShade =
-      shade > 50 && shade < 950
-        ? nearestMultiple(calculatedShade, 100)
-        : calculatedShade
-
-    themeShadesResponseObj = {
-      ...themeShadesResponseObj,
-      [variant]: normalizedShade,
-    }
+  for (const variant of Object.keys(themeShadesResponseObj)) {
+    if (variant === "primary") continue
+    const adjustedShade = primaryShade + shadeDiffs[variant]
+    themeShadesResponseObj[variant as keyof MakUiThemeVariantShades] =
+      adjustedShade
   }
 
   return themeShadesResponseObj
