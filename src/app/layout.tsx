@@ -29,7 +29,7 @@ const palette: MakUiPaletteInput = {
       primary: "zinc-950",
     },
     light: {
-      primary: "zinc-300",
+      primary: "zinc-50",
     },
   },
 }
