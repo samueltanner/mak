@@ -8,6 +8,8 @@ import {
   MakUiPaletteInput,
 } from "./_hooks/useMakUi/types/default-types"
 import { MakUiProvider } from "./_hooks/useMakUi/context/MakUiContext"
+import { ThemeProvider } from "next-themes"
+import { uiThemes } from "./_hooks/useMakUi/constants/defaults/default-constants"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,8 +27,8 @@ const palette: MakUiPaletteInput = {
   successBorder: "blue-300",
   danger: "red",
   dangerBorder: "red-300",
-  primaryText: "zinc-900",
-  secondaryText: "blue-50",
+  primaryText: "zinc-900 dark:zinc-50",
+  secondaryText: "blue-50 dark:blue-700",
   warningText: "red-50",
   theme: {
     dark: "zinc-950",
@@ -49,9 +51,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <MakUiProvider palette={palette} componentConfig={componentConfig}>
-          {children}
-        </MakUiProvider>
+        <ThemeProvider
+          storageKey="mak-ui-theme"
+          enableSystem={false}
+          themes={uiThemes}
+        >
+          <MakUiProvider palette={palette} componentConfig={componentConfig}>
+            {children}
+          </MakUiProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

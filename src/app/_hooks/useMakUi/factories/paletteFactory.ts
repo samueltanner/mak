@@ -8,6 +8,8 @@ import {
   deepMerge,
   isEmptyObject,
   ensureNestedObject,
+  separateObjectByKey,
+  splitKeyAtChar,
 } from "../functions/helpers"
 import {
   MakUiInteraction,
@@ -391,46 +393,58 @@ export const paletteFactory = ({
         const darkVariant = targetPaletteObject[variant]
         const customVariant = targetPaletteObject[variant]
 
-        ensureNestedObject({
-          parent: paletteThemesObject.light,
-          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
-          value: lightVariant,
+        const { light, dark, custom } = separateObjectByKey({
+          obj: targetPaletteObject[variant][state],
+          keys: ["Dark", "Custom"],
+          fallbackKey: "Light",
         })
 
         ensureNestedObject({
           parent: paletteThemesObject.light,
-          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
-          value: lightVariant,
+          keys: [
+            themeVariant,
+            variant as keyof MakUiVerboseTheme,
+            state as keyof MakUiVerboseTheme,
+          ],
+          value: light,
         })
 
         ensureNestedObject({
           parent: paletteThemesObject.dark,
-          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
-          value: darkVariant,
+          keys: [
+            themeVariant,
+            variant as keyof MakUiVerboseTheme,
+            state as keyof MakUiVerboseTheme,
+          ],
+          value: splitKeyAtChar(dark, "D"),
         })
 
         ensureNestedObject({
           parent: paletteThemesObject.custom,
-          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
-          value: customVariant,
+          keys: [
+            themeVariant,
+            variant as keyof MakUiVerboseTheme,
+            state as keyof MakUiVerboseTheme,
+          ],
+          value: splitKeyAtChar(custom, "C"),
         })
 
         ensureNestedObject({
           parent: simplePaletteThemesObject.light,
           keys: [themeVariant, variant as keyof MakUiSimpleTheme],
-          value: lightVariant.default.baseRoot,
+          value: light.baseRoot,
         })
 
         ensureNestedObject({
           parent: simplePaletteThemesObject.dark,
-          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
-          value: darkVariant.default.baseRootDark,
+          keys: [themeVariant, variant as keyof MakUiSimpleTheme],
+          value: dark.baseRootDark,
         })
 
         ensureNestedObject({
           parent: simplePaletteThemesObject.custom,
           keys: [themeVariant, variant as keyof MakUiVerboseTheme],
-          value: customVariant.default.baseRootCustom,
+          value: custom.baseRootCustom,
         })
       }
     }

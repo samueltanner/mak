@@ -2,7 +2,11 @@
 import { forwardRef, useEffect, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
 import { useMakUi } from "../context/MakUiContext"
-import { MakUiState, MakUiVariant, MakUiVerboseTheme } from "../types/default-types";
+import {
+  MakUiState,
+  MakUiVariant,
+  MakUiVerboseTheme,
+} from "../types/default-types"
 import { MakUiButtonConfig } from "../types/button-types"
 
 interface ButtonProps {
@@ -94,7 +98,7 @@ const buttonClassName = ({
   customClassName,
   customTextClassName,
   buttonConfig,
-  palette,
+  theme,
   showFocusRing = true,
 }: {
   text: boolean
@@ -108,13 +112,13 @@ const buttonClassName = ({
   customClassName?: string
   customTextClassName?: string
   buttonConfig: MakUiButtonConfig
-  palette: MakUiVerboseTheme
+  theme: MakUiVerboseTheme
   showFocusRing?: boolean
 }) => {
-  const textPalette = palette.text
-  const colorPalette = palette.color
-  const borderPalette = palette.border
-  const themePalette = palette.theme
+  const textPalette = theme.text
+  const colorPalette = theme.color
+  const borderPalette = theme.border
+  const themePalette = theme.theme
 
   const {
     state: buttonState,
@@ -313,7 +317,7 @@ const Button = forwardRef(
       customClassName: className,
       customTextClassName: textClassName,
       buttonConfig,
-      palette: t,
+      theme: t,
     })
 
     const handleClick = () => {

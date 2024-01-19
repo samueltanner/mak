@@ -11,6 +11,8 @@ import {
   MakUiComponentConfig,
 } from "../types/default-types"
 import { MakUiButtonConfig } from "../types/button-types"
+import { useTheme } from "next-themes"
+import { detectSystemTheme, isEmptyObject } from "../functions/helpers"
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:
@@ -33,19 +35,21 @@ interface MakUiContext {
   sd: MakUiSimpleTheme
   sl: MakUiSimpleTheme
   sc: MakUiSimpleTheme
-  themeMode: MakUiThemeMode
-  setThemeMode: (mode: MakUiThemeMode) => void
+  themeMode: string | undefined
+  setThemeMode: (themeMode: string) => void
   theme: MakUiVerboseTheme
   t: MakUiVerboseTheme
   simpleTheme: MakUiSimpleTheme
   s: MakUiSimpleTheme
+  formattingThemes: boolean
 }
 
 type MakUiProviderProps = {
   children: React.ReactNode
   palette?: MakUiPaletteInput
-  defaultTheme?: MakUiThemeMode | "system"
   componentConfig?: MakUiComponentConfig
+  enableSystem?: boolean
+  defaultTheme?: MakUiThemeMode
 }
 
 const MakUiContext = createContext<MakUiContext | undefined>(undefined)
@@ -53,35 +57,46 @@ const MakUiContext = createContext<MakUiContext | undefined>(undefined)
 export const MakUiProvider = ({
   children,
   palette: paletteInput = {},
-  defaultTheme = "dark",
   componentConfig,
+  enableSystem = true,
+  defaultTheme = "dark",
 }: MakUiProviderProps) => {
-  let themeMode = "dark"
-  // useEffect(() => {
-  //   const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+  let { theme: themeMode, setTheme: setThemeMode } = useTheme()
 
-  //   const handleDarkModeChange = (e: MediaQueryListEvent) => {
-  //     if (e.matches) {
-  //       console.log("dark mode")
-  //       setLocalStorage("mak-ui-theme", "dark")
-  //       setThemeMode("dark")
-  //     } else {
-  //       console.log("light mode")
-  //       setLocalStorage("mak-ui-theme", "light")
-  //       setThemeMode("light")
-  //     }
-  //   }
+  useEffect(() => {
+    const localStorageTheme = localStorage.getItem("mak-ui-theme")
+    if (defaultTheme && !localStorageTheme) {
+      setThemeMode(defaultTheme)
+    }
+  }, [])
 
-  //   darkModeMediaQuery.addEventListener("change", handleDarkModeChange)
+  useEffect(() => {
+    if (!enableSystem) return
+    const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 
-  //   handleDarkModeChange({
-  //     matches: darkModeMediaQuery.matches,
-  //   } as MediaQueryListEvent)
+    const handleDarkModeChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        console.log("dark mode")
+        setThemeMode("dark")
+      } else {
+        console.log("light mode")
+        setThemeMode("light")
+      }
+    }
 
-  //   return () => {
-  //     darkModeMediaQuery.removeEventListener("change", handleDarkModeChange)
-  //   }
-  // }, [])
+    darkModeMediaQuery.addEventListener("change", handleDarkModeChange)
+
+    handleDarkModeChange({
+      matches: darkModeMediaQuery.matches,
+    } as MediaQueryListEvent)
+
+    return () => {
+      darkModeMediaQuery.removeEventListener("change", handleDarkModeChange)
+    }
+  }, [])
+
+  let currentTheme: MakUiThemeMode =
+    (themeMode as MakUiThemeMode | undefined) || defaultTheme
 
   const palettesMemo = useMemo(() => {
     const { paletteThemesObject, simplePaletteThemesObject } =
@@ -105,34 +120,47 @@ export const MakUiProvider = ({
   }, [paletteInput])
 
   const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>(
-    palettesMemo.sp[themeMode]
+    {} as MakUiSimpleTheme
   )
   const [verboseTheme, setVerboseTheme] = useState<MakUiVerboseTheme>(
-    palettesMemo.p[themeMode]
+    {} as MakUiVerboseTheme
   )
 
   const [buttonConfig, setButtonConfig] = useState<MakUiButtonConfig>(
     componentConfig?.buttonConfig || defaultButtonConfig
   )
 
+  const formattingThemes =
+    isEmptyObject(simpleTheme) ||
+    isEmptyObject(verboseTheme) ||
+    !simpleTheme ||
+    !verboseTheme
+      ? true
+      : false
+
   useEffect(() => {
-    setVerboseTheme(palettesMemo.p[themeMode])
-    setSimpleTheme(palettesMemo.sp[themeMode])
-  }, [themeMode])
+    setVerboseTheme(palettesMemo.p[currentTheme])
+    setSimpleTheme(palettesMemo.sp[currentTheme])
+  }, [themeMode, currentTheme])
 
   const value = {
     ...palettesMemo,
     buttonConfig,
     setButtonConfig,
     themeMode,
-    // setThemeMode,
+    setThemeMode,
     theme: verboseTheme,
     t: verboseTheme,
     simpleTheme,
     s: simpleTheme,
+    formattingThemes,
   }
 
-  return <MakUiContext.Provider value={value}>{children}</MakUiContext.Provider>
+  return (
+    <MakUiContext.Provider value={value}>
+      {formattingThemes ? <></> : <>{children}</>}
+    </MakUiContext.Provider>
+  )
 }
 
 export const useMakUi = () => {

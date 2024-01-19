@@ -670,7 +670,6 @@ export const detectSystemTheme = () => {
   if (typeof window === "undefined") return
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
   const detectedTheme = systemTheme.matches ? "dark" : "light"
-  console.log("Detected Theme", detectedTheme)
   return detectedTheme
 }
 
@@ -732,4 +731,44 @@ export const getLocalStorage = (key: string): string | null | undefined => {
 export const removeLocalStorage = (key: string) => {
   if (typeof window === "undefined") return
   window.localStorage.removeItem(key)
+}
+
+export const separateObjectByKey = <T extends { [key: string]: any }>({
+  obj,
+  keys,
+  fallbackKey = "default",
+}: {
+  obj: T
+  keys: string[]
+  fallbackKey?: string
+}) => {
+  const responseObj = {} as { [key: string]: any }
+  const defaultObj = { ...obj }
+
+  Object.entries(obj).forEach(([k, v]) => {
+    for (const key of keys) {
+      if (k.includes(key)) {
+        if (!responseObj[key.toLowerCase()]) {
+          responseObj[key.toLowerCase()] = {}
+        }
+        responseObj[key.toLowerCase()][k] = v
+        delete defaultObj[k]
+      }
+    }
+  })
+
+  responseObj[fallbackKey.toLocaleLowerCase()] = defaultObj
+
+  return responseObj
+}
+
+export const splitKeyAtChar = (obj: GenericObject, char: string) => {
+  if (!isObject(obj)) return obj
+  if (!char) return obj
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    return {
+      ...acc,
+      [key.split(char)[0]]: value,
+    }
+  }, {})
 }
