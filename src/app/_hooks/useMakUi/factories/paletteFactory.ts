@@ -210,6 +210,51 @@ export const paletteFactory = ({
 
       const providedVariant: VariantInput | undefined = targetPalette?.[variant]
 
+      if (!colorPaletteObject?.[variant]) {
+        const classNames = getConstructedClassNames({
+          color: uiDefaultColorPaletteInput[variant] as Interaction,
+          theme: "all",
+          state: "all",
+        })
+
+        colorPaletteObject[variant] = {
+          ...targetPaletteObject[variant],
+          ...classNames,
+        }
+        // simpleColorPaletteObject[variant] = classNames.default.baseRoot
+        // simpleColorPaletteObject[`${variant}Dark`] =
+        //   classNames.default.baseRootDark
+        // simpleColorPaletteObject[`${variant}Custom`] =
+        //   classNames.default.baseRootCustom
+      }
+      if (!borderPaletteObject?.[variant]) {
+        borderPaletteObject[variant] = {
+          ...colorPaletteObject?.[variant],
+        }
+        // simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
+        // simpleBorderPaletteObject[`${variant}Dark`] =
+        //   simpleColorPaletteObject?.[`${variant}Dark`]
+        // simpleBorderPaletteObject[`${variant}Custom`] =
+        //   simpleColorPaletteObject?.[`${variant}Custom`]
+      }
+      if (!textPaletteObject?.[variant]) {
+        const classNames = getConstructedClassNames({
+          color: uiDefaultTextPaletteInput?.[variant] as Interaction,
+          state: "all",
+          theme: "all",
+        })
+
+        textPaletteObject[variant] = {
+          ...targetPaletteObject[variant],
+          ...classNames,
+        }
+        // simpleTextPaletteObject[variant] = classNames.default.baseRoot
+        // simpleTextPaletteObject[`${variant}Dark`] =
+        //   classNames.default.baseRootDark
+        // simpleTextPaletteObject[`${variant}Custom`] =
+        //   classNames.default.baseRoot
+      }
+
       if (typeof providedVariant === "string") {
         const { dark, light, custom } = handleThemes(providedVariant)
 
@@ -344,58 +389,7 @@ export const paletteFactory = ({
           //   darkClassNames.baseRoot
           // targetSimplePaletteObject[`${interaction}Custom`] =
           //   customClassNames.baseRoot
-        } else if (!providedState && !targetPaletteObject?.[variant]?.[state]) {
-          for (const interaction of uiInteractions) {
-            if (!targetPaletteObject?.[variant]?.[state]?.[interaction]) {
-              // console.log({ themeVariant, variant, state, interaction })
-            }
-          }
         }
-      }
-
-      if (!colorPaletteObject?.[variant]) {
-        const classNames = getConstructedClassNames({
-          color: uiDefaultColorPaletteInput[variant] as Interaction,
-          theme: "all",
-          state: "all",
-        })
-
-        colorPaletteObject[variant] = {
-          ...targetPaletteObject[variant],
-          ...classNames,
-        }
-        // simpleColorPaletteObject[variant] = classNames.default.baseRoot
-        // simpleColorPaletteObject[`${variant}Dark`] =
-        //   classNames.default.baseRootDark
-        // simpleColorPaletteObject[`${variant}Custom`] =
-        //   classNames.default.baseRootCustom
-      }
-      if (!borderPaletteObject?.[variant]) {
-        borderPaletteObject[variant] = {
-          ...colorPaletteObject?.[variant],
-        }
-        // simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
-        // simpleBorderPaletteObject[`${variant}Dark`] =
-        //   simpleColorPaletteObject?.[`${variant}Dark`]
-        // simpleBorderPaletteObject[`${variant}Custom`] =
-        //   simpleColorPaletteObject?.[`${variant}Custom`]
-      }
-      if (!textPaletteObject?.[variant]) {
-        const classNames = getConstructedClassNames({
-          color: uiDefaultTextPaletteInput?.[variant] as Interaction,
-          state: "all",
-          theme: "all",
-        })
-
-        textPaletteObject[variant] = {
-          ...targetPaletteObject[variant],
-          ...classNames,
-        }
-        // simpleTextPaletteObject[variant] = classNames.default.baseRoot
-        // simpleTextPaletteObject[`${variant}Dark`] =
-        //   classNames.default.baseRootDark
-        // simpleTextPaletteObject[`${variant}Custom`] =
-        //   classNames.default.baseRoot
       }
     }
   }
