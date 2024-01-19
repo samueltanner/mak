@@ -2,15 +2,7 @@
 import { forwardRef, useEffect, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
 import { useMakUi } from "../context/MakUiContext"
-import {
-  MakUiNestedPalette,
-  MakUiPalette,
-  MakUiState,
-  MakUiStates,
-  MakUiVariant,
-  MakUiVariants,
-  MakUiVerboseTheme,
-} from "../types/default-types"
+import { MakUiState, MakUiVariant, MakUiVerboseTheme } from "../types/default-types";
 import { MakUiButtonConfig } from "../types/button-types"
 
 interface ButtonProps {

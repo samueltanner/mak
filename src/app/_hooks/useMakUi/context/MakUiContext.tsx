@@ -1,11 +1,5 @@
 "use client"
-import React, {
-  createContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import React, { createContext, useEffect, useMemo, useState } from "react"
 import { paletteFactory } from "../factories/paletteFactory"
 import {
   MakUiPaletteInput,
@@ -14,16 +8,9 @@ import {
   MakUiSimpleTheme,
   MakUiVerboseTheme,
   MakUiSimplePalettes,
+  MakUiComponentConfig,
 } from "../types/default-types"
 import { MakUiButtonConfig } from "../types/button-types"
-import {
-  detectSystemTheme,
-  getLocalStorage,
-  getTheme,
-  setLocalStorage,
-} from "../functions/helpers"
-import { useTheme, ThemeProvider } from "next-themes"
-import { uiThemes } from "../constants/defaults/default-constants"
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:
@@ -57,8 +44,8 @@ interface MakUiContext {
 type MakUiProviderProps = {
   children: React.ReactNode
   palette?: MakUiPaletteInput
-  customButtonConfig?: MakUiButtonConfig
   defaultTheme?: MakUiThemeMode | "system"
+  componentConfig?: MakUiComponentConfig
 }
 
 const MakUiContext = createContext<MakUiContext | undefined>(undefined)
@@ -66,38 +53,35 @@ const MakUiContext = createContext<MakUiContext | undefined>(undefined)
 export const MakUiProvider = ({
   children,
   palette: paletteInput = {},
-  customButtonConfig,
+  defaultTheme = "dark",
+  componentConfig,
 }: MakUiProviderProps) => {
-  if (!customButtonConfig) customButtonConfig = defaultButtonConfig
-  const { theme, setTheme } = useTheme()
+  let themeMode = "dark"
+  // useEffect(() => {
+  //   const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 
-  console.log({ theme })
+  //   const handleDarkModeChange = (e: MediaQueryListEvent) => {
+  //     if (e.matches) {
+  //       console.log("dark mode")
+  //       setLocalStorage("mak-ui-theme", "dark")
+  //       setThemeMode("dark")
+  //     } else {
+  //       console.log("light mode")
+  //       setLocalStorage("mak-ui-theme", "light")
+  //       setThemeMode("light")
+  //     }
+  //   }
 
-  useEffect(() => {
-    const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+  //   darkModeMediaQuery.addEventListener("change", handleDarkModeChange)
 
-    const handleDarkModeChange = (e: MediaQueryListEvent) => {
-      if (e.matches) {
-        console.log("dark mode")
-        setThemeMode("dark")
-        // handleThemeChange("dark")
-      } else {
-        console.log("light mode")
-        setThemeMode("light")
-        // handleThemeChange("light")
-      }
-    }
+  //   handleDarkModeChange({
+  //     matches: darkModeMediaQuery.matches,
+  //   } as MediaQueryListEvent)
 
-    darkModeMediaQuery.addEventListener("change", handleDarkModeChange)
-
-    handleDarkModeChange({
-      matches: darkModeMediaQuery.matches,
-    } as MediaQueryListEvent)
-
-    return () => {
-      darkModeMediaQuery.removeEventListener("change", handleDarkModeChange)
-    }
-  }, [])
+  //   return () => {
+  //     darkModeMediaQuery.removeEventListener("change", handleDarkModeChange)
+  //   }
+  // }, [])
 
   const palettesMemo = useMemo(() => {
     const { paletteThemesObject, simplePaletteThemesObject } =
@@ -120,8 +104,6 @@ export const MakUiProvider = ({
     }
   }, [paletteInput])
 
-  const [themeMode, setThemeMode] = useState<MakUiThemeMode>("dark")
-
   const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>(
     palettesMemo.sp[themeMode]
   )
@@ -129,8 +111,9 @@ export const MakUiProvider = ({
     palettesMemo.p[themeMode]
   )
 
-  const [buttonConfig, setButtonConfig] =
-    useState<MakUiButtonConfig>(customButtonConfig)
+  const [buttonConfig, setButtonConfig] = useState<MakUiButtonConfig>(
+    componentConfig?.buttonConfig || defaultButtonConfig
+  )
 
   useEffect(() => {
     setVerboseTheme(palettesMemo.p[themeMode])
@@ -142,24 +125,14 @@ export const MakUiProvider = ({
     buttonConfig,
     setButtonConfig,
     themeMode,
-    setThemeMode,
+    // setThemeMode,
     theme: verboseTheme,
     t: verboseTheme,
     simpleTheme,
     s: simpleTheme,
   }
 
-  return (
-    <ThemeProvider
-      // storageKey="mak-ui-theme"
-      // defaultTheme="system"
-      // enableSystem={true}
-      // themes={uiThemes}
-      attribute="class"
-    >
-      <MakUiContext.Provider value={value}>{children}</MakUiContext.Provider>
-    </ThemeProvider>
-  )
+  return <MakUiContext.Provider value={value}>{children}</MakUiContext.Provider>
 }
 
 export const useMakUi = () => {

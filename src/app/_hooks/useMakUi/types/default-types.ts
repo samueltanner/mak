@@ -1,3 +1,5 @@
+import { MakUiButtonConfig } from "./button-types"
+
 export type SimpleRecord = Record<string, any>
 
 export type MakUiInteraction = "base" | "hover" | "click"
@@ -290,4 +292,8 @@ export type TWColorHelperResponse = {
   colorString: string
   rootString: string
   hex: string
+}
+
+export type MakUiComponentConfig = {
+  buttonConfig?: MakUiButtonConfig
 }
