@@ -4,8 +4,7 @@ import MakFormView from "./_views/MakFormView"
 import MakUiView from "./_views/MakUiView"
 
 export default function Home() {
-  const { activePalette, palette, theme } = useMakUi()
-  console.log(theme?.theme.primary)
+  const { palette, theme, simpleTheme } = useMakUi()
 
   console.log(theme)
   return (

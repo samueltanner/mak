@@ -17,14 +17,14 @@ import {
   MakUiStates,
   MakUiThemePalette,
   MakUiThemeVariant,
-  MakUiSimplePalette,
+  MakUiSimplePalettes,
   MakUiSimpleThemePalette,
   MakUiSimpleNestedPalette,
   MakUiInteractions,
   VariantInput,
   StateInput,
-  MakUiSimpleThemes,
-  MakUiVerboseThemes,
+  MakUiSimplePalette,
+  MakUiVerbosePalettes,
   MakUiVerboseTheme,
   MakUiSimpleTheme,
 } from "../types/default-types"
@@ -60,12 +60,12 @@ export const paletteFactory = ({
     light: {},
     dark: {},
     custom: {},
-  } as MakUiSimpleThemes
+  } as MakUiSimplePalettes
   let paletteThemesObject = {
     light: {},
     dark: {},
     custom: {},
-  } as MakUiVerboseThemes
+  } as MakUiVerbosePalettes
 
   for (const theme of uiThemes) {
     const providedVariant = themePalette?.[theme]

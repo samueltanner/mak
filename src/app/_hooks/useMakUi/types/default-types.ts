@@ -21,7 +21,7 @@ export type MakUiCustomRootInteraction =
   | "hoverRootCustom"
   | "clickRootCustom"
 
-export type MakUiTheme = "dark" | "light" | "custom"
+export type MakUiThemeMode = "dark" | "light" | "custom"
 export type VerboseThemeVariant = "darkTheme" | "lightTheme" | "customTheme"
 
 export type MakUiThemeVariant = "primary" | "secondary" | "tertiary" | "custom"
@@ -39,7 +39,7 @@ export type MakUiThemeVariants = {
 }
 
 export type MakUiThemePalette = {
-  [Key in MakUiTheme]: MakUiThemeVariants
+  [Key in MakUiThemeMode]: MakUiThemeVariants
 }
 
 export type ThemeVariantInput =
@@ -52,7 +52,7 @@ export type ThemeVariantInput =
     }
 
 export type ThemeInput = {
-  [Key in MakUiTheme]?: string | ThemeVariantInput
+  [Key in MakUiThemeMode]?: string | ThemeVariantInput
 }
 
 export type MakUiThemeVariantShades = {
@@ -60,7 +60,7 @@ export type MakUiThemeVariantShades = {
 }
 
 export type ThemeShades = {
-  [Key in MakUiTheme]: MakUiThemeVariantShades
+  [Key in MakUiThemeMode]: MakUiThemeVariantShades
 }
 
 export type MakUiActivePalette = {
@@ -233,7 +233,7 @@ export type MakUiSimplePalette = {
 }
 
 export type MakUiSimpleThemePalette = {
-  [Key in MakUiTheme]: {
+  [Key in MakUiThemeMode]: {
     [Key in MakUiThemeVariant]: string
   }
 }
@@ -249,8 +249,8 @@ export type MakUiSimpleTheme = {
   theme: MakUiSimpleThemeVariant
 }
 
-export type MakUiSimpleThemes = {
-  [Key in MakUiTheme]: MakUiSimpleTheme
+export type MakUiSimplePalettes = {
+  [Key in MakUiThemeMode]: MakUiSimpleTheme
 }
 export type MakUiSeparatedPalette = {
   [Key in MakUiVariant]: {
@@ -266,7 +266,7 @@ export type MakUiVerboseTheme = {
   theme: MakUiThemeVariants
 }
 
-export type MakUiVerboseThemes = {
+export type MakUiVerbosePalettes = {
   dark: MakUiVerboseTheme
   light: MakUiVerboseTheme
   custom: MakUiVerboseTheme

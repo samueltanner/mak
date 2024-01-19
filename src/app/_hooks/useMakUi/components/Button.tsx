@@ -9,6 +9,7 @@ import {
   MakUiStates,
   MakUiVariant,
   MakUiVariants,
+  MakUiVerboseTheme,
 } from "../types/default-types"
 import { MakUiButtonConfig } from "../types/button-types"
 
@@ -115,7 +116,7 @@ const buttonClassName = ({
   customClassName?: string
   customTextClassName?: string
   buttonConfig: MakUiButtonConfig
-  palette: MakUiNestedPalette
+  palette: MakUiVerboseTheme
   showFocusRing?: boolean
 }) => {
   const textPalette = palette.text
@@ -225,13 +226,7 @@ const Button = forwardRef(
       keepStatusVisible = false,
     } = buttonProps
 
-    const { palette, buttonConfig } = useMakUi()
-
-    // if (palette) {
-    //   throw new Error(
-    //     "Colors Conflict, please provide your color schema either to the MakUiProvider or to the Button component, but not both."
-    //   )
-    // }
+    const { t, buttonConfig } = useMakUi()
 
     const status = isLoading || isError || isSuccess
     const [showStatus, setShowStatus] = useState<boolean>(!!status)
@@ -326,7 +321,7 @@ const Button = forwardRef(
       customClassName: className,
       customTextClassName: textClassName,
       buttonConfig,
-      palette,
+      palette: t,
     })
 
     const handleClick = () => {

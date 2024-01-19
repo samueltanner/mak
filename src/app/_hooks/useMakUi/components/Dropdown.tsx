@@ -57,9 +57,6 @@ const DropdownElement = forwardRef(
     },
     ref: React.Ref<HTMLSpanElement>
   ) => {
-    const {
-      palette: { theme },
-    } = useMakUi()
     const isSelect = (
       option: string | number | { label: string; value: string }
     ) => {
@@ -206,8 +203,8 @@ const Dropdown = ({
     top: 0,
     right: 0,
   })
-  const { palette, activePalette } = useMakUi()
-  const { text } = palette
+  const { t } = useMakUi()
+  const { text } = t
 
   if (!labelLeft && !labelRight) {
     labelLeft = true
@@ -388,7 +385,7 @@ const Dropdown = ({
       </div>
       <AnimatePresence>
         <motion.div
-          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${activePalette?.theme?.secondary}`}
+          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${t?.theme?.secondary}`}
           variants={menuVariants}
           initial="hidden"
           animate={dropdownOpen ? "visible" : "exit"}

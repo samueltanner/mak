@@ -13,7 +13,7 @@ import {
   TWColorHelperResponse,
   MakUiVariants,
   SimpleRecord,
-  MakUiTheme,
+  MakUiThemeMode,
   ThemeInput,
   ThemeShades,
   ThemeVariantInput,
@@ -180,7 +180,7 @@ export const separatePalettes = (paletteInput: MakUiPaletteInput) => {
   }
 }
 
-export const getTheme = (input: string): MakUiTheme => {
+export const getTheme = (input: string): MakUiThemeMode => {
   if (!input) return "dark"
   input = input.toLowerCase()
   if (input.includes("dark")) return "dark"
@@ -196,7 +196,7 @@ export const getThemeShades = ({
 }: {
   altBaseShade?: number
   altDiffs?: ThemeShades
-  defaultTheme?: MakUiTheme
+  defaultTheme?: MakUiThemeMode
 }) => {
   const shadesObj =
     (altDiffs as ThemeShades) || (uiDefaultThemeShades as ThemeShades)
@@ -281,7 +281,7 @@ export const getConstructedClassNames = ({
   state?: MakUiState | "all"
   color?: string
   type?: "default" | "theme"
-  theme?: MakUiTheme | "all"
+  theme?: MakUiThemeMode | "all"
 }) => {
   const states = state === "all" ? uiStates : [state]
   const themes = theme === "all" ? uiThemes : [theme]
@@ -667,9 +667,11 @@ export const getTwHex = ({
 }
 
 export const detectSystemTheme = () => {
-  if (typeof window === "undefined") return "dark"
+  if (typeof window === "undefined") return
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-  return systemTheme.matches ? "dark" : "light"
+  const detectedTheme = systemTheme.matches ? "dark" : "light"
+  console.log("Detected Theme", detectedTheme)
+  return detectedTheme
 }
 
 export const getColorContrast = (colorA: string, colorB: string) => {
@@ -702,17 +704,32 @@ export const ensureNestedObject = <T>({
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
 
-    // If it's the last key and value is provided, assign the value
     if (i === keys.length - 1 && value !== undefined) {
       current[key] = value
     } else {
-      // Otherwise, ensure the nested object exists
       current[key] = current[key] || {}
     }
 
-    // Move to the next level in the nested structure
     current = current[key]
   }
 
-  return current // Optionally return the last object
+  return current
+}
+
+export const setLocalStorage = (key: string, value: any) => {
+  if (typeof window === "undefined") return
+  if (typeof value === "object") {
+    value = JSON.stringify(value)
+  }
+  window.localStorage.setItem(key, value)
+}
+
+export const getLocalStorage = (key: string): string | null | undefined => {
+  if (typeof window === "undefined") return
+  return window.localStorage.getItem(key)
+}
+
+export const removeLocalStorage = (key: string) => {
+  if (typeof window === "undefined") return
+  window.localStorage.removeItem(key)
 }
