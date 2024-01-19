@@ -338,80 +338,80 @@ export const getConstructedClassNames = ({
   const globalDefaultColor = twColorHelper({
     colorString: colorString,
   })
- for (const theme of themes) {
-   for (const state of states) {
-     for (const interaction of uiInteractions) {
-       const themeKey = theme.charAt(0).toUpperCase() + theme.slice(1)
-       const interactionKey =
-         theme === "light"
-           ? interaction
-           : (`${interaction}${themeKey}` as keyof MakUiStates)
-       const rootKey =
-         theme === "light"
-           ? (`${interaction}Root` as keyof MakUiStates)
-           : (`${interaction}Root${themeKey}` as keyof MakUiStates)
-       if (typeof relativeClassNamesResponse[state] !== "string") {
-         if (
-           !Object.keys(relativeClassNamesResponse[state]).includes(
-             interactionKey
-           )
-         ) {
-           const updatedColorString = twColorHelper({
-             colorString: globalDefaultColor.colorString,
-             shade: getShades({
-               altBaseShade: globalDefaultColor.shade,
-             })[state][interaction],
-             opacity: 100,
-           })
-           if (typeof relativeClassNamesResponse[state] === "string") {
-             console.log(relativeClassNamesResponse[state])
-           }
-           relativeClassNamesResponse[state][interactionKey] =
-             updatedColorString.colorString
-           relativeClassNamesResponse[state][rootKey] =
-             updatedColorString.rootString
-         } else {
-           const updatedColorString = twColorHelper({
-             colorString: relativeClassNamesResponse[state][interactionKey],
-           })
-           relativeClassNamesResponse[state][interactionKey] =
-             updatedColorString.colorString
-           relativeClassNamesResponse[state][rootKey] =
-             updatedColorString.rootString
-         }
-       } else {
-         const classNameString = relativeClassNamesResponse[
-           state
-         ] as unknown as string
-         const initialTwObj = twColorHelper({
-           colorString: classNameString as string,
-         })
-         const shades = getShades({
-           altBaseShade: initialTwObj.shade,
-         })[state]
+  for (const theme of themes) {
+    for (const state of states) {
+      for (const interaction of uiInteractions) {
+        const themeKey = theme.charAt(0).toUpperCase() + theme.slice(1)
+        const interactionKey =
+          theme === "light"
+            ? interaction
+            : (`${interaction}${themeKey}` as keyof MakUiStates)
+        const rootKey =
+          theme === "light"
+            ? (`${interaction}Root` as keyof MakUiStates)
+            : (`${interaction}Root${themeKey}` as keyof MakUiStates)
+        if (typeof relativeClassNamesResponse[state] !== "string") {
+          if (
+            !Object.keys(relativeClassNamesResponse[state]).includes(
+              interactionKey
+            )
+          ) {
+            const updatedColorString = twColorHelper({
+              colorString: globalDefaultColor.colorString,
+              shade: getShades({
+                altBaseShade: globalDefaultColor.shade,
+              })[state][interaction],
+              opacity: 100,
+            })
+            if (typeof relativeClassNamesResponse[state] === "string") {
+              console.log(relativeClassNamesResponse[state])
+            }
+            relativeClassNamesResponse[state][interactionKey] =
+              updatedColorString.colorString
+            relativeClassNamesResponse[state][rootKey] =
+              updatedColorString.rootString
+          } else {
+            const updatedColorString = twColorHelper({
+              colorString: relativeClassNamesResponse[state][interactionKey],
+            })
+            relativeClassNamesResponse[state][interactionKey] =
+              updatedColorString.colorString
+            relativeClassNamesResponse[state][rootKey] =
+              updatedColorString.rootString
+          }
+        } else {
+          const classNameString = relativeClassNamesResponse[
+            state
+          ] as unknown as string
+          const initialTwObj = twColorHelper({
+            colorString: classNameString as string,
+          })
+          const shades = getShades({
+            altBaseShade: initialTwObj.shade,
+          })[state]
 
-         Object.keys(shades).forEach((int) => {
-           const updatedColorString = twColorHelper({
-             colorString: initialTwObj.colorString,
-             shade: shades[int as keyof InteractionShades],
-             opacity: 100,
-           })
+          Object.keys(shades).forEach((int) => {
+            const updatedColorString = twColorHelper({
+              colorString: initialTwObj.colorString,
+              shade: shades[int as keyof InteractionShades],
+              opacity: 100,
+            })
 
-           if (
-             !relativeClassNamesResponse[state] ||
-             !isObject(relativeClassNamesResponse[state])
-           ) {
-             relativeClassNamesResponse[state] = {} as MakUiStates
-             relativeClassNamesResponse[state][interactionKey] =
-               updatedColorString.colorString
-             relativeClassNamesResponse[state][rootKey] =
-               updatedColorString.rootString
-           }
-         })
-       }
-     }
-   }
- }
+            if (
+              !relativeClassNamesResponse[state] ||
+              !isObject(relativeClassNamesResponse[state])
+            ) {
+              relativeClassNamesResponse[state] = {} as MakUiStates
+              relativeClassNamesResponse[state][interactionKey] =
+                updatedColorString.colorString
+              relativeClassNamesResponse[state][rootKey] =
+                updatedColorString.rootString
+            }
+          })
+        }
+      }
+    }
+  }
 
   return relativeClassNamesResponse
 }
@@ -684,4 +684,35 @@ export const getColorContrast = (colorA: string, colorB: string) => {
     })
   }
   return chroma.contrast(colorA, colorB)
+}
+
+export const ensureNestedObject = <T>({
+  parent,
+  keys,
+  value,
+}: {
+  parent: T
+  keys?: (keyof T)[]
+  value?: any
+}) => {
+  let current: any = parent
+
+  if (!keys || keys.length === 0) return current
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+
+    // If it's the last key and value is provided, assign the value
+    if (i === keys.length - 1 && value !== undefined) {
+      current[key] = value
+    } else {
+      // Otherwise, ensure the nested object exists
+      current[key] = current[key] || {}
+    }
+
+    // Move to the next level in the nested structure
+    current = current[key]
+  }
+
+  return current // Optionally return the last object
 }

@@ -10,6 +10,10 @@ import {
   MakUiSimpleNestedPalette,
   MakUiSimplePalette,
   MakUiSimpleThemePalette,
+  MakUiVerboseThemes,
+  MakUiSimpleThemes,
+  MakUiSimpleTheme,
+  MakUiVerboseTheme,
 } from "../types/default-types"
 import {
   uiDefaultBorderPaletteInput,
@@ -38,6 +42,14 @@ interface MakUiContext {
   borderPalette: MakUiPalette
   themesPalette: MakUiThemePalette
   activePalette: MakUiActivePalette
+  dark: MakUiVerboseTheme | undefined
+  light: MakUiVerboseTheme | undefined
+  custom: MakUiVerboseTheme | undefined
+  simpleDark: MakUiSimpleTheme | undefined
+  simpleLight: MakUiSimpleTheme | undefined
+  simpleCustom: MakUiSimpleTheme | undefined
+  simpleTheme: MakUiSimpleTheme | undefined
+  theme: MakUiVerboseTheme | undefined
 }
 
 type MakUiProviderProps = {
@@ -85,10 +97,10 @@ export const MakUiProvider = ({
       simpleThemePaletteObject = uiDefaultSimpleThemePalette,
       nestedPaletteObject = defaultNestedPalette,
       simpleNestedPaletteObject = defaultSimpleNestedPalette,
+      paletteThemesObject,
+      simplePaletteThemesObject,
     } = paletteFactory({ paletteInput }) || {}
 
-    // console.log({ simpleNestedPaletteObject })
-    console.log({ nestedPaletteObject })
     return {
       colorPalette: colorPaletteObject as MakUiPalette,
       simpleColorPalette: simpleColorPaletteObject as MakUiSimplePalette,
@@ -100,6 +112,8 @@ export const MakUiProvider = ({
       simpleThemesPalette: simpleThemePaletteObject as MakUiSimpleThemePalette,
       palette: nestedPaletteObject as MakUiNestedPalette,
       simplePalette: simpleNestedPaletteObject as MakUiSimpleNestedPalette,
+      verboseThemes: paletteThemesObject as MakUiVerboseThemes,
+      simpleThemes: simplePaletteThemesObject as MakUiSimpleThemes,
     }
   }, [paletteInput])
 
@@ -117,6 +131,8 @@ export const MakUiProvider = ({
   const [activePalette, setActivePalette] = useState<MakUiActivePalette>(
     handleThemeChange()
   )
+  const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>()
+  const [verboseTheme, setVerboseTheme] = useState<MakUiVerboseTheme>()
 
   const [buttonConfig, setButtonConfig] =
     useState<MakUiButtonConfig>(customButtonConfig)
@@ -131,8 +147,12 @@ export const MakUiProvider = ({
     const handleDarkModeChange = (e: MediaQueryListEvent) => {
       if (e.matches) {
         setActiveTheme("dark")
+        setSimpleTheme(palettesMemo.simpleThemes.dark)
+        setVerboseTheme(palettesMemo.verboseThemes.dark)
       } else {
         setActiveTheme("light")
+        setSimpleTheme(palettesMemo.simpleThemes.light)
+        setVerboseTheme(palettesMemo.verboseThemes.light)
       }
     }
 
@@ -154,6 +174,14 @@ export const MakUiProvider = ({
       setButtonConfig,
       systemTheme: detectedSystemTheme,
       activePalette,
+      dark: palettesMemo.verboseThemes.dark as MakUiVerboseTheme,
+      light: palettesMemo.verboseThemes.light as MakUiVerboseTheme,
+      custom: palettesMemo.verboseThemes.custom as MakUiVerboseTheme,
+      simpleDark: palettesMemo.simpleThemes.dark as MakUiSimpleTheme,
+      simpleLight: palettesMemo.simpleThemes.light as MakUiSimpleTheme,
+      simpleCustom: palettesMemo.simpleThemes.custom as MakUiSimpleTheme,
+      simpleTheme,
+      theme: verboseTheme,
     }
   }, [palettesMemo, activeTheme, activePalette])
 

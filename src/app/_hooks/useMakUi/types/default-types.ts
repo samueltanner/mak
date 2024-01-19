@@ -1,19 +1,22 @@
 export type SimpleRecord = Record<string, any>
 
-export type Interaction = "base" | "hover" | "click"
+export type MakUiInteraction = "base" | "hover" | "click"
 
-export type DarkInteraction = "baseDark" | "hoverDark" | "clickDark"
+export type MakUiDarkInteraction = "baseDark" | "hoverDark" | "clickDark"
 
-export type CustomInteraction = "baseCustom" | "hoverCustom" | "clickCustom"
+export type MakUiCustomInteraction =
+  | "baseCustom"
+  | "hoverCustom"
+  | "clickCustom"
 
-export type RootInteraction = "baseRoot" | "hoverRoot" | "clickRoot"
+export type MakUiRootInteraction = "baseRoot" | "hoverRoot" | "clickRoot"
 
-export type DarkRootInteraction =
+export type MakUiDarkRootInteraction =
   | "baseRootDark"
   | "hoverRootDark"
   | "clickRootDark"
 
-export type CustomRootInteraction =
+export type MakUiCustomRootInteraction =
   | "baseRootCustom"
   | "hoverRootCustom"
   | "clickRootCustom"
@@ -21,7 +24,7 @@ export type CustomRootInteraction =
 export type MakUiTheme = "dark" | "light" | "custom"
 export type VerboseThemeVariant = "darkTheme" | "lightTheme" | "customTheme"
 
-export type ThemeVariant = "primary" | "secondary" | "tertiary" | "custom"
+export type MakUiThemeVariant = "primary" | "secondary" | "tertiary" | "custom"
 
 export type ThemeRootVariant =
   | "primaryRoot"
@@ -29,7 +32,7 @@ export type ThemeRootVariant =
   | "tertiaryRoot"
   | "customRoot"
 
-export type ThemeVariantOutput = ThemeVariant | ThemeRootVariant
+export type ThemeVariantOutput = MakUiThemeVariant | ThemeRootVariant
 
 export type MakUiThemeVariants = {
   [Key in ThemeVariantOutput]: string
@@ -53,7 +56,7 @@ export type ThemeInput = {
 }
 
 export type MakUiThemeVariantShades = {
-  [Key in ThemeVariant]: number
+  [Key in MakUiThemeVariant]: number
 }
 
 export type ThemeShades = {
@@ -68,12 +71,12 @@ export type MakUiActivePalette = {
 }
 
 export type MakUiInteractionOutput =
-  | Interaction
-  | RootInteraction
-  | DarkInteraction
-  | DarkRootInteraction
-  | CustomInteraction
-  | CustomRootInteraction
+  | MakUiInteraction
+  | MakUiRootInteraction
+  | MakUiDarkInteraction
+  | MakUiDarkRootInteraction
+  | MakUiCustomInteraction
+  | MakUiCustomRootInteraction
 
 export type MakUiState =
   | "default"
@@ -155,10 +158,13 @@ export type VerboseVariant =
   | VerboseBorderVariant
   | VerboseThemeVariant
 
-export type NestedPaletteVariant = "color" | "text" | "border" | "theme"
+export type MakUiNestedPaletteVariant = "color" | "text" | "border" | "theme"
 
 export type MakUiInteractions = {
-  [Key in Interaction | DarkInteraction | CustomInteraction]: string
+  [Key in
+    | MakUiInteraction
+    | MakUiDarkInteraction
+    | MakUiCustomInteraction]: string
 }
 
 export type MakUiStates = {
@@ -219,7 +225,7 @@ export type MakUiSimpleNestedPalette = {
 }
 
 export type MakUiSimpleThemeVariant = {
-  [Key in ThemeVariant]: string
+  [Key in MakUiThemeVariant]: string
 }
 
 export type MakUiSimplePalette = {
@@ -227,10 +233,47 @@ export type MakUiSimplePalette = {
 }
 
 export type MakUiSimpleThemePalette = {
-  [Key in MakUiTheme]: MakUiSimpleThemeVariant
+  [Key in MakUiTheme]: {
+    [Key in MakUiThemeVariant]: string
+  }
 }
+
+export type MakUiSimpleSeparatedPaletteVariants = {
+  [Key in MakUiVariant]: string
+}
+
+export type MakUiSimpleTheme = {
+  color: MakUiSimpleSeparatedPaletteVariants
+  text: MakUiSimpleSeparatedPaletteVariants
+  border: MakUiSimpleSeparatedPaletteVariants
+  theme: MakUiSimpleThemeVariant
+}
+
+export type MakUiSimpleThemes = {
+  [Key in MakUiTheme]: MakUiSimpleTheme
+}
+export type MakUiSeparatedPalette = {
+  [Key in MakUiVariant]: {
+    [Key in MakUiState]: {
+      [Key in MakUiInteraction | MakUiRootInteraction]: string
+    }
+  }
+}
+export type MakUiVerboseTheme = {
+  text: MakUiSeparatedPalette
+  border: MakUiSeparatedPalette
+  color: MakUiSeparatedPalette
+  theme: MakUiThemeVariants
+}
+
+export type MakUiVerboseThemes = {
+  dark: MakUiVerboseTheme
+  light: MakUiVerboseTheme
+  custom: MakUiVerboseTheme
+}
+
 export type InteractionShades = {
-  [Key in Interaction]: number
+  [Key in MakUiInteraction]: number
 }
 
 export type StateShades = {

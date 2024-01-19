@@ -7,24 +7,26 @@ import {
   handleThemes,
   deepMerge,
   isEmptyObject,
+  ensureNestedObject,
 } from "../functions/helpers"
 import {
-  Interaction,
+  MakUiInteraction,
   MakUiNestedPalette,
   MakUiPaletteInput,
   MakUiPalette,
   MakUiStates,
-  MakUiVariant,
   MakUiThemePalette,
-  ThemeVariant,
+  MakUiThemeVariant,
   MakUiSimplePalette,
   MakUiSimpleThemePalette,
   MakUiSimpleNestedPalette,
   MakUiInteractions,
-  MakUiState,
   VariantInput,
   StateInput,
-  MakUiVariants,
+  MakUiSimpleThemes,
+  MakUiVerboseThemes,
+  MakUiVerboseTheme,
+  MakUiSimpleTheme,
 } from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
@@ -45,13 +47,25 @@ export const paletteFactory = ({
   const { colorPalette, textPalette, borderPalette, themePalette } =
     separatePalettes(paletteInput)
   let colorPaletteObject = {} as MakUiPalette
-  let simpleColorPaletteObject = {} as MakUiSimplePalette
   let textPaletteObject = {} as MakUiPalette
-  let simpleTextPaletteObject = {} as MakUiSimplePalette
   let borderPaletteObject = {} as MakUiPalette
-  let simpleBorderPaletteObject = {} as MakUiSimplePalette
   let themePaletteObject = {} as MakUiThemePalette
+
+  let simpleColorPaletteObject = {} as MakUiSimplePalette
+  let simpleTextPaletteObject = {} as MakUiSimplePalette
+  let simpleBorderPaletteObject = {} as MakUiSimplePalette
   let simpleThemePaletteObject = {} as MakUiSimpleThemePalette
+
+  let simplePaletteThemesObject = {
+    light: {},
+    dark: {},
+    custom: {},
+  } as MakUiSimpleThemes
+  let paletteThemesObject = {
+    light: {},
+    dark: {},
+    custom: {},
+  } as MakUiVerboseThemes
 
   for (const theme of uiThemes) {
     const providedVariant = themePalette?.[theme]
@@ -100,7 +114,7 @@ export const paletteFactory = ({
         defaultTheme: theme,
       })
 
-      const remainingVariants: ThemeVariant[] = [
+      const remainingVariants: MakUiThemeVariant[] = [
         "secondary",
         "tertiary",
         "custom",
@@ -159,7 +173,7 @@ export const paletteFactory = ({
       for (const shade of Object.keys(themeShades)) {
         const { colorString, rootString } = twColorHelper({
           colorString: existingPrimary.primary,
-          shade: themeShades[shade as ThemeVariant],
+          shade: themeShades[shade as MakUiThemeVariant],
         })
         themePaletteObject[theme] = {
           ...themePaletteObject[theme],
@@ -212,7 +226,7 @@ export const paletteFactory = ({
 
       if (!colorPaletteObject?.[variant]) {
         const classNames = getConstructedClassNames({
-          color: uiDefaultColorPaletteInput[variant] as Interaction,
+          color: uiDefaultColorPaletteInput[variant] as MakUiInteraction,
           theme: "all",
           state: "all",
         })
@@ -221,25 +235,25 @@ export const paletteFactory = ({
           ...targetPaletteObject[variant],
           ...classNames,
         }
-        // simpleColorPaletteObject[variant] = classNames.default.baseRoot
-        // simpleColorPaletteObject[`${variant}Dark`] =
-        //   classNames.default.baseRootDark
-        // simpleColorPaletteObject[`${variant}Custom`] =
-        //   classNames.default.baseRootCustom
+        simpleColorPaletteObject[variant] = classNames.default.baseRoot
+        simpleColorPaletteObject[`${variant}Dark`] =
+          classNames.default.baseRootDark
+        simpleColorPaletteObject[`${variant}Custom`] =
+          classNames.default.baseRootCustom
       }
       if (!borderPaletteObject?.[variant]) {
         borderPaletteObject[variant] = {
           ...colorPaletteObject?.[variant],
         }
-        // simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
-        // simpleBorderPaletteObject[`${variant}Dark`] =
-        //   simpleColorPaletteObject?.[`${variant}Dark`]
-        // simpleBorderPaletteObject[`${variant}Custom`] =
-        //   simpleColorPaletteObject?.[`${variant}Custom`]
+        simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
+        simpleBorderPaletteObject[`${variant}Dark`] =
+          simpleColorPaletteObject?.[`${variant}Dark`]
+        simpleBorderPaletteObject[`${variant}Custom`] =
+          simpleColorPaletteObject?.[`${variant}Custom`]
       }
       if (!textPaletteObject?.[variant]) {
         const classNames = getConstructedClassNames({
-          color: uiDefaultTextPaletteInput?.[variant] as Interaction,
+          color: uiDefaultTextPaletteInput?.[variant] as MakUiInteraction,
           state: "all",
           theme: "all",
         })
@@ -248,11 +262,6 @@ export const paletteFactory = ({
           ...targetPaletteObject[variant],
           ...classNames,
         }
-        // simpleTextPaletteObject[variant] = classNames.default.baseRoot
-        // simpleTextPaletteObject[`${variant}Dark`] =
-        //   classNames.default.baseRootDark
-        // simpleTextPaletteObject[`${variant}Custom`] =
-        //   classNames.default.baseRoot
       }
 
       if (typeof providedVariant === "string") {
@@ -279,11 +288,6 @@ export const paletteFactory = ({
           ...targetPaletteObject[variant],
           ...deepMerge(classNames, darkClassNames, customClassNames),
         }
-        // targetSimplePaletteObject[variant] = classNames.default.baseRoot
-        // targetSimplePaletteObject[`${variant}Dark`] =
-        //   darkClassNames.default.baseRootDark
-        // targetSimplePaletteObject[`${variant}Custom`] =
-        //   customClassNames.default.baseRootCustom
       }
 
       for (const state of uiStates) {
@@ -373,8 +377,6 @@ export const paletteFactory = ({
             customClassNames
           )
 
-          console.log({ classNames })
-
           const targetPaletteVariantObject = targetPaletteObject?.[variant]
           const targetPaletteStateObject = targetPaletteVariantObject?.[state]
           targetPaletteObject[variant] = {
@@ -384,16 +386,55 @@ export const paletteFactory = ({
               ...mergedClassNames,
             },
           }
-          // targetSimplePaletteObject[interaction] = classNames.baseRoot
-          // targetSimplePaletteObject[`${interaction}Dark`] =
-          //   darkClassNames.baseRoot
-          // targetSimplePaletteObject[`${interaction}Custom`] =
-          //   customClassNames.baseRoot
         }
+        const lightVariant = targetPaletteObject[variant]
+        const darkVariant = targetPaletteObject[variant]
+        const customVariant = targetPaletteObject[variant]
+
+        ensureNestedObject({
+          parent: paletteThemesObject.light,
+          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
+          value: lightVariant,
+        })
+
+        ensureNestedObject({
+          parent: paletteThemesObject.light,
+          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
+          value: lightVariant,
+        })
+
+        ensureNestedObject({
+          parent: paletteThemesObject.dark,
+          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
+          value: darkVariant,
+        })
+
+        ensureNestedObject({
+          parent: paletteThemesObject.custom,
+          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
+          value: customVariant,
+        })
+
+        ensureNestedObject({
+          parent: simplePaletteThemesObject.light,
+          keys: [themeVariant, variant as keyof MakUiSimpleTheme],
+          value: lightVariant.default.baseRoot,
+        })
+
+        ensureNestedObject({
+          parent: simplePaletteThemesObject.dark,
+          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
+          value: darkVariant.default.baseRootDark,
+        })
+
+        ensureNestedObject({
+          parent: simplePaletteThemesObject.custom,
+          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
+          value: customVariant.default.baseRootCustom,
+        })
       }
     }
   }
-  console.log({ colorPaletteObject, simpleColorPaletteObject })
 
   const nestedPaletteObject: MakUiNestedPalette = {
     color: colorPaletteObject,
@@ -409,6 +450,14 @@ export const paletteFactory = ({
     theme: simpleThemePaletteObject,
   }
 
+  paletteThemesObject.custom["theme"] = themePaletteObject.custom
+  paletteThemesObject.dark["theme"] = themePaletteObject.dark
+  paletteThemesObject.light["theme"] = themePaletteObject.light
+
+  simplePaletteThemesObject.custom["theme"] = simpleThemePaletteObject.custom
+  simplePaletteThemesObject.dark["theme"] = simpleThemePaletteObject.dark
+  simplePaletteThemesObject.light["theme"] = simpleThemePaletteObject.light
+
   return {
     colorPaletteObject,
     simpleColorPaletteObject,
@@ -420,5 +469,7 @@ export const paletteFactory = ({
     simpleThemePaletteObject,
     nestedPaletteObject,
     simpleNestedPaletteObject,
+    paletteThemesObject,
+    simplePaletteThemesObject,
   }
 }

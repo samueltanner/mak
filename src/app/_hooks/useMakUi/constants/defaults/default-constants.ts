@@ -1,31 +1,32 @@
 import {
   MakUiVariant,
   MakUiState,
-  Interaction,
+  MakUiInteraction,
   MakUiPalette,
   MakUiPaletteInput,
   VerboseTextVariant,
   VerboseBorderVariant,
   VerboseColorVariant,
   StateShades,
-  NestedPaletteVariant,
+  MakUiNestedPaletteVariant,
   MakUiThemePalette,
-  ThemeVariant,
+  MakUiThemeVariant,
   VerboseThemeVariant,
   MakUiTheme,
   ThemeShades,
   MakUiSimplePalette,
   MakUiSimpleThemePalette,
+  MakUiRootInteraction,
 } from "../../types/default-types"
 
 export const absoluteRegex =
   /^((white|black)\/\[*0*(?:[0-9][0-9]?|100)%*\]*|(white|black))$/
 
-export const uiPaletteVariants: NestedPaletteVariant[] = [
+export const uiPaletteVariants: MakUiNestedPaletteVariant[] = [
   "color",
   "text",
   "border",
-  // "theme",
+  "theme",
 ]
 export const uiVariants: MakUiVariant[] = [
   "primary",
@@ -83,7 +84,13 @@ export const uiStates: MakUiState[] = [
   "selected",
 ]
 
-export const uiInteractions: Interaction[] = ["base", "hover", "click"]
+export const uiInteractions: MakUiInteraction[] = ["base", "hover", "click"]
+
+export const uiRootInteractions: MakUiRootInteraction[] = [
+  "baseRoot",
+  "hoverRoot",
+  "clickRoot",
+]
 
 export const uiDefaultColorPaletteInput: MakUiPaletteInput = {
   primary: "mak-teal-500",
@@ -166,6 +173,7 @@ export const uiDefaultTextPaletteInput: MakUiPaletteInput = {
   info: "zinc-900",
   custom: "zinc-900",
 }
+
 // export const uiDefaultTextPaletteInput: MakUiPalette = {
 //   primary: {
 //     default: {
@@ -576,13 +584,14 @@ export const uiDefaultShades: StateShades = {
 }
 
 export const uiThemes: MakUiTheme[] = ["dark", "light", "custom"]
+
 export const uiVerboseThemes: VerboseThemeVariant[] = [
   "darkTheme",
   "lightTheme",
   "customTheme",
 ]
 
-export const uiThemeVariants: ThemeVariant[] = [
+export const uiThemeVariants: MakUiThemeVariant[] = [
   "primary",
   "secondary",
   "tertiary",

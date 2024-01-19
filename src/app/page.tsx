@@ -4,10 +4,12 @@ import MakFormView from "./_views/MakFormView"
 import MakUiView from "./_views/MakUiView"
 
 export default function Home() {
-  const { activePalette, palette } = useMakUi()
+  const { activePalette, palette, theme } = useMakUi()
+  console.log(theme?.theme.primary)
 
+  console.log(theme)
   return (
-    <main className={`h-screen w-screen p-4 bg-${activePalette.theme.primary}`}>
+    <main className={`h-screen w-screen p-4 bg-${theme?.theme.secondary}`}>
       <div className="flex w-full h-full justify-between">
         <MakUiView />
         <MakFormView />
