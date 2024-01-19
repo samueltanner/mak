@@ -11,37 +11,13 @@ import {
   MakUiComponentConfig,
 } from "../types/default-types"
 import { MakUiButtonConfig } from "../types/button-types"
-import { useTheme } from "next-themes"
+import { ThemeProvider, useTheme } from "next-themes"
 import { detectSystemTheme, isEmptyObject } from "../functions/helpers"
+import { uiThemes } from "../constants/defaults/default-constants"
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:
     "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold border border-2",
-}
-
-interface MakUiContext {
-  buttonConfig: MakUiButtonConfig
-  setButtonConfig: (config: MakUiButtonConfig) => void
-  palette: MakUiVerbosePalettes
-  p: MakUiVerbosePalettes
-  simplePalette: MakUiSimplePalettes
-  sp: MakUiSimplePalettes
-  dark: MakUiVerboseTheme
-  d: MakUiVerboseTheme
-  light: MakUiVerboseTheme
-  l: MakUiVerboseTheme
-  custom: MakUiVerboseTheme
-  c: MakUiVerboseTheme
-  sd: MakUiSimpleTheme
-  sl: MakUiSimpleTheme
-  sc: MakUiSimpleTheme
-  themeMode: string | undefined
-  setThemeMode: (themeMode: string) => void
-  theme: MakUiVerboseTheme
-  t: MakUiVerboseTheme
-  simpleTheme: MakUiSimpleTheme
-  s: MakUiSimpleTheme
-  formattingThemes: boolean
 }
 
 type MakUiProviderProps = {
@@ -54,7 +30,19 @@ type MakUiProviderProps = {
 
 const MakUiContext = createContext<MakUiContext | undefined>(undefined)
 
-export const MakUiProvider = ({
+export const MakUiProvider = (props: MakUiProviderProps) => {
+  return (
+    <ThemeProvider
+      storageKey="mak-ui-theme"
+      enableSystem={true}
+      themes={uiThemes}
+    >
+      <MakUiProviderChild {...props}>{props.children}</MakUiProviderChild>
+    </ThemeProvider>
+  )
+}
+
+const MakUiProviderChild = ({
   children,
   palette: paletteInput = {},
   componentConfig,
@@ -148,19 +136,53 @@ export const MakUiProvider = ({
     buttonConfig,
     setButtonConfig,
     themeMode,
-    setThemeMode,
-    theme: verboseTheme,
+    setTheme: setThemeMode,
+    theme: themeMode,
+    verboseTheme,
     t: verboseTheme,
     simpleTheme,
     s: simpleTheme,
     formattingThemes,
+    isDark: themeMode === "dark",
+    isLight: themeMode === "light",
+    isCustom: themeMode === "custom",
   }
+
+  console.log(value.t, value.s)
 
   return (
     <MakUiContext.Provider value={value}>
       {formattingThemes ? <></> : <>{children}</>}
     </MakUiContext.Provider>
   )
+}
+
+interface MakUiContext {
+  buttonConfig: MakUiButtonConfig
+  setButtonConfig: (config: MakUiButtonConfig) => void
+  palette: MakUiVerbosePalettes
+  p: MakUiVerbosePalettes
+  simplePalette: MakUiSimplePalettes
+  sp: MakUiSimplePalettes
+  dark: MakUiVerboseTheme
+  d: MakUiVerboseTheme
+  light: MakUiVerboseTheme
+  l: MakUiVerboseTheme
+  custom: MakUiVerboseTheme
+  c: MakUiVerboseTheme
+  sd: MakUiSimpleTheme
+  sl: MakUiSimpleTheme
+  sc: MakUiSimpleTheme
+  theme: string | undefined
+  setTheme: (themeMode: string) => void
+  verboseTheme: MakUiVerboseTheme
+  t: MakUiVerboseTheme
+  simpleTheme: MakUiSimpleTheme
+  s: MakUiSimpleTheme
+  formattingThemes: boolean
+  isDark: boolean
+  isLight: boolean
+  isCustom: boolean
 }
 
 export const useMakUi = () => {

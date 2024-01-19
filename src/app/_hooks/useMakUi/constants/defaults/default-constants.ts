@@ -82,6 +82,7 @@ export const uiStates: MakUiState[] = [
   "disabled",
   "focused",
   "selected",
+  "invalid"
 ]
 
 export const uiInteractions: MakUiInteraction[] = ["base", "hover", "click"]
@@ -186,6 +187,11 @@ export const uiDefaultShades: StateShades = {
     click: 600,
   },
   selected: {
+    base: 400,
+    hover: 500,
+    click: 600,
+  },
+  invalid: {
     base: 400,
     hover: 500,
     click: 600,

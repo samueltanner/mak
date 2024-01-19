@@ -12,7 +12,7 @@ const config: Config = {
   safelist: [
     {
       pattern:
-        /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc)-(50|100|200|300|400|500|600|700|800|900|950)/,
+        /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
       variants: ["hover"],
     },
     {
@@ -21,17 +21,17 @@ const config: Config = {
     },
     {
       pattern:
-        /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc)-(50|100|200|300|400|500|600|700|800|900|950)/,
+        /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
       variants: ["hover"],
     },
     {
       pattern:
-        /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc)-(50|100|200|300|400|500|600|700|800|900|950)/,
+        /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
       variants: ["hover"],
     },
     {
       pattern:
-        /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc)-(50|100|200|300|400|500|600|700|800|900|950)/,
+        /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
       variants: ["focus"],
     },
   ],

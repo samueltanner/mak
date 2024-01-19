@@ -289,6 +289,7 @@ export const getConstructedClassNames = ({
     default: {} as MakUiStates,
     active: {} as MakUiStates,
     selected: {} as MakUiStates,
+    invalid: {} as MakUiStates,
     disabled: {} as MakUiStates,
     focused: {} as MakUiStates,
   }

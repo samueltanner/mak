@@ -86,6 +86,7 @@ export type MakUiState =
   | "disabled"
   | "focused"
   | "selected"
+  | "invalid"
 
 export type MakUiVariant =
   | "primary"
