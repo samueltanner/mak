@@ -53,10 +53,11 @@ const config: Config = {
           },
         },
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      dropShadow: {
+        "hard-sm": "2.5px 2.5px 1px rgba(0, 0, 0, 0.25)",
+      },
+      boxShadow: {
+        "hard-sm": "inset 0px 0px 3.5px rgba(0, 0, 0, 0.5)",
       },
     },
   },

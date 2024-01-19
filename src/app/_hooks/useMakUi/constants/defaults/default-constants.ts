@@ -106,14 +106,32 @@ export const uiDefaultBorderPaletteInput = uiDefaultColorPaletteInput
 
 export const uiDefaultSimpleTextPalette: MakUiSimplePalette = {
   primary: "zinc-900",
+  primaryDark: "zinc-900",
+  primaryCustom: "zinc-900",
   secondary: "zinc-100",
+  secondaryDark: "zinc-100",
+  secondaryCustom: "zinc-100",
   tertiary: "zinc-900",
+  tertiaryDark: "zinc-900",
+  tertiaryCustom: "zinc-900",
   success: "zinc-900",
+  successDark: "zinc-900",
+  successCustom: "zinc-900",
   error: "zinc-900",
+  errorDark: "zinc-900",
+  errorCustom: "zinc-900",
   danger: "zinc-900",
+  dangerDark: "zinc-900",
+  dangerCustom: "zinc-900",
   warning: "zinc-900",
+  warningDark: "zinc-900",
+  warningCustom: "zinc-900",
   info: "zinc-900",
+  infoDark: "zinc-900",
+  infoCustom: "zinc-900",
   custom: "zinc-900",
+  customDark: "zinc-900",
+  customCustom: "zinc-900",
 }
 
 export const uiDefaultSimpleThemePalette: MakUiSimpleThemePalette = {

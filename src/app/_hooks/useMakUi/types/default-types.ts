@@ -2,7 +2,21 @@ export type SimpleRecord = Record<string, any>
 
 export type Interaction = "base" | "hover" | "click"
 
+export type DarkInteraction = "baseDark" | "hoverDark" | "clickDark"
+
+export type CustomInteraction = "baseCustom" | "hoverCustom" | "clickCustom"
+
 export type RootInteraction = "baseRoot" | "hoverRoot" | "clickRoot"
+
+export type DarkRootInteraction =
+  | "baseRootDark"
+  | "hoverRootDark"
+  | "clickRootDark"
+
+export type CustomRootInteraction =
+  | "baseRootCustom"
+  | "hoverRootCustom"
+  | "clickRootCustom"
 
 export type MakUiTheme = "dark" | "light" | "custom"
 export type VerboseThemeVariant = "darkTheme" | "lightTheme" | "customTheme"
@@ -53,7 +67,13 @@ export type MakUiActivePalette = {
   color: MakUiPalette
 }
 
-export type MakUiInteractionOutput = Interaction | RootInteraction
+export type MakUiInteractionOutput =
+  | Interaction
+  | RootInteraction
+  | DarkInteraction
+  | DarkRootInteraction
+  | CustomInteraction
+  | CustomRootInteraction
 
 export type MakUiState =
   | "default"
@@ -72,6 +92,28 @@ export type MakUiVariant =
   | "warning"
   | "info"
   | "custom"
+
+export type MakUiDarkVariant =
+  | "primaryDark"
+  | "secondaryDark"
+  | "tertiaryDark"
+  | "customDark"
+  | "successDark"
+  | "errorDark"
+  | "dangerDark"
+  | "warningDark"
+  | "infoDark"
+
+export type MakUiCustomVariant =
+  | "primaryCustom"
+  | "secondaryCustom"
+  | "tertiaryCustom"
+  | "customCustom"
+  | "successCustom"
+  | "errorCustom"
+  | "dangerCustom"
+  | "warningCustom"
+  | "infoCustom"
 
 export type VerboseColorVariant =
   | "primaryColor"
@@ -116,7 +158,7 @@ export type VerboseVariant =
 export type NestedPaletteVariant = "color" | "text" | "border" | "theme"
 
 export type MakUiInteractions = {
-  [Key in Interaction]: string
+  [Key in Interaction | DarkInteraction | CustomInteraction]: string
 }
 
 export type MakUiStates = {
@@ -181,7 +223,7 @@ export type MakUiSimpleThemeVariant = {
 }
 
 export type MakUiSimplePalette = {
-  [Key in MakUiVariant]: string
+  [Key in MakUiVariant | MakUiDarkVariant | MakUiCustomVariant]: string
 }
 
 export type MakUiSimpleThemePalette = {

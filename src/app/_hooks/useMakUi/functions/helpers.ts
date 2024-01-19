@@ -12,15 +12,13 @@ import {
   VerbosePaletteInput,
   TWColorHelperResponse,
   MakUiVariants,
-  MakUiPalette,
   SimpleRecord,
   MakUiTheme,
   ThemeInput,
   ThemeShades,
   ThemeVariantInput,
-  MakUiNestedPalette,
-  MakUiActivePalette,
   MakUiThemeVariantShades,
+  InteractionShades,
 } from "../types/default-types"
 import {
   absoluteRegex,
@@ -49,6 +47,28 @@ export const isEmptyObject = (obj: GenericObject) =>
 
 export const isNestedObject = (obj: GenericObject) =>
   isObject(obj) && Object.values(obj).some(isObject)
+
+export const deepMerge = (...objects: (GenericObject | undefined)[]) => {
+  const result = {}
+
+  const merge = (target: GenericObject, source: GenericObject) => {
+    Object.keys(source).forEach((key) => {
+      if (source[key] && typeof source[key] === "object") {
+        target[key] = target[key] || {}
+        merge(target[key], source[key])
+      } else {
+        target[key] = source[key]
+      }
+    })
+  }
+
+  for (const obj of objects) {
+    if (!isObject(obj)) continue
+    merge(result, obj)
+  }
+
+  return result
+}
 
 export const constructTailwindObject = ({
   hex,
@@ -255,13 +275,16 @@ export const getConstructedClassNames = ({
   interactions,
   color,
   state = "default",
+  theme = "light",
 }: {
   interactions?: MakUiVariants | MakUiStates
   state?: MakUiState | "all"
   color?: string
   type?: "default" | "theme"
+  theme?: MakUiTheme | "all"
 }) => {
   const states = state === "all" ? uiStates : [state]
+  const themes = theme === "all" ? uiThemes : [theme]
   let relativeClassNamesResponse: MakUiVariants = {
     default: {} as MakUiStates,
     active: {} as MakUiStates,
@@ -315,37 +338,122 @@ export const getConstructedClassNames = ({
   const globalDefaultColor = twColorHelper({
     colorString: colorString,
   })
+ for (const theme of themes) {
+   for (const state of states) {
+     for (const interaction of uiInteractions) {
+       const themeKey = theme.charAt(0).toUpperCase() + theme.slice(1)
+       const interactionKey =
+         theme === "light"
+           ? interaction
+           : (`${interaction}${themeKey}` as keyof MakUiStates)
+       const rootKey =
+         theme === "light"
+           ? (`${interaction}Root` as keyof MakUiStates)
+           : (`${interaction}Root${themeKey}` as keyof MakUiStates)
+       if (typeof relativeClassNamesResponse[state] !== "string") {
+         if (
+           !Object.keys(relativeClassNamesResponse[state]).includes(
+             interactionKey
+           )
+         ) {
+           const updatedColorString = twColorHelper({
+             colorString: globalDefaultColor.colorString,
+             shade: getShades({
+               altBaseShade: globalDefaultColor.shade,
+             })[state][interaction],
+             opacity: 100,
+           })
+           if (typeof relativeClassNamesResponse[state] === "string") {
+             console.log(relativeClassNamesResponse[state])
+           }
+           relativeClassNamesResponse[state][interactionKey] =
+             updatedColorString.colorString
+           relativeClassNamesResponse[state][rootKey] =
+             updatedColorString.rootString
+         } else {
+           const updatedColorString = twColorHelper({
+             colorString: relativeClassNamesResponse[state][interactionKey],
+           })
+           relativeClassNamesResponse[state][interactionKey] =
+             updatedColorString.colorString
+           relativeClassNamesResponse[state][rootKey] =
+             updatedColorString.rootString
+         }
+       } else {
+         const classNameString = relativeClassNamesResponse[
+           state
+         ] as unknown as string
+         const initialTwObj = twColorHelper({
+           colorString: classNameString as string,
+         })
+         const shades = getShades({
+           altBaseShade: initialTwObj.shade,
+         })[state]
 
-  for (const state of states) {
-    for (const interaction of uiInteractions) {
-      if (
-        !Object.keys(relativeClassNamesResponse[state]).includes(interaction)
-      ) {
-        const updatedColorString = twColorHelper({
-          colorString: globalDefaultColor.colorString,
-          shade: getShades({
-            altBaseShade: globalDefaultColor.shade,
-          })[state][interaction],
-          opacity: 100,
-        })
+         Object.keys(shades).forEach((int) => {
+           const updatedColorString = twColorHelper({
+             colorString: initialTwObj.colorString,
+             shade: shades[int as keyof InteractionShades],
+             opacity: 100,
+           })
 
-        relativeClassNamesResponse[state][interaction] =
-          updatedColorString.colorString
-        relativeClassNamesResponse[state][`${interaction}Root`] =
-          updatedColorString.rootString
-      } else {
-        const updatedColorString = twColorHelper({
-          colorString: relativeClassNamesResponse[state][interaction],
-        })
-        relativeClassNamesResponse[state][interaction] =
-          updatedColorString.colorString
-        relativeClassNamesResponse[state][`${interaction}Root`] =
-          updatedColorString.rootString
-      }
-    }
-  }
+           if (
+             !relativeClassNamesResponse[state] ||
+             !isObject(relativeClassNamesResponse[state])
+           ) {
+             relativeClassNamesResponse[state] = {} as MakUiStates
+             relativeClassNamesResponse[state][interactionKey] =
+               updatedColorString.colorString
+             relativeClassNamesResponse[state][rootKey] =
+               updatedColorString.rootString
+           }
+         })
+       }
+     }
+   }
+ }
 
   return relativeClassNamesResponse
+}
+
+export const handleThemes = (colorString: string) => {
+  let responseObject: { [key: string]: string | undefined } = {
+    light: undefined,
+    dark: undefined,
+    custom: undefined,
+  }
+  if (!colorString) return responseObject
+  if (!colorString.includes("dark") && !colorString.includes("custom")) {
+    responseObject.light = colorString
+    responseObject.dark = colorString
+    responseObject.custom = colorString
+    return responseObject
+  }
+  const classNamesArray = colorString.split(" ")
+  classNamesArray.forEach((className) => {
+    if (className.includes("dark")) {
+      const updatedClassName = className.replace("dark:", "")
+      responseObject = {
+        ...responseObject,
+        dark: updatedClassName,
+      }
+    } else if (className.includes("custom")) {
+      const updatedClassName = className.replace("custom:", "")
+      responseObject = {
+        ...responseObject,
+        custom: updatedClassName,
+      }
+    } else {
+      responseObject = {
+        ...responseObject,
+        light: className,
+      }
+    }
+  })
+
+  if (!responseObject.dark) responseObject.dark = responseObject.light
+  if (!responseObject.custom) responseObject.custom = responseObject.light
+  return responseObject
 }
 
 export const getOpacity = ({

@@ -4,6 +4,9 @@ import {
   getThemeShades,
   twColorHelper,
   getConstructedClassNames,
+  handleThemes,
+  deepMerge,
+  isEmptyObject,
 } from "../functions/helpers"
 import {
   Interaction,
@@ -17,6 +20,11 @@ import {
   MakUiSimplePalette,
   MakUiSimpleThemePalette,
   MakUiSimpleNestedPalette,
+  MakUiInteractions,
+  MakUiState,
+  VariantInput,
+  StateInput,
+  MakUiVariants,
 } from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
@@ -26,6 +34,7 @@ import {
   uiVariants,
   uiDefaultThemePaletteInput,
   uiThemes,
+  uiInteractions,
 } from "../constants/defaults/default-constants"
 
 export const paletteFactory = ({
@@ -166,121 +175,231 @@ export const paletteFactory = ({
     }
   }
 
-  for (const uiVariant of uiPaletteVariants) {
+  for (const themeVariant of uiPaletteVariants) {
+    if (themeVariant === "theme") {
+      continue
+    }
+
     for (const variant of uiVariants) {
       const targetPalette =
-        uiVariant === "color"
+        themeVariant === "color"
           ? colorPalette
-          : uiVariant === "text"
+          : themeVariant === "text"
           ? textPalette
-          : uiVariant === "border"
+          : themeVariant === "border"
           ? borderPalette
           : colorPalette
 
       const targetPaletteObject =
-        uiVariant === "color"
+        themeVariant === "color"
           ? colorPaletteObject
-          : uiVariant === "text"
+          : themeVariant === "text"
           ? textPaletteObject
-          : uiVariant === "border"
+          : themeVariant === "border"
           ? borderPaletteObject
           : colorPaletteObject
 
-      const targetSimplePaletteObject =
-        uiVariant === "color"
+      let targetSimplePaletteObject =
+        themeVariant === "color"
           ? simpleColorPaletteObject
-          : uiVariant === "text"
+          : themeVariant === "text"
           ? simpleTextPaletteObject
-          : uiVariant === "border"
+          : themeVariant === "border"
           ? simpleBorderPaletteObject
           : simpleColorPaletteObject
 
-      const providedVariant = targetPalette?.[variant]
+      const providedVariant: VariantInput | undefined = targetPalette?.[variant]
 
       if (typeof providedVariant === "string") {
-        const {
-          colorString: variantColorString,
-          rootString: variantRootString,
-        } = twColorHelper({
-          colorString: providedVariant,
-        })
+        const { dark, light, custom } = handleThemes(providedVariant)
+
         const classNames = getConstructedClassNames({
-          color: variantColorString,
+          color: light,
           state: "all",
+        })
+
+        const darkClassNames = getConstructedClassNames({
+          color: dark,
+          state: "all",
+          theme: "dark",
+        })
+
+        const customClassNames = getConstructedClassNames({
+          color: custom,
+          state: "all",
+          theme: "custom",
         })
 
         targetPaletteObject[variant] = {
           ...targetPaletteObject[variant],
-          ...classNames,
+          ...deepMerge(classNames, darkClassNames, customClassNames),
         }
-
-        targetSimplePaletteObject[variant] = variantRootString
+        // targetSimplePaletteObject[variant] = classNames.default.baseRoot
+        // targetSimplePaletteObject[`${variant}Dark`] =
+        //   darkClassNames.default.baseRootDark
+        // targetSimplePaletteObject[`${variant}Custom`] =
+        //   customClassNames.default.baseRootCustom
       }
 
       for (const state of uiStates) {
-        const providedVariant = targetPalette?.[variant] as MakUiVariant
-        const providedState = providedVariant?.[state as keyof MakUiVariant]
+        let constructedStateObject = {} as MakUiStates
+        const providedState: StateInput | undefined =
+          providedVariant?.[state as keyof StateInput]
+        if (isObject(providedState) && !isEmptyObject(providedState)) {
+          for (const interaction of uiInteractions) {
+            const providedInteraction: string | undefined =
+              providedState?.[interaction as keyof MakUiInteractions]
+            if (typeof providedInteraction === "string") {
+              const {
+                light: lightInteraction,
+                dark: darkInteraction,
+                custom: customInteraction,
+              } = handleThemes(providedInteraction)
 
-        if (typeof providedState === "string") {
-          const {
-            colorString: variantColorString,
-            rootString: variantRootString,
-          } = twColorHelper({
-            colorString: providedState,
-          })
+              const { colorString, rootString } = twColorHelper({
+                colorString: lightInteraction,
+              })
+
+              const {
+                colorString: darkColorString,
+                rootString: darkRootString,
+              } = twColorHelper({
+                colorString: darkInteraction,
+              })
+
+              const {
+                colorString: customColorString,
+                rootString: customRootString,
+              } = twColorHelper({
+                colorString: customInteraction,
+              })
+
+              constructedStateObject = {
+                ...constructedStateObject,
+                [interaction]: colorString,
+                [`${interaction}Root`]: rootString,
+                [`${interaction}Dark`]: darkColorString,
+                [`${interaction}RootDark`]: darkRootString,
+                [`${interaction}Custom`]: customColorString,
+                [`${interaction}RootCustom`]: customRootString,
+              }
+            }
+            const existingBase = constructedStateObject.base
+            const missingInteractionClassNames = getConstructedClassNames({
+              color: existingBase,
+              interactions: constructedStateObject,
+              theme: "all",
+            })[state]
+            constructedStateObject = missingInteractionClassNames
+
+            const targetPaletteVariantObject = targetPaletteObject?.[variant]
+            const targetPaletteStateObject = targetPaletteVariantObject?.[state]
+
+            targetPaletteObject[variant] = {
+              ...targetPaletteObject[variant],
+              [state]: {
+                ...targetPaletteStateObject,
+                ...constructedStateObject,
+              },
+            }
+          }
+        } else if (typeof providedState === "string") {
+          const { light, dark, custom } = handleThemes(providedState)
           const classNames = getConstructedClassNames({
-            color: variantColorString,
-            state: "all",
-          })
+            color: light,
+            state: state,
+          })[state]
+
+          const darkClassNames = getConstructedClassNames({
+            color: dark,
+            state: state,
+            theme: "dark",
+          })[state]
+
+          const customClassNames = getConstructedClassNames({
+            color: custom,
+            state: state,
+            theme: "custom",
+          })[state]
+
+          const mergedClassNames = deepMerge(
+            classNames,
+            darkClassNames,
+            customClassNames
+          )
+
+          console.log({ classNames })
+
+          const targetPaletteVariantObject = targetPaletteObject?.[variant]
+          const targetPaletteStateObject = targetPaletteVariantObject?.[state]
           targetPaletteObject[variant] = {
             ...targetPaletteObject[variant],
-            ...classNames,
+            [state]: {
+              ...targetPaletteStateObject,
+              ...mergedClassNames,
+            },
           }
-          targetSimplePaletteObject[variant] = variantRootString
-        } else if (isObject(providedState)) {
-          const classNames = getConstructedClassNames({
-            interactions: colorPalette?.[variant] as MakUiStates,
-            state: "all",
-          })
-
-          targetPaletteObject[variant] = {
-            ...targetPaletteObject[variant],
-            ...classNames,
+          // targetSimplePaletteObject[interaction] = classNames.baseRoot
+          // targetSimplePaletteObject[`${interaction}Dark`] =
+          //   darkClassNames.baseRoot
+          // targetSimplePaletteObject[`${interaction}Custom`] =
+          //   customClassNames.baseRoot
+        } else if (!providedState && !targetPaletteObject?.[variant]?.[state]) {
+          for (const interaction of uiInteractions) {
+            if (!targetPaletteObject?.[variant]?.[state]?.[interaction]) {
+              // console.log({ themeVariant, variant, state, interaction })
+            }
           }
-
-          targetSimplePaletteObject[variant] = classNames.default.baseRoot
         }
       }
+
       if (!colorPaletteObject?.[variant]) {
         const classNames = getConstructedClassNames({
           color: uiDefaultColorPaletteInput[variant] as Interaction,
+          theme: "all",
           state: "all",
         })
+
         colorPaletteObject[variant] = {
           ...targetPaletteObject[variant],
           ...classNames,
         }
-        simpleColorPaletteObject[variant] = classNames.default.baseRoot
+        // simpleColorPaletteObject[variant] = classNames.default.baseRoot
+        // simpleColorPaletteObject[`${variant}Dark`] =
+        //   classNames.default.baseRootDark
+        // simpleColorPaletteObject[`${variant}Custom`] =
+        //   classNames.default.baseRootCustom
       }
       if (!borderPaletteObject?.[variant]) {
         borderPaletteObject[variant] = {
           ...colorPaletteObject?.[variant],
         }
-        simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
+        // simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
+        // simpleBorderPaletteObject[`${variant}Dark`] =
+        //   simpleColorPaletteObject?.[`${variant}Dark`]
+        // simpleBorderPaletteObject[`${variant}Custom`] =
+        //   simpleColorPaletteObject?.[`${variant}Custom`]
       }
       if (!textPaletteObject?.[variant]) {
         const classNames = getConstructedClassNames({
           color: uiDefaultTextPaletteInput?.[variant] as Interaction,
           state: "all",
+          theme: "all",
         })
+
         textPaletteObject[variant] = {
           ...targetPaletteObject[variant],
           ...classNames,
         }
-        simpleTextPaletteObject[variant] = classNames.default.baseRoot
+        // simpleTextPaletteObject[variant] = classNames.default.baseRoot
+        // simpleTextPaletteObject[`${variant}Dark`] =
+        //   classNames.default.baseRootDark
+        // simpleTextPaletteObject[`${variant}Custom`] =
+        //   classNames.default.baseRoot
       }
     }
   }
+  console.log({ colorPaletteObject, simpleColorPaletteObject })
 
   const nestedPaletteObject: MakUiNestedPalette = {
     color: colorPaletteObject,

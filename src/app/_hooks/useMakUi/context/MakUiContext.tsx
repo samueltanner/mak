@@ -87,6 +87,7 @@ export const MakUiProvider = ({
       simpleNestedPaletteObject = defaultSimpleNestedPalette,
     } = paletteFactory({ paletteInput }) || {}
 
+    // console.log({ simpleNestedPaletteObject })
     console.log({ nestedPaletteObject })
     return {
       colorPalette: colorPaletteObject as MakUiPalette,
