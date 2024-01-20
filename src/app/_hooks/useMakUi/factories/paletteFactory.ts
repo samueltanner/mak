@@ -30,6 +30,9 @@ import {
   MakUiVerbosePalettes,
   MakUiVerboseTheme,
   MakUiSimpleTheme,
+  MakUiVariant,
+  MakUiVariants,
+  MakUiPaletteVariant,
 } from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
@@ -59,8 +62,76 @@ export const paletteFactory = ({
   let simpleBorderPaletteObject = {} as MakUiSimplePalette
   let simpleThemePaletteObject = {} as MakUiSimpleThemePalette
 
-  const constructedObject = extractInitialPalette({ palette: paletteInput })
-  console.log(JSON.stringify(constructedObject, null, 2))
+  const initialVerbosePalette = extractInitialPalette({ palette: paletteInput })
+  console.log("initialVerbosePalette", initialVerbosePalette)
+  let finalVerbosePalette = {} as MakUiVerbosePalettes
+  let finalSimplePalette = {} as MakUiSimplePalettes
+  for (const theme of uiThemes) {
+    if (
+      !initialVerbosePalette?.[theme] ||
+      isEmptyObject(initialVerbosePalette)
+    ) {
+      const constructedClassNames = getConstructedClassNames({
+        theme,
+        state: "all",
+        color: uiDefaultColorPaletteInput[
+          theme as keyof MakUiPaletteInput
+        ] as string,
+      })
+      console.log("constructedClassNames", constructedClassNames)
+
+      //  const classNames = getConstructedClassNames({
+      //   color: uiDefaultColorPaletteInput[variant] as MakUiInteraction,
+      //   theme: "all",
+      //   state: "all",
+      // }
+    }
+    for (const paletteVariant of uiPaletteVariants) {
+      if (!initialVerbosePalette?.[theme]?.[paletteVariant]) continue
+      if (paletteVariant === "theme") continue
+      for (const variant of uiVariants) {
+        if (!initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant])
+          continue
+
+        const providedState =
+          initialVerbosePalette[theme][paletteVariant][variant]
+        const constructedClassNames = getConstructedClassNames({
+          interactions: providedState as MakUiVariants,
+          state: "all",
+        })
+
+        ensureNestedObject({
+          parent: finalVerbosePalette,
+          keys: [theme, paletteVariant, variant],
+          value: constructedClassNames,
+        })
+
+        const {
+          baseRoot: base,
+          clickRoot: click,
+          hoverRoot: hover,
+          focusRoot: focus,
+        } = constructedClassNames.default
+
+        ensureNestedObject({
+          parent: finalSimplePalette,
+          keys: [theme, paletteVariant, variant],
+          value: {
+            base,
+            click,
+            hover,
+            focus,
+          },
+        })
+      }
+    }
+  }
+
+  // console.log(
+  //   "finalVerbosePalette",
+  //   JSON.stringify(finalVerbosePalette, null, 2)
+  // )
+
   let simplePaletteThemesObject = {
     light: {},
     dark: {},

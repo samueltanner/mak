@@ -22,6 +22,9 @@ import {
   MakUiPaletteVariant,
   MakUiInteraction,
   MakUiThemePalette,
+  MakUiPalette,
+  MakUiNestedPalette,
+  MakUiVerbosePalettes,
 } from "../types/default-types"
 import {
   absoluteRegex,
@@ -347,6 +350,7 @@ export const getConstructedClassNames = ({
   const globalDefaultColor = twColorHelper({
     colorString: colorString,
   })
+
   for (const theme of themes) {
     for (const state of states) {
       for (const interaction of uiInteractions) {
@@ -509,7 +513,7 @@ export const twColorHelper = ({
   opacity?: number | string | undefined | null
   shade?: number | string | undefined | null
 }): TWColorHelperResponse => {
-  if (!colorString) colorString = `${uiDefaultColorPaletteInput?.primary}-500`
+  if (!colorString) colorString = `${uiDefaultColorPaletteInput?.primary}`
 
   const isAbsoluteColor =
     absoluteRegex.test(colorString) ||
@@ -534,7 +538,13 @@ export const twColorHelper = ({
       hex: colorString === "white" ? colors["white"] : colors["black"],
     }
   } else {
-    const colorArr = colorString.split("-")
+    // console.log({ colorString })
+    if (isObject(colorString)) {
+      colorString = Object.values(colorString)[0] || uiDefaultColorPaletteInput?.primary
+    } else if (!colorString){
+      colorString = `${uiDefaultColorPaletteInput?.primary}`
+    }
+    const colorArr = colorString!.split("-")
 
     const lastElement = colorArr[colorArr.length - 1]
     let shadeAndOpacity
@@ -838,8 +848,6 @@ const getClassNameAsObject = (key: string, value: string) => {
   let state
   let className
 
-  console.log({ key, value })
-
   const splitString = value.split(":")
   const lightMode =
     splitString[0] === "dark" || splitString[0] === "custom" ? false : true
@@ -903,7 +911,6 @@ export const extractInitialPalette = ({
           }) as MakUiThemePalette
         }
       })
-      console.log({ themePalette })
 
       continue
     }
@@ -949,23 +956,27 @@ export const extractInitialPalette = ({
       }
     }
   }
-  ensureNestedObject({
-    parent: paletteObject,
-    keys: ["light", "theme"],
-    value: themePalette.light,
-  })
+  if (!isEmptyObject(themePalette.light)) {
+    ensureNestedObject({
+      parent: paletteObject,
+      keys: ["light", "theme"],
+      value: themePalette.light,
+    })
+  }
+  if (!isEmptyObject(themePalette.dark)) {
+    ensureNestedObject({
+      parent: paletteObject,
+      keys: ["dark", "theme"],
+      value: themePalette.dark,
+    })
+  }
+  if (!isEmptyObject(themePalette.custom)) {
+    ensureNestedObject({
+      parent: paletteObject,
+      keys: ["custom", "theme"],
+      value: themePalette.custom,
+    })
+  }
 
-  ensureNestedObject({
-    parent: paletteObject,
-    keys: ["dark", "theme"],
-    value: themePalette.dark,
-  })
-
-  ensureNestedObject({
-    parent: paletteObject,
-    keys: ["custom", "theme"],
-    value: themePalette.custom,
-  })
-
-  return paletteObject
+  return paletteObject as MakUiVerbosePalettes
 }

@@ -19,34 +19,32 @@ const inter = Inter({ subsets: ["latin"] })
 // }
 const palette: MakUiPaletteInput = {
   primary:
-    "mak-teal-400 dark:mak-teal-100 custom:red hover:red dark:hover:mak-teal-100",
-  secondary: {
-    active: {
-      base: "zinc-800 dark:zinc-100",
-      focus: "zinc-700",
-    },
-  },
-
-  secondaryBorder: "teal-400",
-  tertiary: "zinc-800",
-  tertiaryBorder: "zinc-600",
-  success: "blue",
-  successBorder: "blue-300",
-  danger: "custom:red",
-  dangerBorder: {
-    default: "red-301 dark:red-302",
-  },
-  primaryText: "zinc-900 dark:zinc-50 custom:yellow",
-  secondaryText: "blue-50 dark:blue-700",
-  warningText: "red-50",
-  theme: {
-    dark: "zinc-950",
-    light: {
-      primary: "zinc-50",
-      secondary: "zinc-100",
-    },
-    custom: "mak-teal-500",
-  },
+    "mak-teal-400 hover:red dark:hover:mak-teal-800",
+  // secondary: {
+  //   active: {
+  //     base: "zinc-800 dark:zinc-100",
+  //     focus: "zinc-700",
+  //   },
+  // },
+  // secondaryBorder: "teal-400",
+  // tertiary: "zinc-800",
+  // tertiaryBorder: "zinc-600",
+  // success: "blue",
+  // successBorder: "blue-300",
+  // dangerBorder: {
+  //   default: "red-301 dark:red-302",
+  // },
+  // primaryText: "zinc-900 dark:zinc-50",
+  // secondaryText: "blue-50 dark:blue-700",
+  // warningText: "red-50",
+  // theme: {
+  //   dark: "zinc-950",
+  //   light: {
+  //     primary: "zinc-50",
+  //     secondary: "zinc-100",
+  //   },
+  //   // custom: "mak-teal-500",
+  // },
 }
 
 const componentConfig: MakUiComponentConfig = {

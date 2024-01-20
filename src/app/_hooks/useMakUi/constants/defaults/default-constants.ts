@@ -93,7 +93,7 @@ export const uiStates: MakUiState[] = [
   "invalid",
 ]
 
-export const uiInteractions: MakUiInteraction[] = ["base", "hover", "click"]
+export const uiInteractions: MakUiInteraction[] = ["base", "hover", "click", "focus"]
 
 export const uiRootInteractions: MakUiRootInteraction[] = [
   "baseRoot",
