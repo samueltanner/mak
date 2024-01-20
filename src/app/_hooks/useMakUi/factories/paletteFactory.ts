@@ -10,6 +10,7 @@ import {
   ensureNestedObject,
   separateObjectByKey,
   splitKeyAtChar,
+  extractInitialPalette,
 } from "../functions/helpers"
 import {
   MakUiInteraction,
@@ -58,6 +59,8 @@ export const paletteFactory = ({
   let simpleBorderPaletteObject = {} as MakUiSimplePalette
   let simpleThemePaletteObject = {} as MakUiSimpleThemePalette
 
+  const constructedObject = extractInitialPalette({ palette: paletteInput })
+  console.log(JSON.stringify(constructedObject, null, 2))
   let simplePaletteThemesObject = {
     light: {},
     dark: {},
@@ -214,15 +217,6 @@ export const paletteFactory = ({
           : themeVariant === "border"
           ? borderPaletteObject
           : colorPaletteObject
-
-      let targetSimplePaletteObject =
-        themeVariant === "color"
-          ? simpleColorPaletteObject
-          : themeVariant === "text"
-          ? simpleTextPaletteObject
-          : themeVariant === "border"
-          ? simpleBorderPaletteObject
-          : simpleColorPaletteObject
 
       const providedVariant: VariantInput | undefined = targetPalette?.[variant]
 

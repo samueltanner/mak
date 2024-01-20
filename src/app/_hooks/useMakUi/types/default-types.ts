@@ -2,26 +2,37 @@ import { MakUiButtonConfig } from "./button-types"
 
 export type SimpleRecord = Record<string, any>
 
-export type MakUiInteraction = "base" | "hover" | "click"
+export type MakUiInteraction = "base" | "hover" | "click" | "focus"
 
-export type MakUiDarkInteraction = "baseDark" | "hoverDark" | "clickDark"
+export type MakUiDarkInteraction =
+  | "baseDark"
+  | "hoverDark"
+  | "clickDark"
+  | "focusDark"
 
 export type MakUiCustomInteraction =
   | "baseCustom"
   | "hoverCustom"
   | "clickCustom"
+  | "focusCustom"
 
-export type MakUiRootInteraction = "baseRoot" | "hoverRoot" | "clickRoot"
+export type MakUiRootInteraction =
+  | "baseRoot"
+  | "hoverRoot"
+  | "clickRoot"
+  | "focusRoot"
 
 export type MakUiDarkRootInteraction =
   | "baseRootDark"
   | "hoverRootDark"
   | "clickRootDark"
+  | "focusRootDark"
 
 export type MakUiCustomRootInteraction =
   | "baseRootCustom"
   | "hoverRootCustom"
   | "clickRootCustom"
+  | "focusRootCustom"
 
 export type MakUiThemeMode = "dark" | "light" | "custom"
 export type VerboseThemeVariant = "darkTheme" | "lightTheme" | "customTheme"
@@ -84,7 +95,6 @@ export type MakUiState =
   | "default"
   | "active"
   | "disabled"
-  | "focused"
   | "selected"
   | "invalid"
 
@@ -161,7 +171,7 @@ export type VerboseVariant =
   | VerboseBorderVariant
   | VerboseThemeVariant
 
-export type MakUiNestedPaletteVariant = "color" | "text" | "border" | "theme"
+export type MakUiPaletteVariant = "color" | "text" | "border" | "theme"
 
 export type MakUiInteractions = {
   [Key in
@@ -188,6 +198,7 @@ export type StateInput =
       base: string
       hover?: string
       click?: string
+      focus?: string
     }
 
 export type VariantInput =
@@ -293,6 +304,14 @@ export type TWColorHelperResponse = {
   colorString: string
   rootString: string
   hex: string
+}
+
+export type SplitStringResponse = {
+  theme: string | undefined
+  interaction: string | undefined
+  state: string | undefined
+  className: string | undefined
+  string: string
 }
 
 export type MakUiComponentConfig = {

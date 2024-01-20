@@ -19,9 +19,15 @@ import {
   ThemeVariantInput,
   MakUiThemeVariantShades,
   InteractionShades,
+  MakUiPaletteVariant,
+  MakUiInteraction,
+  MakUiThemePalette,
 } from "../types/default-types"
 import {
   absoluteRegex,
+  darkRegex,
+  lightRegex,
+  customRegex,
   uiDefaultBorderPaletteInput,
   uiDefaultColorPaletteInput,
   uiDefaultShades,
@@ -32,6 +38,7 @@ import {
   uiDefaultThemeShades,
   uiDefaultThemePaletteInput,
   uiThemes,
+  uiPaletteVariants,
 } from "../constants/defaults/default-constants"
 import colors from "tailwindcss/colors"
 import twConfig from "../../../../../tailwind.config"
@@ -39,14 +46,14 @@ import twConfig from "../../../../../tailwind.config"
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
 
-export const isObject = (v: any): v is GenericObject =>
-  v !== null && typeof v === "object" && !Array.isArray(v)
-
 export const isEmptyObject = (obj: GenericObject) =>
   isObject(obj) && Object.keys(obj).length === 0
 
 export const isNestedObject = (obj: GenericObject) =>
   isObject(obj) && Object.values(obj).some(isObject)
+
+export const isObject = (v: any): v is GenericObject =>
+  v !== null && typeof v === "object" && !Array.isArray(v)
 
 export const deepMerge = (...objects: (GenericObject | undefined)[]) => {
   const result = {}
@@ -265,6 +272,8 @@ export const getShades = ({
       hoverRoot: Math.max(50, Math.min(hoverDiff, 950)),
       click: Math.max(50, Math.min(clickDiff, 950)),
       clickRoot: Math.max(50, Math.min(clickDiff, 950)),
+      focus: Math.max(50, Math.min(clickDiff, 950)),
+      focusRoot: Math.max(50, Math.min(clickDiff, 950)),
     }
     shadesResponseObj[state as MakUiState] = altStateShadesObject
   }
@@ -291,7 +300,6 @@ export const getConstructedClassNames = ({
     selected: {} as MakUiStates,
     invalid: {} as MakUiStates,
     disabled: {} as MakUiStates,
-    focused: {} as MakUiStates,
   }
 
   const variantObjectKey = Object.keys(interactions || {}).find((key) => {
@@ -694,9 +702,10 @@ export const ensureNestedObject = <T>({
   value,
 }: {
   parent: T
-  keys?: (keyof T)[]
+  keys?: (keyof T | string | undefined)[]
   value?: any
 }) => {
+  keys = keys ? keys.filter((k) => k) : []
   let current: any = parent
 
   if (!keys || keys.length === 0) return current
@@ -709,7 +718,6 @@ export const ensureNestedObject = <T>({
     } else {
       current[key] = current[key] || {}
     }
-
     current = current[key]
   }
 
@@ -772,4 +780,192 @@ export const splitKeyAtChar = (obj: GenericObject, char: string) => {
       [key.split(char)[0]]: value,
     }
   }, {})
+}
+
+export const splitStringAtCapital = (string: string) => {
+  return string.split(/(?=[A-Z])/)
+}
+
+const getNestedClassNameObjects = (key: string, value: object) => {
+  const classNamesArray = [] as {
+    variant: string
+    theme: string | undefined
+    paletteVariant: string
+    interaction: string | undefined
+    state: string
+    className: string
+  }[]
+
+  let [variant, paletteVariant = "color"] = splitStringAtCapital(key)
+  paletteVariant = paletteVariant.toLowerCase()
+  const state = Object.keys(value)[0]
+  let interactions = Object.values(value)[0]
+
+  if (typeof interactions === "string") {
+    interactions = {
+      base: interactions,
+    }
+  }
+
+  Object.entries(interactions).forEach(([interaction, classNames]) => {
+    ;(classNames as string).split(" ").forEach((className) => {
+      const hasTheme = className.includes(":")
+      let theme
+      if (hasTheme) {
+        ;[theme, className] = className.split(":")
+      } else {
+        theme = "light"
+      }
+
+      classNamesArray.push({
+        variant,
+        theme,
+        paletteVariant,
+        interaction,
+        state,
+        className,
+      })
+    })
+  })
+  return classNamesArray
+}
+
+const getClassNameAsObject = (key: string, value: string) => {
+  let variant
+  let theme
+  let paletteVariant
+  let interaction
+  let state
+  let className
+
+  console.log({ key, value })
+
+  const splitString = value.split(":")
+  const lightMode =
+    splitString[0] === "dark" || splitString[0] === "custom" ? false : true
+  theme = lightMode ? "light" : splitString[0]
+  paletteVariant =
+    uiPaletteVariants.find((v) => {
+      if (key.toLowerCase().includes(v)) {
+        return v
+      }
+    }) || "color"
+
+  className = splitString[splitString.length - 1]
+  state =
+    splitString.find((el) => uiStates.includes(el as MakUiState)) || "default"
+  variant =
+    uiVariants.find((v) => {
+      if (key.toLowerCase().includes(v)) {
+        return v
+      }
+    }) || "primary"
+
+  interaction =
+    splitString.find((el) => uiInteractions.includes(el as MakUiInteraction)) ||
+    "base"
+
+  return {
+    variant,
+    theme,
+    paletteVariant,
+    interaction,
+    state,
+    className,
+    colorString: value,
+  }
+}
+
+export const extractInitialPalette = ({
+  palette,
+}: {
+  palette: MakUiPaletteInput
+}) => {
+  let themePalette = {
+    light: {},
+    dark: {},
+    custom: {},
+  } as MakUiThemePalette
+  let paletteObject = {} as MakUiPaletteInput
+  for (const [key, value] of Object.entries(palette)) {
+    if (key === "theme") {
+      const themes = Object.entries(value)
+      themes.forEach(([theme, classNames]) => {
+        if (isObject(classNames)) {
+          themePalette = deepMerge(themePalette, {
+            [theme]: classNames,
+          }) as MakUiThemePalette
+        } else {
+          themePalette = deepMerge(themePalette, {
+            [theme]: {
+              primary: classNames,
+            },
+          }) as MakUiThemePalette
+        }
+      })
+      console.log({ themePalette })
+
+      continue
+    }
+    if (isObject(value)) {
+      const classNamesArray = getNestedClassNameObjects(key, value)
+      for (const obj of classNamesArray) {
+        const {
+          variant,
+          theme,
+          paletteVariant,
+          interaction,
+          state,
+          className,
+        } = obj
+        const nestedObj = {}
+        ensureNestedObject({
+          parent: nestedObj,
+          keys: [theme, paletteVariant, variant, state, interaction],
+          value: className,
+        })
+
+        paletteObject = deepMerge(nestedObj, paletteObject)
+      }
+    } else {
+      for (const classNameString of value.split(" ")) {
+        const cnObj = getClassNameAsObject(key, classNameString)
+        const {
+          variant,
+          theme,
+          paletteVariant,
+          interaction,
+          state,
+          className,
+        } = cnObj
+
+        const obj = {}
+        ensureNestedObject({
+          parent: obj,
+          keys: [theme, paletteVariant, variant, state, interaction],
+          value: className,
+        })
+        paletteObject = deepMerge(paletteObject, obj)
+      }
+    }
+  }
+  ensureNestedObject({
+    parent: paletteObject,
+    keys: ["light", "theme"],
+    value: themePalette.light,
+  })
+
+  ensureNestedObject({
+    parent: paletteObject,
+    keys: ["dark", "theme"],
+    value: themePalette.dark,
+  })
+
+  ensureNestedObject({
+    parent: paletteObject,
+    keys: ["custom", "theme"],
+    value: themePalette.custom,
+  })
+
+  return paletteObject
 }

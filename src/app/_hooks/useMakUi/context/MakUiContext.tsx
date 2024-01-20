@@ -64,10 +64,8 @@ const MakUiProviderChild = ({
 
     const handleDarkModeChange = (e: MediaQueryListEvent) => {
       if (e.matches) {
-        console.log("dark mode")
         setThemeMode("dark")
       } else {
-        console.log("light mode")
         setThemeMode("light")
       }
     }
@@ -147,8 +145,6 @@ const MakUiProviderChild = ({
     isLight: themeMode === "light",
     isCustom: themeMode === "custom",
   }
-
-  console.log(value.t, value.s)
 
   return (
     <MakUiContext.Provider value={value}>

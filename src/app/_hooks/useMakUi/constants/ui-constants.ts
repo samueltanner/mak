@@ -112,7 +112,7 @@ export const elementStates: ElementState[] = [
   "active",
   "selected",
   "disabled",
-  "focused",
+  "focus",
 ]
 
 export const elementInteractions: ElementInteractionState[] = [
@@ -154,7 +154,7 @@ export const defaultStateShades: StateShades = {
     click: 700,
     clickRoot: 700,
   },
-  focused: {
+  focus: {
     base: 500,
     baseRoot: 500,
     hover: 600,

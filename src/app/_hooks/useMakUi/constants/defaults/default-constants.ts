@@ -8,7 +8,7 @@ import {
   VerboseBorderVariant,
   VerboseColorVariant,
   StateShades,
-  MakUiNestedPaletteVariant,
+  MakUiPaletteVariant,
   MakUiThemePalette,
   MakUiThemeVariant,
   VerboseThemeVariant,
@@ -22,7 +22,16 @@ import {
 export const absoluteRegex =
   /^((white|black)\/\[*0*(?:[0-9][0-9]?|100)%*\]*|(white|black))$/
 
-export const uiPaletteVariants: MakUiNestedPaletteVariant[] = [
+export const darkRegex =
+  /^dark:((hover)|(focus)|(active)|(disabled)|(invalid)|(error))?:?/
+
+export const lightRegex =
+  /^(?!custom:|dark:)((hover)|(focus)|(active)|(disabled)|(invalid)|(error))?:?/
+
+export const customRegex =
+  /^custom:((hover)|(focus)|(active)|(disabled)|(invalid)|(error))?:?/
+
+export const uiPaletteVariants: MakUiPaletteVariant[] = [
   "color",
   "text",
   "border",
@@ -80,9 +89,8 @@ export const uiStates: MakUiState[] = [
   "active",
   "default",
   "disabled",
-  "focused",
   "selected",
-  "invalid"
+  "invalid",
 ]
 
 export const uiInteractions: MakUiInteraction[] = ["base", "hover", "click"]
@@ -180,31 +188,31 @@ export const uiDefaultShades: StateShades = {
     base: 500,
     hover: 600,
     click: 700,
+    focus: 600,
   },
   active: {
     base: 400,
     hover: 500,
     click: 600,
+    focus: 500,
   },
   selected: {
     base: 400,
     hover: 500,
     click: 600,
+    focus: 500,
   },
   invalid: {
     base: 400,
     hover: 500,
     click: 600,
+    focus: 500,
   },
   disabled: {
     base: 300,
     hover: 300,
     click: 300,
-  },
-  focused: {
-    base: 500,
-    hover: 700,
-    click: 700,
+    focus: 300,
   },
 }
 

@@ -3,6 +3,7 @@ import { forwardRef, useEffect, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
 import { useMakUi } from "../context/MakUiContext"
 import {
+  MakUiInteraction,
   MakUiState,
   MakUiVariant,
   MakUiVerboseTheme,
@@ -47,7 +48,7 @@ interface ButtonProps {
 
   active?: boolean
   disabled?: boolean
-  focused?: boolean
+  focus?: boolean
   buttonState?: MakUiState | undefined
 
   textClassName?: string
@@ -77,13 +78,20 @@ interface ButtonProps {
 
 type ButtonStates = {
   state: MakUiState
+  interaction: ButtonInteractions
   disabled: boolean
   loading: boolean
   selected: boolean
   success: boolean
   error: boolean
   active: boolean
-  focused: boolean
+  focus: boolean
+  click: boolean
+  hover: boolean
+}
+
+type ButtonInteractions = {
+  [Key in MakUiInteraction]: boolean
 }
 
 const buttonClassName = ({
@@ -120,13 +128,7 @@ const buttonClassName = ({
   const borderPalette = theme.border
   const themePalette = theme.theme
 
-  const {
-    state: buttonState,
-    disabled,
-    selected,
-    active,
-    focused,
-  } = buttonStates
+  const { state: buttonState, disabled, selected, active, focus } = buttonStates
 
   const buttonWidth = width === "full" ? "w-full" : "w-fit"
   const cursorAction = disabled ? "cursor-not-allowed" : "cursor-pointer"
@@ -147,7 +149,7 @@ const buttonClassName = ({
       ? `ring-2 ring-${variantObject?.baseRoot}/50 outline-none ring-offset-2`
       : ""
   const focusedClass =
-    focused && showFocusRing && !disabled
+    focus && showFocusRing && !disabled
       ? `focus:ring-2 focus:ring-${variantObject?.base} focus:outline-none ring-offset-2`
       : ""
   return `${baseClass} ${textClass} ${backgroundClass} ${borderClass} ${focusedClass} ${selectedClass} ${buttonWidth}`
@@ -199,7 +201,7 @@ const Button = forwardRef(
       active = false,
       selected = false,
       disabled = false,
-      focused = false,
+      focus = false,
       buttonState = "default",
 
       isLoading = false,
@@ -226,6 +228,13 @@ const Button = forwardRef(
 
     const status = isLoading || isError || isSuccess
     const [showStatus, setShowStatus] = useState<boolean>(!!status)
+    const [buttonInteractions, setButtonInteractions] =
+      useState<ButtonInteractions>({
+        base: true,
+        hover: false,
+        click: false,
+        focus: false,
+      })
 
     useEffect(() => {
       if (status) {
@@ -286,13 +295,16 @@ const Button = forwardRef(
     const currentButtonState = (): ButtonStates => {
       return {
         state: buttonState,
+        interaction: buttonInteractions,
         disabled: isDisabled || buttonState === "disabled",
         loading: isLoading,
         success: isSuccess,
         error: isError,
         selected: selected || buttonState === "selected",
         active: active || buttonState === "active",
-        focused: focused || buttonState === "focused",
+        focus: focus || buttonInteractions.focus,
+        click: buttonInteractions.click,
+        hover: buttonInteractions.hover,
       }
     }
 
@@ -330,12 +342,53 @@ const Button = forwardRef(
       <button
         ref={ref}
         onClick={handleClick}
+        onPointerDown={() => {
+          setButtonInteractions({
+            ...buttonInteractions,
+            base: false,
+            hover: false,
+            click: true,
+          })
+        }}
+        onPointerUp={() => {
+          setButtonInteractions({
+            ...buttonInteractions,
+            base: true,
+            click: false,
+          })
+        }}
+        onPointerEnter={() => {
+          setButtonInteractions({
+            ...buttonInteractions,
+            base: false,
+            hover: true,
+          })
+        }}
+        onPointerLeave={() => {
+          setButtonInteractions({
+            ...buttonInteractions,
+            base: true,
+            hover: false,
+          })
+        }}
+        onFocus={() => {
+          setButtonInteractions({
+            ...buttonInteractions,
+            focus: true,
+          })
+        }}
+        onBlur={() => {
+          setButtonInteractions({
+            ...buttonInteractions,
+            focus: false,
+          })
+        }}
         className={`flex items-center justify-center gap-1 ${computedButtonClassName} `}
         disabled={isDisabled}
         type={type}
         id={id}
         key={buttonKey}
-        autoFocus={currentButtonState().focused}
+        autoFocus={currentButtonState().focus}
       >
         {showStatus && status && statusIconSide === "left" && (
           <InLineLoader loading={isError} error={isError} success={isSuccess} />
