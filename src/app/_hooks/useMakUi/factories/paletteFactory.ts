@@ -11,6 +11,7 @@ import {
   separateObjectByKey,
   splitKeyAtChar,
   extractInitialPalette,
+  getConstructedTheme,
 } from "../functions/helpers"
 import {
   MakUiInteraction,
@@ -30,9 +31,7 @@ import {
   MakUiVerbosePalettes,
   MakUiVerboseTheme,
   MakUiSimpleTheme,
-  MakUiVariant,
   MakUiVariants,
-  MakUiPaletteVariant,
 } from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
@@ -43,6 +42,7 @@ import {
   uiDefaultThemePaletteInput,
   uiThemes,
   uiInteractions,
+  uiDefaultSimpleTextPalette,
 } from "../constants/defaults/default-constants"
 
 export const paletteFactory = ({
@@ -63,492 +63,570 @@ export const paletteFactory = ({
   let simpleThemePaletteObject = {} as MakUiSimpleThemePalette
 
   const initialVerbosePalette = extractInitialPalette({ palette: paletteInput })
-  console.log("initialVerbosePalette", initialVerbosePalette)
   let finalVerbosePalette = {} as MakUiVerbosePalettes
   let finalSimplePalette = {} as MakUiSimplePalettes
   for (const theme of uiThemes) {
-    if (
-      !initialVerbosePalette?.[theme] ||
-      isEmptyObject(initialVerbosePalette)
-    ) {
-      const constructedClassNames = getConstructedClassNames({
-        theme,
-        state: "all",
-        color: uiDefaultColorPaletteInput[
-          theme as keyof MakUiPaletteInput
-        ] as string,
-      })
-      console.log("constructedClassNames", constructedClassNames)
-
-      //  const classNames = getConstructedClassNames({
-      //   color: uiDefaultColorPaletteInput[variant] as MakUiInteraction,
-      //   theme: "all",
-      //   state: "all",
-      // }
-    }
     for (const paletteVariant of uiPaletteVariants) {
-      if (!initialVerbosePalette?.[theme]?.[paletteVariant]) continue
-      if (paletteVariant === "theme") continue
-      for (const variant of uiVariants) {
-        if (!initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant])
-          continue
+      if (paletteVariant === "theme") {
+        if (initialVerbosePalette?.[theme]?.[paletteVariant]) {
+          const providedVariant = initialVerbosePalette[theme][paletteVariant]
 
-        const providedState =
-          initialVerbosePalette[theme][paletteVariant][variant]
-        const constructedClassNames = getConstructedClassNames({
-          interactions: providedState as MakUiVariants,
-          state: "all",
-        })
+          const constructedTheme = getConstructedTheme(providedVariant, theme)
 
-        ensureNestedObject({
-          parent: finalVerbosePalette,
-          keys: [theme, paletteVariant, variant],
-          value: constructedClassNames,
-        })
+          ensureNestedObject({
+            parent: finalVerbosePalette,
+            keys: [theme, paletteVariant],
+            value: constructedTheme,
+          })
 
-        const {
-          baseRoot: base,
-          clickRoot: click,
-          hoverRoot: hover,
-          focusRoot: focus,
-        } = constructedClassNames.default
+          const {
+            primary: primaryRoot,
+            secondary: secondaryRoot,
+            tertiary: tertiaryRoot,
+            custom: customRoot,
+          } = constructedTheme
 
-        ensureNestedObject({
-          parent: finalSimplePalette,
-          keys: [theme, paletteVariant, variant],
-          value: {
-            base,
-            click,
-            hover,
-            focus,
-          },
-        })
-      }
-    }
-  }
-
-  // console.log(
-  //   "finalVerbosePalette",
-  //   JSON.stringify(finalVerbosePalette, null, 2)
-  // )
-
-  let simplePaletteThemesObject = {
-    light: {},
-    dark: {},
-    custom: {},
-  } as MakUiSimplePalettes
-  let paletteThemesObject = {
-    light: {},
-    dark: {},
-    custom: {},
-  } as MakUiVerbosePalettes
-
-  for (const theme of uiThemes) {
-    const providedVariant = themePalette?.[theme]
-
-    if (typeof providedVariant === "string") {
-      const providedClassName = twColorHelper({ colorString: providedVariant })
-      const autoShade = providedClassName.autoShade
-      const relativeThemeShades = getThemeShades({
-        altBaseShade: autoShade ? undefined : providedClassName.shade,
-        defaultTheme: theme,
-      })
-
-      for (const [variant, shade] of Object.entries(relativeThemeShades)) {
-        const { colorString, rootString } = twColorHelper({
-          colorString: providedClassName.colorString,
-          shade: shade,
-        })
-
-        themePaletteObject[theme] = {
-          ...themePaletteObject[theme],
-          [variant]: colorString,
-          [`${variant}Root`]: rootString,
-        }
-        simpleThemePaletteObject[theme] = {
-          ...simpleThemePaletteObject[theme],
-          [variant]: rootString,
-        }
-      }
-    }
-
-    if (isObject(providedVariant)) {
-      const primaryColor = providedVariant?.primary
-      const primaryColorObject = twColorHelper({
-        colorString: primaryColor,
-      })
-      const {
-        color: primaryColorVal,
-        colorString: primaryColorString,
-        rootString: primaryRootString,
-        shade: primaryShade,
-        opacity: primaryOpacity,
-      } = primaryColorObject
-
-      const relativeThemeShades = getThemeShades({
-        altBaseShade: primaryShade,
-        defaultTheme: theme,
-      })
-
-      const remainingVariants: MakUiThemeVariant[] = [
-        "secondary",
-        "tertiary",
-        "custom",
-      ]
-
-      themePaletteObject[theme] = {
-        ...themePaletteObject[theme],
-        primary: primaryColorString,
-        primaryRoot: primaryRootString,
-      }
-
-      simpleThemePaletteObject[theme] = {
-        ...simpleThemePaletteObject[theme],
-        primary: primaryRootString,
-      }
-
-      remainingVariants.forEach((variant) => {
-        const variantColor = providedVariant?.[variant]
-          ? twColorHelper({ colorString: providedVariant[variant]! })
-          : undefined
-        const {
-          colorString: variantColorString,
-          rootString: variantRootString,
-        } = twColorHelper({
-          colorString: variantColor?.colorString || primaryColorVal,
-          shade: variantColor?.shade || relativeThemeShades[variant],
-          opacity: variantColor?.opacity || primaryOpacity,
-        })
-        themePaletteObject[theme] = {
-          ...themePaletteObject[theme],
-          [variant]: variantColorString,
-          [`${variant}Root`]: variantRootString,
-        }
-
-        simpleThemePaletteObject[theme] = {
-          ...simpleThemePaletteObject[theme],
-          [variant]: variantRootString,
-        }
-      })
-    }
-
-    if (!themePalette?.[theme]) {
-      const existingDarkPrimary = themePaletteObject?.dark
-      const existingLightPrimary = themePaletteObject?.light
-      const existingCustomPrimary = themePaletteObject?.custom
-      const existingPrimary =
-        existingDarkPrimary ||
-        existingLightPrimary ||
-        existingCustomPrimary ||
-        uiDefaultThemePaletteInput[theme]
-
-      const themeShades = getThemeShades({
-        defaultTheme: theme,
-      })
-
-      for (const shade of Object.keys(themeShades)) {
-        const { colorString, rootString } = twColorHelper({
-          colorString: existingPrimary.primary,
-          shade: themeShades[shade as MakUiThemeVariant],
-        })
-        themePaletteObject[theme] = {
-          ...themePaletteObject[theme],
-          [shade]: colorString,
-          [`${shade}Root`]: rootString,
-        }
-
-        simpleThemePaletteObject[theme] = {
-          ...simpleThemePaletteObject[theme],
-          [shade]: rootString,
-        }
-      }
-    }
-  }
-
-  for (const themeVariant of uiPaletteVariants) {
-    if (themeVariant === "theme") {
-      continue
-    }
-
-    for (const variant of uiVariants) {
-      const targetPalette =
-        themeVariant === "color"
-          ? colorPalette
-          : themeVariant === "text"
-          ? textPalette
-          : themeVariant === "border"
-          ? borderPalette
-          : colorPalette
-
-      const targetPaletteObject =
-        themeVariant === "color"
-          ? colorPaletteObject
-          : themeVariant === "text"
-          ? textPaletteObject
-          : themeVariant === "border"
-          ? borderPaletteObject
-          : colorPaletteObject
-
-      const providedVariant: VariantInput | undefined = targetPalette?.[variant]
-
-      if (!colorPaletteObject?.[variant]) {
-        const classNames = getConstructedClassNames({
-          color: uiDefaultColorPaletteInput[variant] as MakUiInteraction,
-          theme: "all",
-          state: "all",
-        })
-
-        colorPaletteObject[variant] = {
-          ...targetPaletteObject[variant],
-          ...classNames,
-        }
-        simpleColorPaletteObject[variant] = classNames.default.baseRoot
-        simpleColorPaletteObject[`${variant}Dark`] =
-          classNames.default.baseRootDark
-        simpleColorPaletteObject[`${variant}Custom`] =
-          classNames.default.baseRootCustom
-      }
-      if (!borderPaletteObject?.[variant]) {
-        borderPaletteObject[variant] = {
-          ...colorPaletteObject?.[variant],
-        }
-        simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
-        simpleBorderPaletteObject[`${variant}Dark`] =
-          simpleColorPaletteObject?.[`${variant}Dark`]
-        simpleBorderPaletteObject[`${variant}Custom`] =
-          simpleColorPaletteObject?.[`${variant}Custom`]
-      }
-      if (!textPaletteObject?.[variant]) {
-        const classNames = getConstructedClassNames({
-          color: uiDefaultTextPaletteInput?.[variant] as MakUiInteraction,
-          state: "all",
-          theme: "all",
-        })
-
-        textPaletteObject[variant] = {
-          ...targetPaletteObject[variant],
-          ...classNames,
-        }
-      }
-
-      if (typeof providedVariant === "string") {
-        const { dark, light, custom } = handleThemes(providedVariant)
-
-        const classNames = getConstructedClassNames({
-          color: light,
-          state: "all",
-        })
-
-        const darkClassNames = getConstructedClassNames({
-          color: dark,
-          state: "all",
-          theme: "dark",
-        })
-
-        const customClassNames = getConstructedClassNames({
-          color: custom,
-          state: "all",
-          theme: "custom",
-        })
-
-        targetPaletteObject[variant] = {
-          ...targetPaletteObject[variant],
-          ...deepMerge(classNames, darkClassNames, customClassNames),
-        }
-      }
-
-      for (const state of uiStates) {
-        let constructedStateObject = {} as MakUiStates
-        const providedState: StateInput | undefined =
-          providedVariant?.[state as keyof StateInput]
-        if (isObject(providedState) && !isEmptyObject(providedState)) {
-          for (const interaction of uiInteractions) {
-            const providedInteraction: string | undefined =
-              providedState?.[interaction as keyof MakUiInteractions]
-            if (typeof providedInteraction === "string") {
-              const {
-                light: lightInteraction,
-                dark: darkInteraction,
-                custom: customInteraction,
-              } = handleThemes(providedInteraction)
-
-              const { colorString, rootString } = twColorHelper({
-                colorString: lightInteraction,
-              })
-
-              const {
-                colorString: darkColorString,
-                rootString: darkRootString,
-              } = twColorHelper({
-                colorString: darkInteraction,
-              })
-
-              const {
-                colorString: customColorString,
-                rootString: customRootString,
-              } = twColorHelper({
-                colorString: customInteraction,
-              })
-
-              constructedStateObject = {
-                ...constructedStateObject,
-                [interaction]: colorString,
-                [`${interaction}Root`]: rootString,
-                [`${interaction}Dark`]: darkColorString,
-                [`${interaction}RootDark`]: darkRootString,
-                [`${interaction}Custom`]: customColorString,
-                [`${interaction}RootCustom`]: customRootString,
-              }
-            }
-            const existingBase = constructedStateObject.base
-            const missingInteractionClassNames = getConstructedClassNames({
-              color: existingBase,
-              interactions: constructedStateObject,
-              theme: "all",
-            })[state]
-            constructedStateObject = missingInteractionClassNames
-
-            const targetPaletteVariantObject = targetPaletteObject?.[variant]
-            const targetPaletteStateObject = targetPaletteVariantObject?.[state]
-
-            targetPaletteObject[variant] = {
-              ...targetPaletteObject[variant],
-              [state]: {
-                ...targetPaletteStateObject,
-                ...constructedStateObject,
-              },
-            }
-          }
-        } else if (typeof providedState === "string") {
-          const { light, dark, custom } = handleThemes(providedState)
-          const classNames = getConstructedClassNames({
-            color: light,
-            state: state,
-          })[state]
-
-          const darkClassNames = getConstructedClassNames({
-            color: dark,
-            state: state,
-            theme: "dark",
-          })[state]
-
-          const customClassNames = getConstructedClassNames({
-            color: custom,
-            state: state,
-            theme: "custom",
-          })[state]
-
-          const mergedClassNames = deepMerge(
-            classNames,
-            darkClassNames,
-            customClassNames
-          )
-
-          const targetPaletteVariantObject = targetPaletteObject?.[variant]
-          const targetPaletteStateObject = targetPaletteVariantObject?.[state]
-          targetPaletteObject[variant] = {
-            ...targetPaletteObject[variant],
-            [state]: {
-              ...targetPaletteStateObject,
-              ...mergedClassNames,
+          ensureNestedObject({
+            parent: finalSimplePalette,
+            keys: [theme, paletteVariant],
+            value: {
+              primary: primaryRoot,
+              secondary: secondaryRoot,
+              tertiary: tertiaryRoot,
+              custom: customRoot,
             },
+          })
+        }
+        continue
+      }
+      for (const variant of uiVariants) {
+        if (initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]) {
+          const providedState =
+            initialVerbosePalette[theme][paletteVariant][variant]
+
+          const constructedClassNames = getConstructedClassNames({
+            interactions: providedState as MakUiVariants,
+            state: "all",
+          })
+
+          ensureNestedObject({
+            parent: finalVerbosePalette,
+            keys: [theme, paletteVariant, variant],
+            value: constructedClassNames,
+          })
+
+          const {
+            baseRoot: base,
+            clickRoot: click,
+            hoverRoot: hover,
+            focusRoot: focus,
+          } = constructedClassNames.default
+
+          ensureNestedObject({
+            parent: finalSimplePalette,
+            keys: [theme, paletteVariant, variant],
+            value: {
+              base,
+              click,
+              hover,
+              focus,
+            },
+          })
+        } else {
+          if (paletteVariant === "color" || paletteVariant === "border") {
+            const classNames = getConstructedClassNames({
+              color: uiDefaultColorPaletteInput?.[variant] as MakUiInteraction,
+              state: "all",
+              theme,
+            })
+
+            ensureNestedObject({
+              parent: finalVerbosePalette,
+              keys: [theme, paletteVariant, variant],
+              value: classNames,
+            })
+
+            const {
+              baseRoot: base,
+              clickRoot: click,
+              hoverRoot: hover,
+              focusRoot: focus,
+            } = classNames.default
+
+            ensureNestedObject({
+              parent: finalSimplePalette,
+              keys: [theme, paletteVariant, variant],
+              value: {
+                base,
+                click,
+                hover,
+                focus,
+              },
+            })
+          }
+          if (paletteVariant === "text") {
+            const classNames = getConstructedClassNames({
+              color: uiDefaultSimpleTextPalette?.[variant] as MakUiInteraction,
+              state: "all",
+              theme,
+            })
+
+            ensureNestedObject({
+              parent: finalVerbosePalette,
+              keys: [theme, paletteVariant, variant],
+              value: classNames,
+            })
+
+            const {
+              baseRoot: base,
+              clickRoot: click,
+              hoverRoot: hover,
+              focusRoot: focus,
+            } = classNames.default
+
+            ensureNestedObject({
+              parent: finalSimplePalette,
+              keys: [theme, paletteVariant, variant],
+              value: {
+                base,
+                click,
+                hover,
+                focus,
+              },
+            })
           }
         }
-        const lightVariant = targetPaletteObject[variant]
-        const darkVariant = targetPaletteObject[variant]
-        const customVariant = targetPaletteObject[variant]
-
-        const { light, dark, custom } = separateObjectByKey({
-          obj: targetPaletteObject[variant][state],
-          keys: ["Dark", "Custom"],
-          fallbackKey: "Light",
-        })
-
-        ensureNestedObject({
-          parent: paletteThemesObject.light,
-          keys: [
-            themeVariant,
-            variant as keyof MakUiVerboseTheme,
-            state as keyof MakUiVerboseTheme,
-          ],
-          value: light,
-        })
-
-        ensureNestedObject({
-          parent: paletteThemesObject.dark,
-          keys: [
-            themeVariant,
-            variant as keyof MakUiVerboseTheme,
-            state as keyof MakUiVerboseTheme,
-          ],
-          value: splitKeyAtChar(dark, "D"),
-        })
-
-        ensureNestedObject({
-          parent: paletteThemesObject.custom,
-          keys: [
-            themeVariant,
-            variant as keyof MakUiVerboseTheme,
-            state as keyof MakUiVerboseTheme,
-          ],
-          value: splitKeyAtChar(custom, "C"),
-        })
-
-        ensureNestedObject({
-          parent: simplePaletteThemesObject.light,
-          keys: [themeVariant, variant as keyof MakUiSimpleTheme],
-          value: light.baseRoot,
-        })
-
-        ensureNestedObject({
-          parent: simplePaletteThemesObject.dark,
-          keys: [themeVariant, variant as keyof MakUiSimpleTheme],
-          value: dark.baseRootDark,
-        })
-
-        ensureNestedObject({
-          parent: simplePaletteThemesObject.custom,
-          keys: [themeVariant, variant as keyof MakUiVerboseTheme],
-          value: custom.baseRootCustom,
-        })
       }
     }
   }
 
-  const nestedPaletteObject: MakUiNestedPalette = {
-    color: colorPaletteObject,
-    text: textPaletteObject,
-    border: borderPaletteObject,
-    theme: themePaletteObject,
-  }
+  console.log(
+    "finalVerbosePalette",
+    JSON.stringify(finalVerbosePalette.light.color.primary, null, 2)
+  )
 
-  const simpleNestedPaletteObject: MakUiSimpleNestedPalette = {
-    color: simpleColorPaletteObject,
-    text: simpleTextPaletteObject,
-    border: simpleBorderPaletteObject,
-    theme: simpleThemePaletteObject,
-  }
+  console.log(
+    "finalSimplePalette",
+    JSON.stringify(finalSimplePalette.light.color.primary, null, 2)
+  )
 
-  paletteThemesObject.custom["theme"] = themePaletteObject.custom
-  paletteThemesObject.dark["theme"] = themePaletteObject.dark
-  paletteThemesObject.light["theme"] = themePaletteObject.light
+  // let simplePaletteThemesObject = {
+  //   light: {},
+  //   dark: {},
+  //   custom: {},
+  // } as MakUiSimplePalettes
+  // let paletteThemesObject = {
+  //   light: {},
+  //   dark: {},
+  //   custom: {},
+  // } as MakUiVerbosePalettes
 
-  simplePaletteThemesObject.custom["theme"] = simpleThemePaletteObject.custom
-  simplePaletteThemesObject.dark["theme"] = simpleThemePaletteObject.dark
-  simplePaletteThemesObject.light["theme"] = simpleThemePaletteObject.light
+  // for (const theme of uiThemes) {
+  //   const providedVariant = themePalette?.[theme]
 
-  return {
-    colorPaletteObject,
-    simpleColorPaletteObject,
-    textPaletteObject,
-    simpleTextPaletteObject,
-    borderPaletteObject,
-    simpleBorderPaletteObject,
-    themePaletteObject,
-    simpleThemePaletteObject,
-    nestedPaletteObject,
-    simpleNestedPaletteObject,
-    paletteThemesObject,
-    simplePaletteThemesObject,
-  }
+  //   if (typeof providedVariant === "string") {
+  //     const providedClassName = twColorHelper({ colorString: providedVariant })
+  //     const autoShade = providedClassName.autoShade
+  //     const relativeThemeShades = getThemeShades({
+  //       altBaseShade: autoShade ? undefined : providedClassName.shade,
+  //       defaultTheme: theme,
+  //     })
+
+  //     for (const [variant, shade] of Object.entries(relativeThemeShades)) {
+  //       const { colorString, rootString } = twColorHelper({
+  //         colorString: providedClassName.colorString,
+  //         shade: shade,
+  //       })
+
+  //       themePaletteObject[theme] = {
+  //         ...themePaletteObject[theme],
+  //         [variant]: colorString,
+  //         [`${variant}Root`]: rootString,
+  //       }
+  //       simpleThemePaletteObject[theme] = {
+  //         ...simpleThemePaletteObject[theme],
+  //         [variant]: rootString,
+  //       }
+  //     }
+  //   }
+
+  //   if (isObject(providedVariant)) {
+  //     const primaryColor = providedVariant?.primary
+  //     const primaryColorObject = twColorHelper({
+  //       colorString: primaryColor,
+  //     })
+  //     const {
+  //       color: primaryColorVal,
+  //       colorString: primaryColorString,
+  //       rootString: primaryRootString,
+  //       shade: primaryShade,
+  //       opacity: primaryOpacity,
+  //     } = primaryColorObject
+
+  //     const relativeThemeShades = getThemeShades({
+  //       altBaseShade: primaryShade,
+  //       defaultTheme: theme,
+  //     })
+
+  //     const remainingVariants: MakUiThemeVariant[] = [
+  //       "secondary",
+  //       "tertiary",
+  //       "custom",
+  //     ]
+
+  //     themePaletteObject[theme] = {
+  //       ...themePaletteObject[theme],
+  //       primary: primaryColorString,
+  //       primaryRoot: primaryRootString,
+  //     }
+
+  //     simpleThemePaletteObject[theme] = {
+  //       ...simpleThemePaletteObject[theme],
+  //       primary: primaryRootString,
+  //     }
+
+  //     remainingVariants.forEach((variant) => {
+  //       const variantColor = providedVariant?.[variant]
+  //         ? twColorHelper({ colorString: providedVariant[variant]! })
+  //         : undefined
+  //       const {
+  //         colorString: variantColorString,
+  //         rootString: variantRootString,
+  //       } = twColorHelper({
+  //         colorString: variantColor?.colorString || primaryColorVal,
+  //         shade: variantColor?.shade || relativeThemeShades[variant],
+  //         opacity: variantColor?.opacity || primaryOpacity,
+  //       })
+  //       themePaletteObject[theme] = {
+  //         ...themePaletteObject[theme],
+  //         [variant]: variantColorString,
+  //         [`${variant}Root`]: variantRootString,
+  //       }
+
+  //       simpleThemePaletteObject[theme] = {
+  //         ...simpleThemePaletteObject[theme],
+  //         [variant]: variantRootString,
+  //       }
+  //     })
+  //   }
+
+  //   if (!themePalette?.[theme]) {
+  //     const existingDarkPrimary = themePaletteObject?.dark
+  //     const existingLightPrimary = themePaletteObject?.light
+  //     const existingCustomPrimary = themePaletteObject?.custom
+  //     const existingPrimary =
+  //       existingDarkPrimary ||
+  //       existingLightPrimary ||
+  //       existingCustomPrimary ||
+  //       uiDefaultThemePaletteInput[theme]
+
+  //     const themeShades = getThemeShades({
+  //       defaultTheme: theme,
+  //     })
+
+  //     for (const shade of Object.keys(themeShades)) {
+  //       const { colorString, rootString } = twColorHelper({
+  //         colorString: existingPrimary.primary,
+  //         shade: themeShades[shade as MakUiThemeVariant],
+  //       })
+  //       themePaletteObject[theme] = {
+  //         ...themePaletteObject[theme],
+  //         [shade]: colorString,
+  //         [`${shade}Root`]: rootString,
+  //       }
+
+  //       simpleThemePaletteObject[theme] = {
+  //         ...simpleThemePaletteObject[theme],
+  //         [shade]: rootString,
+  //       }
+  //     }
+  //   }
+  // }
+
+  // for (const themeVariant of uiPaletteVariants) {
+  //   if (themeVariant === "theme") {
+  //     continue
+  //   }
+
+  //   for (const variant of uiVariants) {
+  //     const targetPalette =
+  //       themeVariant === "color"
+  //         ? colorPalette
+  //         : themeVariant === "text"
+  //         ? textPalette
+  //         : themeVariant === "border"
+  //         ? borderPalette
+  //         : colorPalette
+
+  //     const targetPaletteObject =
+  //       themeVariant === "color"
+  //         ? colorPaletteObject
+  //         : themeVariant === "text"
+  //         ? textPaletteObject
+  //         : themeVariant === "border"
+  //         ? borderPaletteObject
+  //         : colorPaletteObject
+
+  //     const providedVariant: VariantInput | undefined = targetPalette?.[variant]
+
+  //     if (!colorPaletteObject?.[variant]) {
+  //       const classNames = getConstructedClassNames({
+  //         color: uiDefaultColorPaletteInput[variant] as MakUiInteraction,
+  //         theme: "all",
+  //         state: "all",
+  //       })
+
+  //       colorPaletteObject[variant] = {
+  //         ...targetPaletteObject[variant],
+  //         ...classNames,
+  //       }
+  //       simpleColorPaletteObject[variant] = classNames.default.baseRoot
+  //       simpleColorPaletteObject[`${variant}Dark`] =
+  //         classNames.default.baseRootDark
+  //       simpleColorPaletteObject[`${variant}Custom`] =
+  //         classNames.default.baseRootCustom
+  //     }
+  //     if (!borderPaletteObject?.[variant]) {
+  //       borderPaletteObject[variant] = {
+  //         ...colorPaletteObject?.[variant],
+  //       }
+  //       simpleBorderPaletteObject[variant] = simpleColorPaletteObject?.[variant]
+  //       simpleBorderPaletteObject[`${variant}Dark`] =
+  //         simpleColorPaletteObject?.[`${variant}Dark`]
+  //       simpleBorderPaletteObject[`${variant}Custom`] =
+  //         simpleColorPaletteObject?.[`${variant}Custom`]
+  //     }
+  //     if (!textPaletteObject?.[variant]) {
+  //       const classNames = getConstructedClassNames({
+  //         color: uiDefaultTextPaletteInput?.[variant] as MakUiInteraction,
+  //         state: "all",
+  //         theme: "all",
+  //       })
+
+  //       textPaletteObject[variant] = {
+  //         ...targetPaletteObject[variant],
+  //         ...classNames,
+  //       }
+  //     }
+
+  //     if (typeof providedVariant === "string") {
+  //       const { dark, light, custom } = handleThemes(providedVariant)
+
+  //       const classNames = getConstructedClassNames({
+  //         color: light,
+  //         state: "all",
+  //       })
+
+  //       const darkClassNames = getConstructedClassNames({
+  //         color: dark,
+  //         state: "all",
+  //         theme: "dark",
+  //       })
+
+  //       const customClassNames = getConstructedClassNames({
+  //         color: custom,
+  //         state: "all",
+  //         theme: "custom",
+  //       })
+
+  //       targetPaletteObject[variant] = {
+  //         ...targetPaletteObject[variant],
+  //         ...deepMerge(classNames, darkClassNames, customClassNames),
+  //       }
+  //     }
+
+  //     for (const state of uiStates) {
+  //       let constructedStateObject = {} as MakUiStates
+  //       const providedState: StateInput | undefined =
+  //         providedVariant?.[state as keyof StateInput]
+  //       if (isObject(providedState) && !isEmptyObject(providedState)) {
+  //         for (const interaction of uiInteractions) {
+  //           const providedInteraction: string | undefined =
+  //             providedState?.[interaction as keyof MakUiInteractions]
+  //           if (typeof providedInteraction === "string") {
+  //             const {
+  //               light: lightInteraction,
+  //               dark: darkInteraction,
+  //               custom: customInteraction,
+  //             } = handleThemes(providedInteraction)
+
+  //             const { colorString, rootString } = twColorHelper({
+  //               colorString: lightInteraction,
+  //             })
+
+  //             const {
+  //               colorString: darkColorString,
+  //               rootString: darkRootString,
+  //             } = twColorHelper({
+  //               colorString: darkInteraction,
+  //             })
+
+  //             const {
+  //               colorString: customColorString,
+  //               rootString: customRootString,
+  //             } = twColorHelper({
+  //               colorString: customInteraction,
+  //             })
+
+  //             constructedStateObject = {
+  //               ...constructedStateObject,
+  //               [interaction]: colorString,
+  //               [`${interaction}Root`]: rootString,
+  //               [`${interaction}Dark`]: darkColorString,
+  //               [`${interaction}RootDark`]: darkRootString,
+  //               [`${interaction}Custom`]: customColorString,
+  //               [`${interaction}RootCustom`]: customRootString,
+  //             }
+  //           }
+  //           const existingBase = constructedStateObject.base
+  //           const missingInteractionClassNames = getConstructedClassNames({
+  //             color: existingBase,
+  //             interactions: constructedStateObject,
+  //             theme: "all",
+  //           })[state]
+  //           constructedStateObject = missingInteractionClassNames
+
+  //           const targetPaletteVariantObject = targetPaletteObject?.[variant]
+  //           const targetPaletteStateObject = targetPaletteVariantObject?.[state]
+
+  //           targetPaletteObject[variant] = {
+  //             ...targetPaletteObject[variant],
+  //             [state]: {
+  //               ...targetPaletteStateObject,
+  //               ...constructedStateObject,
+  //             },
+  //           }
+  //         }
+  //       } else if (typeof providedState === "string") {
+  //         const { light, dark, custom } = handleThemes(providedState)
+  //         const classNames = getConstructedClassNames({
+  //           color: light,
+  //           state: state,
+  //         })[state]
+
+  //         const darkClassNames = getConstructedClassNames({
+  //           color: dark,
+  //           state: state,
+  //           theme: "dark",
+  //         })[state]
+
+  //         const customClassNames = getConstructedClassNames({
+  //           color: custom,
+  //           state: state,
+  //           theme: "custom",
+  //         })[state]
+
+  //         const mergedClassNames = deepMerge(
+  //           classNames,
+  //           darkClassNames,
+  //           customClassNames
+  //         )
+
+  //         const targetPaletteVariantObject = targetPaletteObject?.[variant]
+  //         const targetPaletteStateObject = targetPaletteVariantObject?.[state]
+  //         targetPaletteObject[variant] = {
+  //           ...targetPaletteObject[variant],
+  //           [state]: {
+  //             ...targetPaletteStateObject,
+  //             ...mergedClassNames,
+  //           },
+  //         }
+  //       }
+  //       const lightVariant = targetPaletteObject[variant]
+  //       const darkVariant = targetPaletteObject[variant]
+  //       const customVariant = targetPaletteObject[variant]
+
+  //       const { light, dark, custom } = separateObjectByKey({
+  //         obj: targetPaletteObject[variant][state],
+  //         keys: ["Dark", "Custom"],
+  //         fallbackKey: "Light",
+  //       })
+
+  //       // ensureNestedObject({
+  //       //   parent: paletteThemesObject.light,
+  //       //   keys: [
+  //       //     themeVariant,
+  //       //     variant as keyof MakUiVerboseTheme,
+  //       //     state as keyof MakUiVerboseTheme,
+  //       //   ],
+  //       //   value: light,
+  //       // })
+
+  //       // ensureNestedObject({
+  //       //   parent: paletteThemesObject.dark,
+  //       //   keys: [
+  //       //     themeVariant,
+  //       //     variant as keyof MakUiVerboseTheme,
+  //       //     state as keyof MakUiVerboseTheme,
+  //       //   ],
+  //       //   value: splitKeyAtChar(dark, "D"),
+  //       // })
+
+  //       // ensureNestedObject({
+  //       //   parent: paletteThemesObject.custom,
+  //       //   keys: [
+  //       //     themeVariant,
+  //       //     variant as keyof MakUiVerboseTheme,
+  //       //     state as keyof MakUiVerboseTheme,
+  //       //   ],
+  //       //   value: splitKeyAtChar(custom, "C"),
+  //       // })
+
+  //       // ensureNestedObject({
+  //       //   parent: simplePaletteThemesObject.light,
+  //       //   keys: [themeVariant, variant as keyof MakUiSimpleTheme],
+  //       //   value: light.baseRoot,
+  //       // })
+
+  //       // ensureNestedObject({
+  //       //   parent: simplePaletteThemesObject.dark,
+  //       //   keys: [themeVariant, variant as keyof MakUiSimpleTheme],
+  //       //   value: dark.baseRootDark,
+  //       // })
+
+  //       // ensureNestedObject({
+  //       //   parent: simplePaletteThemesObject.custom,
+  //       //   keys: [themeVariant, variant as keyof MakUiVerboseTheme],
+  //       //   value: custom.baseRootCustom,
+  //       // })
+  //     }
+  //   }
+  // }
+
+  // const nestedPaletteObject: MakUiNestedPalette = {
+  //   color: colorPaletteObject,
+  //   text: textPaletteObject,
+  //   border: borderPaletteObject,
+  //   theme: themePaletteObject,
+  // }
+
+  // const simpleNestedPaletteObject: MakUiSimpleNestedPalette = {
+  //   color: simpleColorPaletteObject,
+  //   text: simpleTextPaletteObject,
+  //   border: simpleBorderPaletteObject,
+  //   theme: simpleThemePaletteObject,
+  // }
+
+  // paletteThemesObject.custom["theme"] = themePaletteObject.custom
+  // paletteThemesObject.dark["theme"] = themePaletteObject.dark
+  // paletteThemesObject.light["theme"] = themePaletteObject.light
+
+  // simplePaletteThemesObject.custom["theme"] = simpleThemePaletteObject.custom
+  // simplePaletteThemesObject.dark["theme"] = simpleThemePaletteObject.dark
+  // simplePaletteThemesObject.light["theme"] = simpleThemePaletteObject.light
+
+  // return {
+  //   colorPaletteObject,
+  //   simpleColorPaletteObject,
+  //   textPaletteObject,
+  //   simpleTextPaletteObject,
+  //   borderPaletteObject,
+  //   simpleBorderPaletteObject,
+  //   themePaletteObject,
+  //   simpleThemePaletteObject,
+  //   nestedPaletteObject,
+  //   simpleNestedPaletteObject,
+  //   paletteThemesObject,
+  //   simplePaletteThemesObject,
+  // }
 }

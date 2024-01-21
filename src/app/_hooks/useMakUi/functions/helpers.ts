@@ -19,18 +19,13 @@ import {
   ThemeVariantInput,
   MakUiThemeVariantShades,
   InteractionShades,
-  MakUiPaletteVariant,
   MakUiInteraction,
   MakUiThemePalette,
-  MakUiPalette,
-  MakUiNestedPalette,
   MakUiVerbosePalettes,
+  MakUiThemeVariants,
 } from "../types/default-types"
 import {
   absoluteRegex,
-  darkRegex,
-  lightRegex,
-  customRegex,
   uiDefaultBorderPaletteInput,
   uiDefaultColorPaletteInput,
   uiDefaultShades,
@@ -42,6 +37,7 @@ import {
   uiDefaultThemePaletteInput,
   uiThemes,
   uiPaletteVariants,
+  uiDefaultThemeShadesDiffs,
 } from "../constants/defaults/default-constants"
 import colors from "tailwindcss/colors"
 import twConfig from "../../../../../tailwind.config"
@@ -114,9 +110,15 @@ export const constructTailwindObject = ({
   return tailwindColors
 }
 
-export const nearestMultiple = (num: number, multiple: number) => {
+export const nearestMultiple = (
+  num: number,
+  multiple: number,
+  roundDir: "up" | "down" | "nearest" = "nearest"
+) => {
+  const delta =
+    roundDir === "up" ? multiple : roundDir === "down" ? -multiple : 0
   const remainder = num % multiple
-  return remainder === 0 ? num : num + multiple - remainder
+  return remainder === 0 ? num + delta : num + multiple - remainder + delta
 }
 
 export const mergeWithFallback = (
@@ -197,6 +199,89 @@ export const getTheme = (input: string): MakUiThemeMode => {
   if (input.includes("light")) return "light"
   if (input.includes("custom")) return "custom"
   return "dark"
+}
+
+export const getConstructedTheme = (
+  providedVariants: MakUiThemeVariants,
+  theme: MakUiThemeMode
+) => {
+  const { primary, secondary, tertiary, custom } = providedVariants
+
+  const primaryColor = twColorHelper({
+    colorString: primary,
+  })
+  const primaryShade = primary
+    ? primaryColor.shade
+    : uiDefaultThemeShades[theme].primary
+
+  const themeShades = {
+    primary: primaryShade!,
+    secondary: secondary
+      ? twColorHelper({
+          colorString: secondary,
+        }).shade!
+      : primaryShade! + uiDefaultThemeShadesDiffs[theme].secondary,
+
+    tertiary: tertiary
+      ? twColorHelper({
+          colorString: tertiary,
+        }).shade!
+      : primaryShade! + uiDefaultThemeShadesDiffs[theme].tertiary,
+    custom: custom
+      ? twColorHelper({
+          colorString: custom,
+        }).shade!
+      : primaryShade! + uiDefaultThemeShadesDiffs[theme].custom,
+  }
+
+  const getNormalizedNumber = (number: number) => {
+    if (number >= 950) return 950
+    if (number <= 100) return 100
+    return nearestMultiple(number, 100, theme === "dark" ? "down" : "up")
+  }
+
+  const normalizedThemeShades = {
+    primary: getNormalizedNumber(themeShades.primary),
+    secondary: getNormalizedNumber(themeShades.secondary),
+    tertiary: getNormalizedNumber(themeShades.tertiary),
+    custom: getNormalizedNumber(themeShades.custom),
+  }
+
+  const { colorString, rootString } = twColorHelper({
+    colorString: primaryColor.color,
+    shade: normalizedThemeShades.primary,
+  })
+
+  const { colorString: secondaryColorString, rootString: secondaryRootString } =
+    twColorHelper({
+      colorString: providedVariants?.secondary || primaryColor.color,
+      shade: normalizedThemeShades.secondary,
+    })
+
+  const { colorString: tertiaryColorString, rootString: tertiaryRootString } =
+    twColorHelper({
+      colorString: providedVariants?.tertiary || primaryColor.color,
+      shade: normalizedThemeShades.tertiary,
+    })
+
+  const { colorString: customColorString, rootString: customRootString } =
+    twColorHelper({
+      colorString: providedVariants?.custom || primaryColor.color,
+      shade: normalizedThemeShades.custom,
+    })
+
+  const themeResponse = {
+    primary: colorString,
+    primaryRoot: rootString,
+    secondary: secondaryColorString,
+    secondaryRoot: secondaryRootString,
+    tertiary: tertiaryColorString,
+    tertiaryRoot: tertiaryRootString,
+    custom: customColorString,
+    customRoot: customRootString,
+  }
+
+  return themeResponse
 }
 
 export const getThemeShades = ({
@@ -353,24 +438,43 @@ export const getConstructedClassNames = ({
 
   for (const theme of themes) {
     for (const state of states) {
+      const providedState = relativeClassNamesResponse?.default
+      const providedStatesObj = {
+        base: providedState?.base
+          ? twColorHelper({
+              colorString:
+                providedState?.base || globalDefaultColor.colorString,
+            })
+          : globalDefaultColor,
+        hover: providedState?.hover
+          ? twColorHelper({
+              colorString:
+                providedState?.hover || globalDefaultColor.colorString,
+            })
+          : globalDefaultColor,
+        focus: providedState?.focus
+          ? twColorHelper({
+              colorString:
+                providedState?.focus || globalDefaultColor.colorString,
+            })
+          : globalDefaultColor,
+        click: providedState?.click
+          ? twColorHelper({
+              colorString:
+                providedState?.click || globalDefaultColor.colorString,
+            })
+          : globalDefaultColor,
+      }
+
       for (const interaction of uiInteractions) {
-        const themeKey = theme.charAt(0).toUpperCase() + theme.slice(1)
-        const interactionKey =
-          theme === "light"
-            ? interaction
-            : (`${interaction}${themeKey}` as keyof MakUiStates)
-        const rootKey =
-          theme === "light"
-            ? (`${interaction}Root` as keyof MakUiStates)
-            : (`${interaction}Root${themeKey}` as keyof MakUiStates)
         if (typeof relativeClassNamesResponse[state] !== "string") {
           if (
             !Object.keys(relativeClassNamesResponse[state]).includes(
-              interactionKey
+              interaction
             )
           ) {
             const updatedColorString = twColorHelper({
-              colorString: globalDefaultColor.colorString,
+              colorString: providedStatesObj[interaction].colorString,
               shade: getShades({
                 altBaseShade: globalDefaultColor.shade,
               })[state][interaction],
@@ -379,48 +483,19 @@ export const getConstructedClassNames = ({
             if (typeof relativeClassNamesResponse[state] === "string") {
               console.log(relativeClassNamesResponse[state])
             }
-            relativeClassNamesResponse[state][interactionKey] =
+            relativeClassNamesResponse[state][interaction] =
               updatedColorString.colorString
-            relativeClassNamesResponse[state][rootKey] =
+            relativeClassNamesResponse[state][`${interaction}Root`] =
               updatedColorString.rootString
           } else {
             const updatedColorString = twColorHelper({
-              colorString: relativeClassNamesResponse[state][interactionKey],
+              colorString: relativeClassNamesResponse[state][interaction],
             })
-            relativeClassNamesResponse[state][interactionKey] =
+            relativeClassNamesResponse[state][interaction] =
               updatedColorString.colorString
-            relativeClassNamesResponse[state][rootKey] =
+            relativeClassNamesResponse[state][`${interaction}Root`] =
               updatedColorString.rootString
           }
-        } else {
-          const classNameString = relativeClassNamesResponse[
-            state
-          ] as unknown as string
-          const initialTwObj = twColorHelper({
-            colorString: classNameString as string,
-          })
-          const shades = getShades({
-            altBaseShade: initialTwObj.shade,
-          })[state]
-
-          Object.keys(shades).forEach((int) => {
-            const updatedColorString = twColorHelper({
-              colorString: initialTwObj.colorString,
-              shade: shades[int as keyof InteractionShades],
-              opacity: 100,
-            })
-
-            if (
-              !relativeClassNamesResponse[state] ||
-              !isObject(relativeClassNamesResponse[state])
-            ) {
-              relativeClassNamesResponse[state] = {} as MakUiStates
-              relativeClassNamesResponse[state][interactionKey] =
-                updatedColorString.colorString
-              relativeClassNamesResponse[state][rootKey] =
-                updatedColorString.rootString
-            }
-          })
         }
       }
     }
@@ -540,8 +615,9 @@ export const twColorHelper = ({
   } else {
     // console.log({ colorString })
     if (isObject(colorString)) {
-      colorString = Object.values(colorString)[0] || uiDefaultColorPaletteInput?.primary
-    } else if (!colorString){
+      colorString =
+        Object.values(colorString)[0] || uiDefaultColorPaletteInput?.primary
+    } else if (!colorString) {
       colorString = `${uiDefaultColorPaletteInput?.primary}`
     }
     const colorArr = colorString!.split("-")
@@ -567,11 +643,15 @@ export const twColorHelper = ({
       variableOpacity = 100
       color = colorArr.join("-")
     }
-
+    variableShade = Number(variableShade)
     const opacityObj = getOpacity({
       opacityValue: variableOpacity,
       override: opacity,
     })
+
+    if (variableShade > 50 && variableShade < 950) {
+      variableShade = nearestMultiple(variableShade, 100)
+    }
 
     const hex = getTwHex({
       color,

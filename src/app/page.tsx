@@ -18,11 +18,16 @@ export default function Home() {
   } = useMakUi()
 
   return (
-    <main className={`h-screen w-screen p-4 bg-${t.theme.secondary}`}>
+    <main
+      className={`h-screen w-screen p-4 
+    
+    `}
+      // bg-${t.theme.secondary}
+    >
       <div className="flex w-full h-full justify-between">
         <MakUiView />
         <MakFormView />
-        <Button
+        {/* <Button
           secondary
           outline
           textPrimary
@@ -35,10 +40,10 @@ export default function Home() {
             <BiSolidMoon className={`size-6 text-${t.text.primary}`} />
           )}
           {isCustom && <BiParty className={`size-6 text-${t.text.primary}`} />}
-        </Button>
+        </Button> */}
         <input
           type="text"
-          className="rounded-md h-fit w-fit bg-white px-4 py-2 font-normal text-mak-teal-900 focus:outline-none shadow-hard-sm"
+          // className="rounded-md h-fit w-fit bg-white px-4 py-2 font-normal text-mak-teal-900 focus:outline-none shadow-hard-sm"
         />
       </div>
     </main>

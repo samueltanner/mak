@@ -37,7 +37,7 @@ const MakFormView = () => {
   return (
     <div>
       <FirstName
-        className={`p-2 text-${t.text.primary.default.base}`}
+        // className={`p-2 text-${t.text.primary.default.base}`}
       />
       <Pick />
     </div>

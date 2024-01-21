@@ -378,7 +378,7 @@ const Dropdown = ({
             className="flex items-center"
           >
             <BiChevronUp
-              className={`size-4 text-${text.primary.default.base}`}
+              // className={`size-4 text-${text.primary.default.base}`}
             />
           </motion.span>
         )}

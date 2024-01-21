@@ -93,7 +93,12 @@ export const uiStates: MakUiState[] = [
   "invalid",
 ]
 
-export const uiInteractions: MakUiInteraction[] = ["base", "hover", "click", "focus"]
+export const uiInteractions: MakUiInteraction[] = [
+  "base",
+  "hover",
+  "click",
+  "focus",
+]
 
 export const uiRootInteractions: MakUiRootInteraction[] = [
   "baseRoot",
@@ -264,6 +269,27 @@ export const uiDefaultThemePaletteInput: MakUiThemePalette = {
   },
 }
 
+export const makUiDefaultThemeColors = {
+  dark: {
+    primary: "zinc-950",
+    secondary: "zinc-800",
+    tertiary: "zinc-700",
+    custom: "zinc-950",
+  },
+  light: {
+    primary: "zinc-50",
+    secondary: "zinc-100",
+    tertiary: "zinc-200",
+    custom: "zinc-50",
+  },
+  custom: {
+    primary: "mak-teal-900",
+    secondary: "mak-teal-800",
+    tertiary: "mak-teal-700",
+    custom: "mak-teal-600",
+  },
+}
+
 export const uiDefaultThemeShades: ThemeShades = {
   dark: {
     primary: 950,
@@ -278,9 +304,32 @@ export const uiDefaultThemeShades: ThemeShades = {
     custom: 300,
   },
   custom: {
-    primary: 500,
-    secondary: 500,
-    tertiary: 500,
-    custom: 500,
+    primary: 900,
+    secondary: 800,
+    tertiary: 700,
+    custom: 600,
+  },
+}
+
+export const uiDefaultThemeShadesDiffs: {
+  [Key in MakUiThemeMode]: { [Key in MakUiThemeVariant]: number }
+} = {
+  dark: {
+    primary: 0,
+    secondary: -50,
+    tertiary: -100,
+    custom: -250,
+  },
+  light: {
+    primary: 0,
+    secondary: 50,
+    tertiary: 150,
+    custom: 250,
+  },
+  custom: {
+    primary: 0,
+    secondary: -100,
+    tertiary: -200,
+    custom: -300,
   },
 }
