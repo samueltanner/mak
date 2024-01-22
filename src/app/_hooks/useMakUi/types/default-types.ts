@@ -17,6 +17,29 @@ export type MakUiVariantShortHand =
   | "inf"
   | "cus"
 
+export type MakUiStateVariants =
+  | "open"
+  | "closed"
+  | "default"
+  | "empty"
+  | "disabled"
+  | "enabled"
+  | "checked"
+  | "indeterminate"
+  | "required"
+  | "invalid"
+  | "valid"
+  | "in-range"
+  | "out-of-range"
+  | "placeholder-shown"
+  | "read-only"
+  | "autofill"
+  | "hover"
+  | "focus"
+  | "active"
+  | "visited"
+  | "selection"
+
 export type MakUiStateShortHand = "def" | "act" | "dis" | "sel" | "inv"
 
 export type MakUiInteractionsShortHand = "bse" | "hov" | "clk" | "foc"
@@ -247,10 +270,10 @@ export type VerbosePaletteInput = {
 }
 
 export type NestedPaletteInput = {
-  color?: PaletteVariantInput
-  text?: PaletteVariantInput
-  border?: PaletteVariantInput
-  theme?: ThemeInput
+  color?: string | PaletteVariantInput
+  text?: string | PaletteVariantInput
+  border?: string | PaletteVariantInput
+  theme?: string | ThemeInput
 }
 
 export type MakUiPaletteInput = VerbosePaletteInput & NestedPaletteInput
@@ -289,11 +312,6 @@ export type MakUiSimpleSeparatedPaletteVariants = {
     hover: string
     click: string
     focus: string
-
-    // bse: string
-    // hov: string
-    // clk: string
-    // foc: string
   }
 }
 
@@ -315,10 +333,11 @@ export type MakUiSeparatedPalette = {
   }
 }
 export type MakUiVerboseTheme = {
+  [key: string]: MakUiSeparatedPalette | MakUiSeparatedPalette
   text: MakUiSeparatedPalette
   border: MakUiSeparatedPalette
   color: MakUiSeparatedPalette
-  theme: MakUiThemeVariants
+  theme: MakUiSeparatedPalette
 }
 
 export type MakUiVerbosePalettes = {

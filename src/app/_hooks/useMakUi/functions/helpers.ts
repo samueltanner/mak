@@ -23,6 +23,11 @@ import {
   MakUiThemePalette,
   MakUiVerbosePalettes,
   MakUiThemeVariants,
+  MakUiSimpleTheme,
+  MakUiVerboseTheme,
+  MakUiSimplePalettes,
+  MakUiSeparatedPalette,
+  MakUiVariant,
 } from "../types/default-types"
 import {
   absoluteRegex,
@@ -140,17 +145,29 @@ export const mergeWithFallback = (
 }
 
 export const separatePalettes = (paletteInput: MakUiPaletteInput) => {
-  let colorPalette = uiDefaultColorPaletteInput as PaletteVariantInput
-  let textPalette = uiDefaultTextPaletteInput as PaletteVariantInput
-  let borderPalette = uiDefaultBorderPaletteInput as PaletteVariantInput
-  let themePalette = uiDefaultThemePaletteInput as ThemeInput
+  let colorPalette = uiDefaultColorPaletteInput as
+    | PaletteVariantInput
+    | string
+    | undefined
+  let textPalette = uiDefaultTextPaletteInput as
+    | PaletteVariantInput
+    | string
+    | undefined
+  let borderPalette = uiDefaultBorderPaletteInput as
+    | PaletteVariantInput
+    | string
+    | undefined
+  let themePalette = uiDefaultThemePaletteInput as
+    | ThemeInput
+    | string
+    | undefined
 
   const { color, text, border, theme } = paletteInput as NestedPaletteInput
 
-  colorPalette = { ...color }
-  textPalette = { ...text }
-  borderPalette = { ...border }
-  themePalette = { ...theme }
+  colorPalette = isObject(color) ? { ...color } : color
+  textPalette = isObject(text) ? { ...text } : text
+  borderPalette = isObject(border) ? { ...border } : border
+  themePalette = isObject(theme) ? { ...theme } : theme
 
   for (const colorVariant of uiVariants) {
     const colorValue =
@@ -163,13 +180,13 @@ export const separatePalettes = (paletteInput: MakUiPaletteInput) => {
       `${colorVariant}Text`
     ]
 
-    if (!color && colorValue) {
+    if (!color && colorValue && isObject(colorPalette)) {
       colorPalette[colorVariant] = colorValue
     }
-    if (!border && borderValue) {
+    if (!border && borderValue && isObject(borderPalette)) {
       borderPalette[colorVariant] = borderValue
     }
-    if (!text && textValue) {
+    if (!text && textValue && isObject(textPalette)) {
       textPalette[colorVariant] = textValue
     }
   }
@@ -179,7 +196,7 @@ export const separatePalettes = (paletteInput: MakUiPaletteInput) => {
       `${themeName}Theme`
     ]
 
-    if (!theme && themeValue) {
+    if (!theme && themeValue && isObject(themePalette)) {
       themePalette[themeName] = themeValue as ThemeVariantInput
     }
   }
@@ -977,6 +994,34 @@ export const extractInitialPalette = ({
   let paletteObject = {} as MakUiPaletteInput
   for (const [key, value] of Object.entries(palette)) {
     if (key === "theme") {
+      if (typeof value === "string") {
+        const classNamesArray = value.split(" ")
+        let themeObject = {
+          light: undefined,
+          dark: undefined,
+          custom: undefined,
+        } as { [Key in MakUiThemeMode]: string | undefined }
+
+        classNamesArray.forEach((className) => {
+          if (className.includes("dark:")) {
+            themeObject.dark = className.split(":")[1]
+          } else if (className.includes("custom:")) {
+            themeObject.custom = className.split(":")[1]
+          } else {
+            themeObject.light = className
+          }
+        })
+        for (const [theme, classNames] of Object.entries(themeObject)) {
+          ensureNestedObject({
+            parent: paletteObject,
+            keys: [theme, "theme", "primary"],
+            value: classNames,
+          })
+        }
+
+        continue
+      }
+      // console.log({ key, value })
       const themes = Object.entries(value)
       themes.forEach(([theme, classNames]) => {
         if (isObject(classNames)) {
@@ -1060,3 +1105,129 @@ export const extractInitialPalette = ({
 
   return paletteObject as MakUiVerbosePalettes
 }
+
+export const makClassNameHelper = ({
+  string,
+  simpleTheme,
+  verboseTheme,
+  verbosePalettes,
+  simplePalettes,
+}: {
+  string: string
+  simpleTheme: MakUiSimpleTheme
+  verboseTheme: MakUiVerboseTheme
+  verbosePalettes: any
+  simplePalettes: any
+}) => {
+  if (!string) return ""
+  let finalClassName = []
+  const splitClassNames = string.split(" ")
+  let makClassNames = []
+
+  let insideMakArray = false
+  for (let className of splitClassNames) {
+    if (className.includes("mak(")) {
+      insideMakArray = true
+      makClassNames.push(className.slice(4))
+      continue
+    }
+
+    if (className.includes(")")) {
+      makClassNames.push(className.slice(0, -1))
+      insideMakArray = false
+      continue
+    }
+    if (insideMakArray) {
+      makClassNames.push(className)
+      continue
+    } else {
+      finalClassName.push(className)
+    }
+  }
+
+  const pvMap = {
+    text: "text",
+    border: "border",
+    color: "color",
+    bg: "color",
+  } as {
+    [key: string]: "text" | "border" | "color"
+  }
+  for (const makCn of makClassNames) {
+    const { variant, twVariant, theme, paletteVariant, interaction, state } =
+      parseMakClassName(makCn)
+
+    let className
+    let classNames = {
+      base: "",
+      disabled: "disabled:",
+      focus: "focus:",
+      active: "active:",
+      hover: "hover:",
+    }
+
+    const parsedPV = pvMap[paletteVariant]
+
+    console.log({
+      makCn,
+      theme,
+      twVariant,
+      paletteVariant,
+      variant,
+      interaction,
+      parsedPV,
+    })
+    if (interaction) {
+      const target = verboseTheme?.[parsedPV]?.[variant as MakUiVariant]
+      const disabled = target?.disabled
+      const defaultState = target?.default
+
+      className = `${twVariant}-${verboseTheme?.[parsedPV]?.[variant]?.[state]?.[interaction]}`
+    } else {
+      className = `${twVariant}-${simpleTheme?.[parsedPV]?.[variant].base}`
+    }
+    finalClassName.push(className)
+  }
+  const finalClassNamesString = finalClassName.join(" ")
+
+  return finalClassNamesString
+}
+
+const parseMakClassName = (string: string) => {
+  const makClassNameObj = {
+    theme: "light",
+    paletteVariant: "color",
+    variant: "primary",
+    state: "default",
+    interaction: "base",
+    twVariant: "bg",
+  }
+  for (const theme of uiThemes) {
+    string.includes(theme) && (makClassNameObj.theme = theme)
+  }
+  for (const paletteVariant of ["text", "color", "border"]) {
+    string.includes(paletteVariant) &&
+      (makClassNameObj.paletteVariant = paletteVariant) &&
+      (makClassNameObj.twVariant = paletteVariant)
+  }
+  for (const variant of uiVariants) {
+    string.includes(variant) && (makClassNameObj.variant = variant)
+  }
+  for (const state of uiStates) {
+    string.includes(state) && (makClassNameObj.state = state)
+  }
+  for (const interaction of uiInteractions) {
+    string.includes(interaction) && (makClassNameObj.interaction = interaction)
+  }
+
+  makClassNameObj.twVariant === "color" && makClassNameObj.variant === "bg"
+  return makClassNameObj
+}
+
+const generateTwClassName = ({
+  twVariant,
+  variant,
+}: {
+  twVariant: string
+  variant: string
+}) => {}

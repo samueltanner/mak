@@ -17,6 +17,7 @@ import {
   MakUiSimplePalette,
   MakUiSimpleThemePalette,
   MakUiRootInteraction,
+  MakUiStateVariants,
 } from "../../types/default-types"
 
 export const paletteShorthand = {
@@ -142,6 +143,30 @@ export const uiStates: MakUiState[] = [
   "disabled",
   "selected",
   "invalid",
+]
+
+export const uiStateVariants: MakUiStateVariants[] = [
+  "open",
+  "closed",
+  "default",
+  "empty",
+  "disabled",
+  "enabled",
+  "checked",
+  "indeterminate",
+  "required",
+  "invalid",
+  "valid",
+  "in-range",
+  "out-of-range",
+  "placeholder-shown",
+  "read-only",
+  "autofill",
+  "hover",
+  "focus",
+  "active",
+  "visited",
+  "selection",
 ]
 
 export const uiInteractions: MakUiInteraction[] = [

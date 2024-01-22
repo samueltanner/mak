@@ -6,13 +6,21 @@ import Modal, {
   ModalFooter,
   ModalHeader,
 } from "../_hooks/useMakUi/components/Modal"
+import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
 
 const MakUiView = () => {
+  const { simpleTheme } = useMakUi()
   const [modalIsOpen, setModalIsOpen] = useState(false)
   return (
     <div>
       <div>
-        <Dropdown icon={<span>trigger</span>}>
+        <Dropdown
+          icon={
+            <span className={`text-${simpleTheme.text.primary.base}`}>
+              trigger
+            </span>
+          }
+        >
           <span className="flex h-full w-full ">
             <ul>
               <li>Element 1</li>

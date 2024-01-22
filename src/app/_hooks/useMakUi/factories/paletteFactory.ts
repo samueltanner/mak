@@ -3,7 +3,7 @@ import {
   ensureNestedObject,
   extractInitialPalette,
   getConstructedTheme,
-} from "../functions/helpers";
+} from "../functions/helpers"
 import {
   MakUiInteraction,
   MakUiPaletteInput,
@@ -12,7 +12,8 @@ import {
   MakUiVariants,
   MakUiVerbosePalettesShortHand,
   MakUiSimplePalettesShortHand,
-} from "../types/default-types";
+  MakUiThemeMode,
+} from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
   uiPaletteVariants,
@@ -25,22 +26,24 @@ import {
   paletteShorthand,
   uiInteractionsAndRoots,
   uiThemeColorVariantsAndRoots,
-} from "../constants/defaults/default-constants";
+} from "../constants/defaults/default-constants"
 
 export const paletteFactory = ({
   paletteInput,
+  enabledModes,
 }: {
   paletteInput: MakUiPaletteInput
+  enabledModes: MakUiThemeMode[]
 }) => {
   const initialVerbosePalette = extractInitialPalette({ palette: paletteInput })
+
   let finalVerbosePalette = {} as MakUiVerbosePalettes
   let finalSimplePalette = {} as MakUiSimplePalettes
-  for (const theme of uiThemes) {
+  for (const theme of enabledModes) {
     for (const paletteVariant of uiPaletteVariants) {
       if (paletteVariant === "theme") {
         if (initialVerbosePalette?.[theme]?.[paletteVariant]) {
           const providedVariant = initialVerbosePalette[theme][paletteVariant]
-
           const constructedTheme = getConstructedTheme(providedVariant, theme)
 
           ensureNestedObject({

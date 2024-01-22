@@ -10,8 +10,8 @@ const formConfig = {
   },
   last_name: {
     type: "text",
-    label: "First Name",
-    placeholder: "Enter first name",
+    label: "Last Name",
+    placeholder: "Enter lst name",
     required: true,
   },
   pick: {
@@ -28,16 +28,16 @@ const formConfig = {
 }
 
 const MakFormView = () => {
-  const { t } = useMakUi()
+  const { verboseTheme } = useMakUi()
 
   const {
     form,
-    components: { FirstName, Pick },
+    components: { FirstName, Pick, LastName },
   } = useMakForm({ formConfig })
   return (
     <div>
       <FirstName
-        // className={`p-2 text-${t.text.primary.default.base}`}
+        className={`p-2 text-${verboseTheme.text.primary.default.base}`}
       />
       <Pick />
     </div>
