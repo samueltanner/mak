@@ -2,7 +2,7 @@ import { MakUiButtonConfig } from "./button-types"
 
 export type SimpleRecord = Record<string, any>
 
-export type MakUiThemeModeShortHand = "drk" | "lgt" | "cus"
+export type MakUiThemeModeShortHand = "drk" | "lgt" | "cst"
 
 export type MakUiPaletteShortHand = "bor" | "col" | "txt" | "thm"
 
@@ -15,7 +15,7 @@ export type MakUiVariantShortHand =
   | "dng"
   | "war"
   | "inf"
-  | "cus"
+  | "cst"
 
 export type MakUiStateVariants =
   | "open"
@@ -46,7 +46,7 @@ export type MakUiInteractionsShortHand = "bse" | "hov" | "clk" | "foc"
 
 export type MakUiRootInteractionsShortHand = "bser" | "hovr" | "clkr" | "focr"
 
-export type MakUiSimpleThemeVariantShortHand = "pri" | "sec" | "ter" | "cus"
+export type MakUiSimpleThemeVariantShortHand = "pri" | "sec" | "ter" | "cst"
 export type MakUiThemeVariantsShortHand =
   | "prir"
   | "secr"
@@ -55,7 +55,7 @@ export type MakUiThemeVariantsShortHand =
   | "pri"
   | "sec"
   | "ter"
-  | "cus"
+  | "cst"
 export type MakUiInteraction = "base" | "hover" | "click" | "focus"
 
 export type MakUiDarkInteraction =

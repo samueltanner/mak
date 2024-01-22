@@ -1,24 +1,23 @@
 "use client"
 import React, { createContext, useEffect, useMemo, useState } from "react"
 import { paletteFactory } from "../factories/paletteFactory"
-import {
-  MakUiPaletteInput,
-  MakUiThemeMode,
-  MakUiVerbosePalettes,
-  MakUiSimpleTheme,
-  MakUiVerboseTheme,
-  MakUiSimplePalettes,
-  MakUiComponentConfig,
-  MakUiSimplePalettesShortHand,
-  MakUiVerbosePalettesShortHand,
-  MakUiSimpleThemesShortHand,
-  MakUiThemeModeShortHand,
-  MakUiVerboseThemesShortHand,
-} from "../types/default-types"
+// import {
+//   MakUiPaletteInput,
+//   MakUiThemeMode,
+//   MakUiVerbosePalettes,
+//   MakUiSimpleTheme,
+//   MakUiVerboseTheme,
+//   MakUiSimplePalettes,
+//   MakUiComponentConfig,
+//   MakUiSimplePalettesShortHand,
+//   MakUiVerbosePalettesShortHand,
+//   MakUiSimpleThemesShortHand,
+//   MakUiThemeModeShortHand,
+//   MakUiVerboseThemesShortHand,
+// } from "../types/default-types"
 import { MakUiButtonConfig } from "../types/button-types"
 import { ThemeProvider, useTheme } from "next-themes"
 import {
-  detectSystemTheme,
   isEmptyObject,
   makClassNameHelper,
 } from "../functions/helpers"
@@ -26,6 +25,7 @@ import {
   paletteShorthand,
   uiThemes,
 } from "../constants/defaults/default-constants"
+import { MakUiPaletteInput } from "../types/ui-types"
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:

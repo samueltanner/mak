@@ -4,16 +4,16 @@ import {
   extractInitialPalette,
   getConstructedTheme,
 } from "../functions/helpers"
-import {
-  MakUiInteraction,
-  MakUiPaletteInput,
-  MakUiSimplePalettes,
-  MakUiVerbosePalettes,
-  MakUiVariants,
-  MakUiVerbosePalettesShortHand,
-  MakUiSimplePalettesShortHand,
-  MakUiThemeMode,
-} from "../types/default-types"
+// import {
+//   MakUiInteraction,
+//   MakUiPaletteInput,
+//   MakUiSimplePalettes,
+//   MakUiVerbosePalettes,
+//   MakUiVariants,
+//   MakUiVerbosePalettesShortHand,
+//   MakUiSimplePalettesShortHand,
+//   MakUiThemeMode,
+// } from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
   uiPaletteVariants,
@@ -27,18 +27,21 @@ import {
   uiInteractionsAndRoots,
   uiThemeColorVariantsAndRoots,
 } from "../constants/defaults/default-constants"
+import { MakUiPaletteInput, MakUiSimplePalette, MakUiThemeKeys, MakUiVerbosePalette, MakUiVerboseVariant } from "../types/ui-types"
+import { MakUiVariants } from "../types/default-types"
+
 
 export const paletteFactory = ({
   paletteInput,
   enabledModes,
 }: {
   paletteInput: MakUiPaletteInput
-  enabledModes: MakUiThemeMode[]
+  enabledModes: MakUiThemeKeys[]
 }) => {
   const initialVerbosePalette = extractInitialPalette({ palette: paletteInput })
 
-  let finalVerbosePalette = {} as MakUiVerbosePalettes
-  let finalSimplePalette = {} as MakUiSimplePalettes
+  let finalVerbosePalette = {} as MakUiVerbosePalette
+  let finalSimplePalette = {} as MakUiSimplePalette
   for (const theme of enabledModes) {
     for (const paletteVariant of uiPaletteVariants) {
       if (paletteVariant === "theme") {
@@ -152,7 +155,7 @@ export const paletteFactory = ({
             initialVerbosePalette[theme][paletteVariant][variant]
 
           const constructedClassNames = getConstructedClassNames({
-            interactions: providedState as MakUiVariants,
+            interactions: providedState as MakUiVerboseVariant,
             state: "all",
           })
 

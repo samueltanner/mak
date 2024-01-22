@@ -23,7 +23,7 @@ import {
 export const paletteShorthand = {
   dark: "drk",
   light: "lgt",
-  custom: "cus",
+  custom: "cst",
   border: "bor",
   color: "col",
   text: "txt",

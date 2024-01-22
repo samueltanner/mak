@@ -46,6 +46,7 @@ import {
 } from "../constants/defaults/default-constants"
 import colors from "tailwindcss/colors"
 import twConfig from "../../../../../tailwind.config"
+import { MakUiVerboseVariant } from "../types/ui-types"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
@@ -391,7 +392,7 @@ export const getConstructedClassNames = ({
   state = "default",
   theme = "light",
 }: {
-  interactions?: MakUiVariants | MakUiStates
+  interactions?: MakUiVerboseVariant | MakUiStates
   state?: MakUiState | "all"
   color?: string
   type?: "default" | "theme"
