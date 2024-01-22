@@ -19,6 +19,41 @@ import {
   MakUiRootInteraction,
 } from "../../types/default-types"
 
+export const paletteShorthand = {
+  dark: "drk",
+  light: "lgt",
+  custom: "cus",
+  border: "bor",
+  color: "col",
+  text: "txt",
+  theme: "thm",
+  primary: "pri",
+  secondary: "sec",
+  tertiary: "ter",
+  hover: "hov",
+  focus: "foc",
+  active: "act",
+  disabled: "dis",
+  invalid: "inv",
+  error: "err",
+  danger: "dng",
+  warning: "war",
+  success: "suc",
+  info: "inf",
+  default: "def",
+  selected: "sel",
+  base: "bse",
+  click: "clk",
+  baseRoot: "bser",
+  hoverRoot: "hovr",
+  clickRoot: "clkr",
+  focusRoot: "focr",
+  primaryRoot: "prir",
+  secondaryRoot: "secr",
+  tertiaryRoot: "terr",
+  customRoot: "cusr",
+}
+
 export const absoluteRegex =
   /^((white|black)\/\[*0*(?:[0-9][0-9]?|100)%*\]*|(white|black))$/
 
@@ -31,6 +66,22 @@ export const lightRegex =
 export const customRegex =
   /^custom:((hover)|(focus)|(active)|(disabled)|(invalid)|(error))?:?/
 
+export const uiThemeColorVariants = [
+  "primary",
+  "secondary",
+  "tertiary",
+  "custom",
+] as const
+export const uiThemeColorRootVariants = [
+  "primaryRoot",
+  "secondaryRoot",
+  "tertiaryRoot",
+  "customRoot",
+] as const
+export const uiThemeColorVariantsAndRoots = [
+  ...uiThemeColorVariants,
+  ...uiThemeColorRootVariants,
+]
 export const uiPaletteVariants: MakUiPaletteVariant[] = [
   "color",
   "text",
@@ -104,7 +155,13 @@ export const uiRootInteractions: MakUiRootInteraction[] = [
   "baseRoot",
   "hoverRoot",
   "clickRoot",
+  "focusRoot",
 ]
+
+export const uiInteractionsAndRoots: (
+  | MakUiInteraction
+  | MakUiRootInteraction
+)[] = [...uiInteractions, ...uiRootInteractions]
 
 export const uiDefaultColorPaletteInput: MakUiPaletteInput = {
   primary: "mak-teal-500",

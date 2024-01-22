@@ -9,11 +9,19 @@ import {
   MakUiVerboseTheme,
   MakUiSimplePalettes,
   MakUiComponentConfig,
+  MakUiSimplePalettesShortHand,
+  MakUiVerbosePalettesShortHand,
+  MakUiSimpleThemesShortHand,
+  MakUiThemeModeShortHand,
+  MakUiVerboseThemesShortHand,
 } from "../types/default-types"
 import { MakUiButtonConfig } from "../types/button-types"
 import { ThemeProvider, useTheme } from "next-themes"
 import { detectSystemTheme, isEmptyObject } from "../functions/helpers"
-import { uiThemes } from "../constants/defaults/default-constants"
+import {
+  paletteShorthand,
+  uiThemes,
+} from "../constants/defaults/default-constants"
 
 export const defaultButtonConfig: MakUiButtonConfig = {
   className:
@@ -83,34 +91,32 @@ const MakUiProviderChild = ({
 
   let currentTheme: MakUiThemeMode =
     (themeMode as MakUiThemeMode | undefined) || defaultTheme
-
+  let currentThemeShorthand = paletteShorthand[
+    currentTheme
+  ] as MakUiThemeModeShortHand
   const palettesMemo = useMemo(() => {
-    const { paletteThemesObject, simplePaletteThemesObject } =
-      paletteFactory({ paletteInput }) || {}
+    const { verbose, simple } = paletteFactory({ paletteInput }) || {}
 
     return {
-      palette: paletteThemesObject,
-      p: paletteThemesObject,
-      simplePalette: simplePaletteThemesObject,
-      sp: simplePaletteThemesObject,
-      dark: paletteThemesObject.dark,
-      d: paletteThemesObject.dark,
-      light: paletteThemesObject.light,
-      l: paletteThemesObject.light,
-      custom: paletteThemesObject.custom,
-      c: paletteThemesObject.custom,
-      sd: simplePaletteThemesObject.dark,
-      sl: simplePaletteThemesObject.light,
-      sc: simplePaletteThemesObject.custom,
+      sp: simple as MakUiSimplePalettesShortHand,
+      vp: verbose as MakUiVerbosePalettesShortHand,
+      simplePalettes: simple as MakUiSimplePalettes,
+      verbosePalettes: verbose as MakUiVerbosePalettes,
     }
   }, [paletteInput])
 
   const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>(
     {} as MakUiSimpleTheme
   )
+
   const [verboseTheme, setVerboseTheme] = useState<MakUiVerboseTheme>(
     {} as MakUiVerboseTheme
   )
+  const [simpleThemeShortHand, setSimpleThemeShortHand] =
+    useState<MakUiSimpleThemesShortHand>({} as MakUiSimpleThemesShortHand)
+
+  const [verboseThemeShortHand, setVerboseThemeShortHand] =
+    useState<MakUiVerboseThemesShortHand>({} as MakUiVerboseThemesShortHand)
 
   const [buttonConfig, setButtonConfig] = useState<MakUiButtonConfig>(
     componentConfig?.buttonConfig || defaultButtonConfig
@@ -125,21 +131,28 @@ const MakUiProviderChild = ({
       : false
 
   useEffect(() => {
-    setVerboseTheme(palettesMemo.p[currentTheme])
-    setSimpleTheme(palettesMemo.sp[currentTheme])
+    setVerboseTheme(palettesMemo.verbosePalettes[currentTheme])
+    setSimpleTheme(palettesMemo.simplePalettes[currentTheme])
+    setVerboseThemeShortHand(palettesMemo.vp[currentThemeShorthand])
+    setSimpleThemeShortHand(palettesMemo.sp[currentThemeShorthand])
   }, [themeMode, currentTheme])
 
+  const { sp, vp, simplePalettes, verbosePalettes } = palettesMemo
   const value = {
-    ...palettesMemo,
+    simplePalettes,
+    verbosePalettes,
+    simpleTheme,
+    verboseTheme,
+    sp,
+    vp,
+    st: simpleThemeShortHand,
+    vt: verboseThemeShortHand,
+
     buttonConfig,
     setButtonConfig,
     themeMode,
     setTheme: setThemeMode,
     theme: themeMode,
-    verboseTheme,
-    t: verboseTheme,
-    simpleTheme,
-    s: simpleTheme,
     formattingThemes,
     isDark: themeMode === "dark",
     isLight: themeMode === "light",
@@ -156,29 +169,22 @@ const MakUiProviderChild = ({
 interface MakUiContext {
   buttonConfig: MakUiButtonConfig
   setButtonConfig: (config: MakUiButtonConfig) => void
-  palette: MakUiVerbosePalettes
-  p: MakUiVerbosePalettes
-  simplePalette: MakUiSimplePalettes
-  sp: MakUiSimplePalettes
-  dark: MakUiVerboseTheme
-  d: MakUiVerboseTheme
-  light: MakUiVerboseTheme
-  l: MakUiVerboseTheme
-  custom: MakUiVerboseTheme
-  c: MakUiVerboseTheme
-  sd: MakUiSimpleTheme
-  sl: MakUiSimpleTheme
-  sc: MakUiSimpleTheme
+
   theme: string | undefined
   setTheme: (themeMode: string) => void
-  verboseTheme: MakUiVerboseTheme
-  t: MakUiVerboseTheme
-  simpleTheme: MakUiSimpleTheme
-  s: MakUiSimpleTheme
   formattingThemes: boolean
   isDark: boolean
   isLight: boolean
   isCustom: boolean
+
+  simplePalettes: MakUiSimplePalettes
+  verbosePalettes: MakUiVerbosePalettes
+  simpleTheme: MakUiSimpleTheme
+  verboseTheme: MakUiVerboseTheme
+  sp: MakUiSimplePalettesShortHand
+  vp: MakUiVerbosePalettesShortHand
+  st: MakUiSimpleThemesShortHand
+  vt: MakUiVerboseThemesShortHand
 }
 
 export const useMakUi = () => {

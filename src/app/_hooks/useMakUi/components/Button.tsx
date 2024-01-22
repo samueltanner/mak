@@ -224,7 +224,7 @@ const Button = forwardRef(
       keepStatusVisible = false,
     } = buttonProps
 
-    const { t, buttonConfig } = useMakUi()
+    const { verboseTheme, buttonConfig } = useMakUi()
 
     const status = isLoading || isError || isSuccess
     const [showStatus, setShowStatus] = useState<boolean>(!!status)
@@ -329,7 +329,7 @@ const Button = forwardRef(
       customClassName: className,
       customTextClassName: textClassName,
       buttonConfig,
-      theme: t,
+      theme: verboseTheme,
     })
 
     const handleClick = () => {

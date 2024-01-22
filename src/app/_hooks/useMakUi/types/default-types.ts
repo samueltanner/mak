@@ -2,6 +2,37 @@ import { MakUiButtonConfig } from "./button-types"
 
 export type SimpleRecord = Record<string, any>
 
+export type MakUiThemeModeShortHand = "drk" | "lgt" | "cus"
+
+export type MakUiPaletteShortHand = "bor" | "col" | "txt" | "thm"
+
+export type MakUiVariantShortHand =
+  | "pri"
+  | "sec"
+  | "ter"
+  | "suc"
+  | "err"
+  | "dng"
+  | "war"
+  | "inf"
+  | "cus"
+
+export type MakUiStateShortHand = "def" | "act" | "dis" | "sel" | "inv"
+
+export type MakUiInteractionsShortHand = "bse" | "hov" | "clk" | "foc"
+
+export type MakUiRootInteractionsShortHand = "bser" | "hovr" | "clkr" | "focr"
+
+export type MakUiSimpleThemeVariantShortHand = "pri" | "sec" | "ter" | "cus"
+export type MakUiThemeVariantsShortHand =
+  | "prir"
+  | "secr"
+  | "terr"
+  | "cusr"
+  | "pri"
+  | "sec"
+  | "ter"
+  | "cus"
 export type MakUiInteraction = "base" | "hover" | "click" | "focus"
 
 export type MakUiDarkInteraction =
@@ -253,7 +284,17 @@ export type MakUiSimpleThemePalette = {
 }
 
 export type MakUiSimpleSeparatedPaletteVariants = {
-  [Key in MakUiVariant]: string
+  [Key in MakUiVariant]: {
+    base: string
+    hover: string
+    click: string
+    focus: string
+
+    // bse: string
+    // hov: string
+    // clk: string
+    // foc: string
+  }
 }
 
 export type MakUiSimpleTheme = {
@@ -281,9 +322,7 @@ export type MakUiVerboseTheme = {
 }
 
 export type MakUiVerbosePalettes = {
-  dark: MakUiVerboseTheme
-  light: MakUiVerboseTheme
-  custom: MakUiVerboseTheme
+  [Key in MakUiThemeMode]: MakUiVerboseTheme
 }
 
 export type InteractionShades = {
@@ -314,6 +353,52 @@ export type SplitStringResponse = {
   string: string
 }
 
+export type MakUiSimplePalettesShortHand = {
+  [Key in MakUiThemeModeShortHand]: MakUiSimpleThemesShortHand
+}
+
+export type MakUiVerbosePalettesShortHand = {
+  [Key in MakUiThemeModeShortHand]: MakUiVerboseThemesShortHand
+}
+
+export type MakUiVerboseThemesShortHand = {
+  bor: MakUiVariantsShortHand
+  txt: MakUiVariantsShortHand
+  col: MakUiVariantsShortHand
+  thm: MakUiThemesShortHand
+}
+
 export type MakUiComponentConfig = {
   buttonConfig?: MakUiButtonConfig
 }
+export type MakUiSimpleThemesShortHand = {
+  bor: MakUiSimpleVariantsShortHand
+  txt: MakUiSimpleVariantsShortHand
+  col: MakUiSimpleVariantsShortHand
+  thm: MakUiSimpleThemeShortHand
+}
+
+export type MakUiVariantsShortHand = {
+  [Key in MakUiVariantShortHand]: {
+    [Key in MakUiStateShortHand]: {
+      [Key in MakUiInteractionsShortHand]: string
+    }
+  }
+}
+
+export type MakUiSimpleVariantsShortHand = {
+  [Key in MakUiVariantShortHand]: {
+    [Key in MakUiInteractionsShortHand]: string
+  }
+}
+
+export type MakUiThemesShortHand = {
+  [Key in MakUiThemeVariantsShortHand]: {
+    [Key in MakUiInteractionsShortHand]: string
+  }
+}
+export type MakUiSimpleThemeShortHand = {
+  [Key in MakUiSimpleThemeVariantShortHand]: string
+}
+
+// export type MakUi

@@ -6,28 +6,16 @@ import MakFormView from "./_views/MakFormView"
 import MakUiView from "./_views/MakUiView"
 
 export default function Home() {
-  const {
-    palette,
-    theme,
-    simpleTheme,
-    setTheme,
-    isDark,
-    isLight,
-    isCustom,
-    t,
-  } = useMakUi()
+  const { setTheme, isDark, isLight, isCustom, verboseTheme } = useMakUi()
 
   return (
     <main
-      className={`h-screen w-screen p-4 
-    
-    `}
-      // bg-${t.theme.secondary}
+      className={`h-screen w-screen p-4 bg-${verboseTheme.theme.secondary}`}
     >
       <div className="flex w-full h-full justify-between">
         <MakUiView />
         <MakFormView />
-        {/* <Button
+        <Button
           secondary
           outline
           textPrimary
@@ -35,15 +23,21 @@ export default function Home() {
             setTheme(isDark ? "light" : isLight ? "custom" : "dark")
           }}
         >
-          {isDark && <BiSun className={`size-6 text-${t.text.primary}`} />}
-          {isLight && (
-            <BiSolidMoon className={`size-6 text-${t.text.primary}`} />
+          {isDark && (
+            <BiSun className={`size-6 text-${verboseTheme.text.primary}`} />
           )}
-          {isCustom && <BiParty className={`size-6 text-${t.text.primary}`} />}
-        </Button> */}
+          {isLight && (
+            <BiSolidMoon
+              className={`size-6 text-${verboseTheme.text.primary}`}
+            />
+          )}
+          {isCustom && (
+            <BiParty className={`size-6 text-${verboseTheme.text.primary}`} />
+          )}
+        </Button>
         <input
           type="text"
-          // className="rounded-md h-fit w-fit bg-white px-4 py-2 font-normal text-mak-teal-900 focus:outline-none shadow-hard-sm"
+          className="rounded-md h-fit w-fit bg-white px-4 py-2 font-normal text-mak-teal-900 focus:outline-none shadow-hard-sm"
         />
       </div>
     </main>

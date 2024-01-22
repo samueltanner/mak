@@ -203,8 +203,8 @@ const Dropdown = ({
     top: 0,
     right: 0,
   })
-  const { t } = useMakUi()
-  const { text } = t
+  const { verboseTheme } = useMakUi()
+  const { text } = verboseTheme
 
   if (!labelLeft && !labelRight) {
     labelLeft = true
@@ -378,14 +378,14 @@ const Dropdown = ({
             className="flex items-center"
           >
             <BiChevronUp
-              // className={`size-4 text-${text.primary.default.base}`}
+              className={`size-4 text-${text.primary.default.base}`}
             />
           </motion.span>
         )}
       </div>
       <AnimatePresence>
         <motion.div
-          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${t?.theme?.secondary}`}
+          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${verboseTheme?.theme?.secondary}`}
           variants={menuVariants}
           initial="hidden"
           animate={dropdownOpen ? "visible" : "exit"}
