@@ -1,4 +1,4 @@
-import { MakUiButtonConfig } from "./button-types"
+import { MakUiButtonConfig } from "./component-types"
 
 export type SimpleRecord = Record<string, any>
 

@@ -1,11 +1,27 @@
 // Generic Types
 
-import { makUiThemeVariants } from "../constants/ui-constants"
-import { MakUiButtonConfigInput } from "./button-types"
-
 export type GenericObject = Record<string, any>
 
 // KEYS
+
+export type TailwindVariantKey =
+  | "bg"
+  | "text"
+  | "border"
+  | "ring"
+  | "outline"
+  | "ring-offset"
+  | "fill"
+  | "stroke"
+
+export type HtmlElementKey =
+  | "button"
+  | "input"
+  | "text"
+  | "form"
+  | "dialog"
+  | "select"
+  | "textarea"
 
 export type MakUiThemeKeySH = "drk" | "lgt" | "cst"
 
@@ -45,14 +61,14 @@ export type MakUiVariantKey =
   | "warning"
   | "info"
 
-export type MakUiStateKey =
-  | "base"
+export type MakUiCustomInteractionStateKey = "base" | "click"
+
+export type MakUiInteractionStateKey =
   | "active"
   | "autofill"
   | "checked"
   | "closed"
   | "default"
-  | "click"
   | "disabled"
   | "empty"
   | "enabled"
@@ -73,6 +89,10 @@ export type MakUiStateKey =
   | "target"
   | "valid"
   | "visited"
+
+export type MakUiStateKey =
+  | MakUiInteractionStateKey
+  | MakUiCustomInteractionStateKey
 
 export type MakUiRootStateKey =
   | "openRoot"
@@ -126,7 +146,7 @@ export type MakUiState = {
 // SIMPLE OUTPUT TYPES
 
 export type MakUiSimplePalette = {
-  [Key in MakUiThemeKey | MakUiThemeKeySH]: MakUiSimpleTheme
+  [Key in MakUiThemeKey]: MakUiSimpleTheme
 }
 
 export type MakUiSimpleTheme = {
@@ -142,11 +162,20 @@ export type MakUiSimpleTheme = {
 }
 
 export type MakUiSimpleVariant = {
-  [Key in MakUiVariantKey | MakUiVariantKeySH]: string
+  [Key in MakUiVariantKey]: {
+    base: string
+    active: string
+    click: string
+    default: string
+    focus: string
+    hover: string
+    disabled: string
+    selected: string
+  }
 }
 
 export type MakUiSimpleThemeVariant = {
-  [Key in MakUiThemeVariantKey | MakUiThemeVariantKeySH]: string
+  [Key in MakUiThemeVariantKey]: string
 }
 
 export type MakUiSimpleState = {
@@ -204,10 +233,6 @@ export type MakUiThemeShadesInput = {
   }
 }
 
-export type MakUiComponentConfigInput = {
-  buttonConfig?: MakUiButtonConfigInput
-}
-
 // Default Types
 
 export type MakUiThemeVariantShades = {
@@ -262,4 +287,12 @@ export type TWColorHelperResponse = {
   colorString: string
   rootString: string
   hex: string
+}
+
+export type ParsedClassNameResponse = {
+  theme: MakUiThemeKey
+  palette: MakUiPaletteKey
+  variant: MakUiVariantKey
+  state: MakUiStateKey | undefined
+  twVariant: TailwindVariantKey
 }

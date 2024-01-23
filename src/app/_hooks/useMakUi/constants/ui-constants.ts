@@ -1,17 +1,45 @@
+import { MakUiComponentConfigInput, MakUiRootComponentConfigInput } from "../types/component-types"
 import {
+  HtmlElementKey,
+  MakUiCustomInteractionStateKey,
   MakUiDefaultColors,
   MakUiDefaultPalette,
   MakUiDefaultStateColors,
-  MakUiPaletteInput,
+  MakUiInteractionStateKey,
   MakUiPaletteKey,
   MakUiStateKey,
   MakUiStateShades,
   MakUiThemeKey,
   MakUiThemeShades,
-  MakUiThemeShadesInput,
   MakUiThemeVariantKey,
   MakUiVariantKey,
+  TailwindVariantKey,
 } from "../types/ui-types"
+
+export const tailwindVariants: TailwindVariantKey[] = [
+  "bg",
+  "text",
+  "border",
+  "ring",
+  "outline",
+  "ring-offset",
+  "fill",
+  "stroke",
+]
+
+export const htmlElements: HtmlElementKey[] = [
+  "button",
+  "input",
+  "text",
+  "form",
+  "dialog",
+  "select",
+  "textarea",
+]
+
+export const tailwindVariantsSet: Set<TailwindVariantKey> = new Set(
+  tailwindVariants
+)
 
 export const makUiThemes: MakUiThemeKey[] = ["dark", "light", "custom"]
 
@@ -33,6 +61,10 @@ export const makUiThemeVariants: MakUiThemeVariantKey[] = [
   "custom",
 ]
 
+export const makUiThemeVariantsSet: Set<MakUiThemeVariantKey> = new Set(
+  makUiThemeVariants
+)
+
 export const makUiVariants: MakUiVariantKey[] = [
   ...makUiThemeVariants,
   "success",
@@ -44,23 +76,19 @@ export const makUiVariants: MakUiVariantKey[] = [
 
 export const makUiVariantsSet: Set<MakUiVariantKey> = new Set(makUiVariants)
 
-export const makUiStates: MakUiStateKey[] = [
-  "base",
+export const makUiInteractionStates: MakUiInteractionStateKey[] = [
   "active",
-  "default",
-  "enabled",
-  "hover",
-  "target",
-  "click",
-
   "autofill",
   "checked",
   "closed",
+  "default",
   "disabled",
   "empty",
+  "enabled",
   "focus",
   "focus-visible",
   "focus-within",
+  "hover",
   "in-range",
   "indeterminate",
   "invalid",
@@ -71,8 +99,19 @@ export const makUiStates: MakUiStateKey[] = [
   "required",
   "selected",
   "selection",
+  "target",
   "valid",
   "visited",
+]
+
+export const makUiCustomInteractionStates: MakUiCustomInteractionStateKey[] = [
+  "base",
+  "click",
+]
+
+export const makUiStates: MakUiStateKey[] = [
+  ...makUiCustomInteractionStates,
+  ...makUiInteractionStates,
 ]
 
 export const makUiStatesSet: Set<MakUiStateKey> = new Set(makUiStates)
@@ -204,4 +243,18 @@ export const makUiDefaultStates: MakUiDefaultStateColors = {
   target: "zinc-500",
   valid: "zinc-500",
   visited: "zinc-500",
+}
+
+export const defaultButtonConfig: MakUiRootComponentConfigInput = {
+  className:
+    "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold border border-2",
+}
+
+export const defaultInputConfig: MakUiRootComponentConfigInput = {
+  className: "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold",
+}
+
+export const defaultComponentConfig: MakUiComponentConfigInput = {
+  buttonConfig: defaultButtonConfig,
+  inputConfig: defaultInputConfig,
 }

@@ -58,21 +58,16 @@ export const paletteFactory = ({
             value: constructedTheme,
           })
 
-          const {
-            primaryRoot: primaryRoot,
-            secondaryRoot: secondaryRoot,
-            tertiaryRoot: tertiaryRoot,
-            customRoot: customRoot,
-          } = constructedTheme
+          const { primary, secondary, tertiary, custom } = constructedTheme
 
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant],
             value: {
-              primary: primaryRoot,
-              secondary: secondaryRoot,
-              tertiary: tertiaryRoot,
-              custom: customRoot,
+              primary,
+              secondary,
+              tertiary,
+              custom,
             },
           })
         } else {
@@ -90,21 +85,16 @@ export const paletteFactory = ({
             value: constructedTheme,
           })
 
-          const {
-            primaryRoot: primary,
-            secondaryRoot: secondary,
-            tertiaryRoot: tertiary,
-            customRoot: custom,
-          } = constructedTheme
+          const { primary, secondary, tertiary, custom } = constructedTheme
 
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant],
             value: {
-              primary: primary,
-              secondary: secondary,
-              tertiary: tertiary,
-              custom: custom,
+              primary,
+              secondary,
+              tertiary,
+              custom,
             },
           })
         }
@@ -161,8 +151,6 @@ export const paletteFactory = ({
             defaultShades: defaultShades.defaultStateShades,
             theme,
           })
-
-          console.log(theme, paletteVariant, variant, constructedStates)
 
           ensureNestedObject({
             parent: finalVerbosePalette,

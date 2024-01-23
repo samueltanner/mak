@@ -48,11 +48,10 @@ export default function Home() {
           )}
         </Button>
         <button
-          onFocus={() => {
-            console.log("focused")
-          }}
-          className={`disabled:bg-${verboseTheme.color.primary.disabled} hover:bg-${verboseTheme.color.primary.hover} bg-${verboseTheme.color.primary.base} h-fit w-fit px-4 py-2 rounded-md fade-in-out`}
-          // className={mcn("mak(dark:text-primary bg-secondary-hover) h-fit w-fit px-4 py-2 rounded-md")}
+          className={mcn(
+            "mak(dark:text-primary bg-primary border-primary focus:ring-offset-primary) focus:ring-2",
+            { type: "button", states: ["disabled", "hover", "focus"] }
+          )}
         >
           Test
         </button>

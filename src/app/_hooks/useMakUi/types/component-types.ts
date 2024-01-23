@@ -1,12 +1,23 @@
-export type MakUiButtonConfigInput = {
-  [key: string]: string | undefined
+import { MakUiInteractionStateKey } from "./ui-types"
+
+export type MakUiRootComponentConfigInput = {
+  [key: string]: string | undefined | MakUiInteractionStateKey[]
   borderRadius?: string
   borderWidth?: string
   borderStyle?: string
   className?: string
   text?: string
+  enabledStates?: MakUiInteractionStateKey[]
 }
-
+export type MakUiComponentConfigInput = {
+  buttonConfig?: MakUiRootComponentConfigInput
+  inputConfig?: MakUiRootComponentConfigInput
+  textConfig?: MakUiRootComponentConfigInput
+  formConfig?: MakUiRootComponentConfigInput
+  dialogConfig?: MakUiRootComponentConfigInput
+  selectConfig?: MakUiRootComponentConfigInput
+  textareaConfig?: MakUiRootComponentConfigInput
+}
 export type ButtonVariants = {
   [key: string]: ButtonStates
   primary: ButtonStates
@@ -37,4 +48,3 @@ export type ButtonSubStates = {
   focusBorder: string
   clickedBorder: string
 }
-

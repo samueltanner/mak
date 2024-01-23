@@ -8,7 +8,7 @@ import {
   MakUiVariant,
 } from "../types/default-types"
 import { MakUiVerboseTheme } from "../types/ui-types"
-import { MakUiButtonConfig } from "../types/button-types"
+import { MakUiButtonConfig } from "../types/component-types"
 
 interface ButtonProps {
   text?: string

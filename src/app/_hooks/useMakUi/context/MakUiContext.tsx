@@ -1,68 +1,51 @@
 "use client"
 import React, { createContext, useEffect, useMemo, useState } from "react"
 import { paletteFactory } from "../factories/paletteFactory"
-// import {
-//   MakUiPaletteInput,
-//   MakUiThemeMode,
-//   MakUiVerbosePalettes,
-//   MakUiSimpleTheme,
-//   MakUiVerboseTheme,
-//   MakUiSimplePalettes,
-//   MakUiComponentConfig,
-//   MakUiSimplePalettesShortHand,
-//   MakUiVerbosePalettesShortHand,
-//   MakUiSimpleThemesShortHand,
-//   MakUiThemeModeShortHand,
-//   MakUiVerboseThemesShortHand,
-// } from "../types/default-types"
-import { MakUiButtonConfigInput } from "../types/button-types"
 import { ThemeProvider, useTheme } from "next-themes"
 import {
   deepMerge,
   isEmptyObject,
   makClassNameHelper,
 } from "../functions/helpers"
+import { paletteShorthand } from "../constants/defaults/default-constants"
 import {
-  paletteShorthand,
-  uiThemes,
-} from "../constants/defaults/default-constants"
-import {
-  MakUiComponentConfigInput,
+  HtmlElementKey,
   MakUiFlexiblePaletteInput,
-  MakUiPaletteInput,
+  MakUiInteractionStateKey,
   MakUiSimplePalette,
   MakUiSimpleTheme,
   MakUiStateShades,
-  MakUiThemeColors,
   MakUiThemeKey,
   MakUiThemeKeySH,
   MakUiThemeShades,
-  MakUiThemeShadesInput,
   MakUiVerbosePalette,
   MakUiVerboseTheme,
 } from "../types/ui-types"
 import {
+  htmlElements,
   makUiDefaultStateShades,
   makUiDefaultThemeShades,
+  makUiInteractionStates,
   makUiThemes,
+  defaultComponentConfig,
 } from "../constants/ui-constants"
-
-export const defaultButtonConfig: MakUiButtonConfigInput = {
-  className:
-    "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold border border-2",
-}
+import {
+  MakUiComponentConfigInput,
+  MakUiRootComponentConfigInput,
+} from "../types/component-types"
 
 type MakUiProviderProps = {
   children: React.ReactNode
   palette: MakUiFlexiblePaletteInput
   componentConfig?: MakUiComponentConfigInput
-  buttonConfig?: MakUiButtonConfigInput
+  buttonConfig?: MakUiRootComponentConfigInput
   themeShades?: MakUiThemeShades
   stateShades?: MakUiStateShades
   enableSystem?: boolean
   defaultTheme?: MakUiThemeKey
   enableDarkMode?: boolean
   enableCustomMode?: boolean
+  enabledStates?: MakUiInteractionStateKey[]
 }
 
 const MakUiContext = createContext<MakUiContext | undefined>(undefined)
@@ -82,13 +65,14 @@ export const MakUiProvider = (props: MakUiProviderProps) => {
 const MakUiProviderChild = ({
   children,
   palette: paletteInput = {},
-  componentConfig,
+  componentConfig: componentConfigInput,
   enableSystem = true,
   defaultTheme = "light",
   enableDarkMode = true,
   enableCustomMode = false,
   themeShades = makUiDefaultThemeShades,
   stateShades = makUiDefaultStateShades,
+  enabledStates = makUiInteractionStates,
 }: MakUiProviderProps) => {
   let { theme: themeMode, setTheme: setThemeMode } = useTheme()
 
@@ -149,8 +133,8 @@ const MakUiProviderChild = ({
     return {
       // sp: simple as MakUiSimplePalettesShortHand,
       // vp: verbose as MakUiVerbosePalettesShortHand,
-      simplePalettes: simple as MakUiSimplePalette,
-      verbosePalettes: verbose as MakUiVerbosePalette,
+      simplePalette: simple as MakUiSimplePalette,
+      verbosePalette: verbose as MakUiVerbosePalette,
     }
   }, [paletteInput, enabledModes])
 
@@ -161,15 +145,16 @@ const MakUiProviderChild = ({
   const [verboseTheme, setVerboseTheme] = useState<MakUiVerboseTheme>(
     {} as MakUiVerboseTheme
   )
-  const [simpleThemeShortHand, setSimpleThemeShortHand] =
-    useState<MakUiSimpleThemesShortHand>({} as MakUiSimpleThemesShortHand)
 
-  const [verboseThemeShortHand, setVerboseThemeShortHand] =
-    useState<MakUiVerboseThemesShortHand>({} as MakUiVerboseThemesShortHand)
-
-  const [buttonConfig, setButtonConfig] = useState<MakUiButtonConfigInput>(
-    componentConfig?.buttonConfig || defaultButtonConfig
-  )
+  const componentConfig = useMemo(() => {
+    const configObject = {} as MakUiComponentConfigInput
+    for (const key of htmlElements) {
+      const configKey = `${key}Config` as keyof MakUiComponentConfigInput
+      configObject[configKey] =
+        componentConfigInput?.[configKey] || defaultComponentConfig[configKey]
+    }
+    return configObject
+  }, [JSON.stringify(componentConfigInput)])
 
   const formattingThemes =
     isEmptyObject(simpleTheme) ||
@@ -180,35 +165,38 @@ const MakUiProviderChild = ({
       : false
 
   useEffect(() => {
-    setVerboseTheme(palettesMemo.verbosePalettes[currentTheme])
-    setSimpleTheme(palettesMemo.simplePalettes[currentTheme])
-    // setVerboseThemeShortHand(palettesMemo.vp[currentThemeShorthand])
-    // setSimpleThemeShortHand(palettesMemo.sp[currentThemeShorthand])
+    setVerboseTheme(palettesMemo.verbosePalette[currentTheme])
+    setSimpleTheme(palettesMemo.simplePalette[currentTheme])
   }, [themeMode, currentTheme])
 
-  const { sp, vp, simplePalettes, verbosePalettes } = palettesMemo
+  const { simplePalette, verbosePalette } = palettesMemo
 
-  const makClassName = (className: string) => {
+  const makClassName = (
+    className: MakUiClassNameHelperClassNames,
+    options?: MakUiClassNameHelperOptions
+  ) => {
+    const { type, states } = options || {}
+    const configKey: keyof MakUiComponentConfigInput = type
+      ? `${type}Config`
+      : "buttonConfig"
+    enabledStates = states || componentConfig[configKey]?.enabledStates || []
+    const defaultConfig = componentConfig?.[configKey]
+    console.log("defaultConfig", defaultConfig)
+
     return makClassNameHelper({
       string: className,
-      verboseTheme,
-      simpleTheme,
-      verbosePalettes,
-      simplePalettes,
+      verbosePalette,
+      enabledStates,
+      defaultConfig,
     })
   }
   const value = {
-    simplePalettes,
-    verbosePalettes,
+    simplePalette,
+    verbosePalette,
     simpleTheme,
     verboseTheme,
-    sp,
-    vp,
-    st: simpleThemeShortHand,
-    vt: verboseThemeShortHand,
-
-    buttonConfig,
-    setButtonConfig,
+    buttonConfig: componentConfig.buttonConfig,
+    componentConfig,
     themeMode,
     setTheme: setThemeMode,
     theme: themeMode,
@@ -228,9 +216,15 @@ const MakUiProviderChild = ({
   )
 }
 
+type MakUiClassNameHelperClassNames = string
+type MakUiClassNameHelperOptions = {
+  type?: HtmlElementKey
+  states?: MakUiInteractionStateKey[]
+}
+
 interface MakUiContext {
-  buttonConfig: MakUiButtonConfig
-  setButtonConfig: (config: MakUiButtonConfig) => void
+  buttonConfig: MakUiRootComponentConfigInput | undefined
+  componentConfig: MakUiComponentConfigInput
 
   theme: string | undefined
   setTheme: (themeMode: string) => void
@@ -240,15 +234,15 @@ interface MakUiContext {
   isCustom: boolean
   enabledModes: MakUiThemeKey[]
 
-  simplePalettes: MakUiSimplePalette
-  verbosePalettes: MakUiVerbosePalette
+  simplePalette: MakUiSimplePalette
+  verbosePalette: MakUiVerbosePalette
   simpleTheme: MakUiSimpleTheme
   verboseTheme: MakUiVerboseTheme
-  sp: MakUiSimplePalettesShortHand
-  vp: MakUiVerbosePalettesShortHand
-  st: MakUiSimpleThemesShortHand
-  vt: MakUiVerboseThemesShortHand
-  mcn: (className: string) => string | undefined
+
+  mcn: (
+    className: MakUiClassNameHelperClassNames,
+    options?: MakUiClassNameHelperOptions
+  ) => string | undefined
   makClassName: (className: string) => string | undefined
 }
 

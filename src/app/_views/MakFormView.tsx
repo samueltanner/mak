@@ -37,7 +37,7 @@ const MakFormView = () => {
   return (
     <div>
       <FirstName
-        className={`p-2 text-${verboseTheme.text.primary.default.base}`}
+        className={`p-2 text-${verboseTheme.text.primary.base}`}
       />
       <Pick />
     </div>
