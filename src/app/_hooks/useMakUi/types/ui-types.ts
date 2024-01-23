@@ -1,53 +1,63 @@
+// Generic Types
+
+import { makUiThemeVariants } from "../constants/ui-constants"
+import { MakUiButtonConfigInput } from "./button-types"
+
+export type GenericObject = Record<string, any>
+
 // KEYS
 
-export type MakUiThemeKeysSH = "drk" | "lgt" | "cst"
+export type MakUiThemeKeySH = "drk" | "lgt" | "cst"
 
-export type MakUiPaletteKeysSH = "col" | "txt" | "bor" | "thm"
+export type MakUiPaletteKeySH = "col" | "txt" | "bor" | "thm"
 
-export type MakUiThemeVariantKeysSH = "pri" | "sec" | "ter" | "cst"
+export type MakUiThemeVariantKeySH = "pri" | "sec" | "ter" | "cst"
 
-export type MakUiVariantKeysSH =
-  | MakUiThemeVariantKeysSH
+export type MakUiVariantKeySH =
+  | MakUiThemeVariantKeySH
   | "suc"
   | "err"
   | "dng"
   | "war"
   | "inf"
 
-export type MakUiThemeKeys = "dark" | "light" | "custom"
+export type MakUiThemeKey = "dark" | "light" | "custom"
 
-export type MakUiPaletteKeys = "color" | "text" | "border" | "theme"
+export type MakUiPaletteKey = "color" | "text" | "border" | "theme"
 
-export type MakUiThemeVariantKeys =
+export type MakUiThemeVariantKey =
   | "primary"
   | "secondary"
   | "tertiary"
   | "custom"
 
-export type MakUiVariantRootKeys =
+export type MakUiVariantRootKey =
   | "primaryRoot"
   | "secondaryRoot"
   | "tertiaryRoot"
   | "customRoot"
 
-export type MakUiVariantKeys =
-  | MakUiThemeVariantKeys
+export type MakUiVariantKey =
+  | MakUiThemeVariantKey
   | "success"
   | "error"
   | "danger"
   | "warning"
   | "info"
 
-export type MakUiStateKeys =
-  | "default"
+export type MakUiStateKey =
+  | "base"
   | "active"
   | "autofill"
   | "checked"
   | "closed"
+  | "default"
   | "disabled"
   | "empty"
   | "enabled"
   | "focus"
+  | "focus-visible"
+  | "focus-within"
   | "hover"
   | "in-range"
   | "indeterminate"
@@ -59,10 +69,11 @@ export type MakUiStateKeys =
   | "required"
   | "selected"
   | "selection"
+  | "target"
   | "valid"
   | "visited"
 
-export type MakUiRootStateKeys =
+export type MakUiRootStateKey =
   | "openRoot"
   | "closedRoot"
   | "defaultRoot"
@@ -89,7 +100,7 @@ export type MakUiRootStateKeys =
 // VERBOSE OUTPUT TYPES
 
 export type MakUiVerbosePalette = {
-  [Key in MakUiThemeKeys]: MakUiVerboseTheme
+  [Key in MakUiThemeKey]: MakUiVerboseTheme
 }
 
 export type MakUiVerboseTheme = {
@@ -100,21 +111,21 @@ export type MakUiVerboseTheme = {
 }
 
 export type MakUiVerboseVariant = {
-  [Key in MakUiVariantKeys]: MakUiState
+  [Key in MakUiVariantKey]: MakUiState
 }
 
 export type MakUiVerboseThemeVariant = {
-  [Key in MakUiThemeVariantKeys]: string
+  [Key in MakUiThemeVariantKey]: string
 }
 
 export type MakUiState = {
-  [Key in MakUiStateKeys]: string
+  [Key in MakUiStateKey]: string
 }
 
 // SIMPLE OUTPUT TYPES
 
 export type MakUiSimplePalette = {
-  [Key in MakUiThemeKeys | MakUiThemeKeysSH]: MakUiSimpleTheme
+  [Key in MakUiThemeKey | MakUiThemeKeySH]: MakUiSimpleTheme
 }
 
 export type MakUiSimpleTheme = {
@@ -123,45 +134,131 @@ export type MakUiSimpleTheme = {
   border: MakUiSimpleVariant
   theme: MakUiSimpleThemeVariant
 
-  col: MakUiSimpleVariant
-  txt: MakUiSimpleVariant
-  bor: MakUiSimpleVariant
-  thm: MakUiSimpleThemeVariant
+  // col: MakUiSimpleVariant
+  // txt: MakUiSimpleVariant
+  // bor: MakUiSimpleVariant
+  // thm: MakUiSimpleThemeVariant
 }
 
 export type MakUiSimpleVariant = {
-  [Key in MakUiVariantKeys | MakUiVariantKeysSH]: string
+  [Key in MakUiVariantKey | MakUiVariantKeySH]: string
 }
 
 export type MakUiSimpleThemeVariant = {
-  [Key in MakUiThemeVariantKeys | MakUiThemeVariantKeysSH]: string
+  [Key in MakUiThemeVariantKey | MakUiThemeVariantKeySH]: string
 }
 
 export type MakUiSimpleState = {
-  [Key in MakUiStateKeys]: string
+  [Key in MakUiStateKey]: string
 }
 
 // INPUTS
 
 export type MakUiPaletteInput = {
-  [Key in MakUiThemeKeys]?: string
+  [Key in MakUiThemeKey]?: MakUiThemeInput
 }
 
-export type MakUiThemeInput = {
+export type MakUiThemePaletteInput = {
   color?: string | MakUiVariantInput
   text?: string | MakUiVariantInput
   border?: string | MakUiVariantInput
   theme?: string | MakUiThemeVariantInput
 }
 
-export type MakUiVariantInput = {
-  [Key in MakUiVariantKeys]?: string
+export type MakUiVariantPaletteInput = {
+  [Key in MakUiVariantKey]: string | MakUiStateInput
 }
 
-export type MakUiThemeVariantInput = {
-  [Key in MakUiThemeVariantKeys]?: string
+export type MakUiFlexiblePaletteInput =
+  | MakUiPaletteInput
+  | MakUiThemePaletteInput
+  | MakUiVariantPaletteInput
+
+export type MakUiThemeInput = {
+  color?: MakUiVariantInput
+  text?: MakUiVariantInput
+  border?: MakUiVariantInput
+  theme?: MakUiThemeVariantInput
 }
+
+export type MakUiVariantInput =
+  | string
+  | {
+      [Key in MakUiVariantKey]?: string | MakUiStateInput
+    }
+
+export type MakUiThemeVariantInput =
+  | string
+  | {
+      [Key in MakUiThemeVariantKey]?: string
+    }
 
 export type MakUiStateInput = {
-  [Key in MakUiStateKeys]?: string
+  [Key in MakUiStateKey]?: string
+}
+
+export type MakUiThemeShadesInput = {
+  [Key in MakUiThemeKey]?: {
+    [Key in MakUiThemeVariantKey]?: number
+  }
+}
+
+export type MakUiComponentConfigInput = {
+  buttonConfig?: MakUiButtonConfigInput
+}
+
+// Default Types
+
+export type MakUiThemeVariantShades = {
+  [Key in MakUiThemeVariantKey]: number
+}
+export type MakUiThemeShades = {
+  [Key in MakUiThemeKey]: MakUiThemeVariantShades
+}
+
+export type MakUiStateShades = {
+  [Key in MakUiStateKey]: number
+}
+export type MakUiThemeColors = {
+  [Key in MakUiThemeKey]: {
+    [Key in MakUiThemeVariantKey]: string
+  }
+}
+
+export type MakUiDefaultColors = {
+  [Key in MakUiVariantKey]: string
+}
+
+export type MakUiDefaultStateColors = {
+  [Key in MakUiStateKey]: string
+}
+
+export type MakUiDefaultPalette = {
+  [Key in MakUiThemeKey]: {
+    color: {
+      [Key in MakUiVariantKey]: string
+    }
+    text: string
+    border: string
+    theme: {
+      primary: string
+      secondary: string
+      tertiary: string
+      custom: string
+    }
+  }
+}
+// Helper Function Types
+
+export type TWColorHelperResponse = {
+  absolute: boolean
+  isTwColor: boolean
+  color: string | undefined
+  shade: number | undefined
+  autoShade: boolean
+  autoColor: boolean
+  opacity: number
+  colorString: string
+  rootString: string
+  hex: string
 }

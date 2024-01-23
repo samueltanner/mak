@@ -1,4 +1,4 @@
-export type MakUiButtonConfig = {
+export type MakUiButtonConfigInput = {
   [key: string]: string | undefined
   borderRadius?: string
   borderWidth?: string

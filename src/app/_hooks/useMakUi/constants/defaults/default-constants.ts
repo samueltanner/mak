@@ -1,9 +1,9 @@
+import { nearestMultiple } from "../../functions/helpers"
 import {
   MakUiVariant,
   MakUiState,
   MakUiInteraction,
   MakUiPalette,
-  MakUiPaletteInput,
   VerboseTextVariant,
   VerboseBorderVariant,
   VerboseColorVariant,
@@ -19,6 +19,13 @@ import {
   MakUiRootInteraction,
   MakUiStateVariants,
 } from "../../types/default-types"
+import {
+  MakUiThemeVariantInput,
+  MakUiPaletteInput,
+  MakUiThemeInput,
+  MakUiVariantInput,
+  MakUiStateInput,
+} from "../../types/ui-types"
 
 export const paletteShorthand = {
   dark: "drk",
@@ -73,12 +80,14 @@ export const uiThemeColorVariants = [
   "tertiary",
   "custom",
 ] as const
+
 export const uiThemeColorRootVariants = [
   "primaryRoot",
   "secondaryRoot",
   "tertiaryRoot",
   "customRoot",
 ] as const
+
 export const uiThemeColorVariantsAndRoots = [
   ...uiThemeColorVariants,
   ...uiThemeColorRootVariants,
@@ -318,36 +327,107 @@ export const uiThemeVariants: MakUiThemeVariant[] = [
   "custom",
 ]
 
-export const uiDefaultThemePaletteInput: MakUiThemePalette = {
+// export const makUiDefaultState: MakUiStateInput= {
+//   default:
+// }
+
+export const getMakUiDefaultStateInput = ({
+  baseColor = "mak-teal",
+  baseShade = 500,
+  errorColor = "red",
+  successColor = "mak-teal",
+  disabledColor = "zinc",
+}: {
+  baseColor?: string
+  baseShade?: number
+  errorColor?: string
+  warningColor?: string
+  successColor?: string
+  disabledColor?: string
+} = {}): MakUiStateInput => {
+  baseShade = Math.max(50, Math.min(baseShade, 950))
+  const getAltShade = (shade: number, diff: number) => {
+    if (shade <= 50) return shade
+    if (shade >= 950) return shade
+
+    return nearestMultiple(shade + diff, 100, "down")
+  }
+
+  return {
+    base: `${baseColor}-${baseShade}`,
+    active: `${baseColor}-${getAltShade(baseShade, -100)}`,
+    autofill: `${baseColor}-${baseShade}`,
+    checked: `${baseColor}-${baseShade}`,
+    closed: `${baseColor}-${baseShade}`,
+    default: `${baseColor}-${baseShade}`,
+    disabled: `${disabledColor}-${baseShade}/30`,
+    empty: `${baseColor}-${baseShade}`,
+    enabled: `${baseColor}-${baseShade}`,
+    focus: `${baseColor}-${getAltShade(baseShade, -200)}`,
+    "focus-visible": `${baseColor}-${getAltShade(baseShade, -200)}`,
+    "focus-within": `${baseColor}-${getAltShade(baseShade, -200)}`,
+    hover: `${baseColor}-${getAltShade(baseShade, -200)}`,
+    "in-range": `${successColor}-${baseShade}`,
+    indeterminate: `${baseColor}-${baseShade}`,
+    invalid: `${errorColor}-${baseShade}`,
+    open: `${baseColor}-${baseShade}`,
+    "out-of-range": `${errorColor}-${baseShade}`,
+    "placeholder-shown": `${baseColor}-${baseShade}`,
+    "read-only": "zinc-${baseShade}",
+    required: `${baseColor}-${baseShade}`,
+    selected: `${baseColor}-${baseShade}`,
+    selection: `${baseColor}-${baseShade}/30`,
+    valid: `${successColor}-${baseShade}`,
+    visited: `${baseColor}-${getAltShade(baseShade, -100)}`,
+  }
+}
+
+export const makUiDefaultTheme: MakUiThemeInput = {
+  color: {},
+  text: {},
+  border: {},
+  theme: {},
+}
+
+export const makUiDefaultPalette: MakUiPaletteInput = {
+  light: {
+    color: "mak-teal-500",
+    text: "zinc-50",
+    border: "mak-teal-300",
+    theme: "zinc-50",
+  },
+  dark: {
+    color: "mak-teal-400",
+    text: "zinc-950",
+    border: "mak-teal-600",
+    theme: "zinc-950",
+  },
+  custom: {
+    color: "red-500",
+    text: "zinc-900",
+    border: "zinc-900",
+    theme: "red-500",
+  },
+}
+
+export const uiDefaultThemePaletteInput: MakUiTheme = {
   dark: {
     primary: "zinc-950/100",
-    primaryRoot: "zinc-950",
     secondary: "zinc-800/100",
-    secondaryRoot: "zinc-800",
     tertiary: "zinc-700/100",
-    tertiaryRoot: "zinc-700",
     custom: "zinc-950",
-    customRoot: "zinc-950",
   },
   light: {
     primary: "zinc-50/100",
-    primaryRoot: "zinc-50",
     secondary: "zinc-100/100",
-    secondaryRoot: "zinc-100",
     tertiary: "zinc-200/100",
-    tertiaryRoot: "zinc-200",
     custom: "zinc-50/100",
-    customRoot: "zinc-50",
   },
   custom: {
     primary: "red-500/100",
-    primaryRoot: "red-500",
     secondary: "blue-500/100",
-    secondaryRoot: "blue-500",
     tertiary: "white/100",
-    tertiaryRoot: "white",
     custom: "red-500/100",
-    customRoot: "red-500",
   },
 }
 

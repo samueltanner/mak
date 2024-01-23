@@ -3,6 +3,7 @@ import {
   ensureNestedObject,
   extractInitialPalette,
   getConstructedTheme,
+  getConstructedStates,
 } from "../functions/helpers"
 // import {
 //   MakUiInteraction,
@@ -16,38 +17,58 @@ import {
 // } from "../types/default-types"
 import {
   uiDefaultColorPaletteInput,
-  uiPaletteVariants,
   uiStates,
   uiVariants,
-  uiDefaultThemePaletteInput,
-  uiThemes,
   uiInteractions,
   uiDefaultSimpleTextPalette,
   paletteShorthand,
   uiInteractionsAndRoots,
   uiThemeColorVariantsAndRoots,
 } from "../constants/defaults/default-constants"
-import { MakUiPaletteInput, MakUiSimplePalette, MakUiThemeKeys, MakUiVerbosePalette, MakUiVerboseVariant } from "../types/ui-types"
-import { MakUiVariants } from "../types/default-types"
+import {
+  MakUiFlexiblePaletteInput,
+  MakUiSimplePalette,
+  MakUiState,
+  MakUiStateShades,
+  MakUiThemeKey,
+  MakUiThemeShades,
+  MakUiVerbosePalette,
+  MakUiVerboseVariant,
+} from "../types/ui-types"
 
+import {
+  makUiDefaultPalette,
+  makUiPalettes,
+  makUiThemeVariants,
+  makUiVariants,
+} from "../constants/ui-constants"
 
 export const paletteFactory = ({
   paletteInput,
   enabledModes,
+  defaultShades,
 }: {
-  paletteInput: MakUiPaletteInput
-  enabledModes: MakUiThemeKeys[]
+  paletteInput: MakUiFlexiblePaletteInput
+  enabledModes: MakUiThemeKey[]
+  defaultShades: {
+    defaultThemeShades: MakUiThemeShades
+    defaultStateShades: MakUiStateShades
+  }
 }) => {
   const initialVerbosePalette = extractInitialPalette({ palette: paletteInput })
 
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
   for (const theme of enabledModes) {
-    for (const paletteVariant of uiPaletteVariants) {
+    for (const paletteVariant of makUiPalettes) {
       if (paletteVariant === "theme") {
-        if (initialVerbosePalette?.[theme]?.[paletteVariant]) {
-          const providedVariant = initialVerbosePalette[theme][paletteVariant]
-          const constructedTheme = getConstructedTheme(providedVariant, theme)
+        if (initialVerbosePalette?.[theme]?.["theme"]) {
+          const providedVariant = initialVerbosePalette[theme].theme
+          const constructedTheme = getConstructedTheme({
+            providedVariants: providedVariant,
+            theme,
+            defaultShades: defaultShades.defaultThemeShades,
+          })
 
           ensureNestedObject({
             parent: finalVerbosePalette,
@@ -56,10 +77,6 @@ export const paletteFactory = ({
           })
 
           const {
-            primary: primary,
-            secondary: secondary,
-            tertiary: tertiary,
-            custom: custom,
             primaryRoot: primaryRoot,
             secondaryRoot: secondaryRoot,
             tertiaryRoot: tertiaryRoot,
@@ -77,10 +94,13 @@ export const paletteFactory = ({
             },
           })
         } else {
-          const constructedTheme = getConstructedTheme(
-            uiDefaultThemePaletteInput?.[theme],
-            theme
-          )
+          const defaultVariant = makUiDefaultPalette[theme]!.theme
+
+          const constructedTheme = getConstructedTheme({
+            providedVariants: defaultVariant,
+            theme,
+            defaultShades: defaultShades.defaultThemeShades,
+          })
 
           ensureNestedObject({
             parent: finalVerbosePalette,
@@ -107,81 +127,87 @@ export const paletteFactory = ({
           })
         }
         const shorthand = paletteShorthand[paletteVariant]
-        Object.defineProperty(finalVerbosePalette[theme], shorthand, {
-          get: function () {
-            return finalVerbosePalette[theme][paletteVariant]
-          },
-        })
+        // Object.defineProperty(finalVerbosePalette[theme], shorthand, {
+        //   get: function () {
+        //     return finalVerbosePalette[theme][paletteVariant]
+        //   },
+        // })
 
-        Object.defineProperty(finalSimplePalette[theme], shorthand, {
-          get: function () {
-            return finalSimplePalette[theme][paletteVariant]
-          },
-        })
+        // Object.defineProperty(finalSimplePalette[theme], shorthand, {
+        //   get: function () {
+        //     return finalSimplePalette[theme][paletteVariant]
+        //   },
+        // })
 
         for (const colorVariant of uiThemeColorVariantsAndRoots) {
           const shorthand = paletteShorthand[colorVariant]
-          Object.defineProperty(
-            finalVerbosePalette[theme][paletteVariant],
-            shorthand,
-            {
-              get: function () {
-                return finalVerbosePalette[theme][paletteVariant][colorVariant]
-              },
-            }
-          )
+          // Object.defineProperty(
+          //   finalVerbosePalette[theme][paletteVariant],
+          //   shorthand,
+          //   {
+          //     get: function () {
+          //       return finalVerbosePalette[theme][paletteVariant][colorVariant]
+          //     },
+          //   }
+          // )
           if (
             colorVariant !== "customRoot" &&
             colorVariant !== "primaryRoot" &&
             colorVariant !== "secondaryRoot" &&
             colorVariant !== "tertiaryRoot"
           ) {
-            Object.defineProperty(
-              finalSimplePalette[theme][paletteVariant],
-              shorthand,
-              {
-                get: function () {
-                  return finalSimplePalette[theme][paletteVariant][colorVariant]
-                },
-              }
-            )
+            // Object.defineProperty(
+            //   finalSimplePalette[theme][paletteVariant],
+            //   shorthand,
+            //   {
+            //     get: function () {
+            //       return finalSimplePalette[theme][paletteVariant][colorVariant]
+            //     },
+            //   }
+            // )
           }
         }
         continue
       }
-      for (const variant of uiVariants) {
+      for (const variant of makUiVariants) {
         if (initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]) {
-          const providedState =
+          const providedStates =
             initialVerbosePalette[theme][paletteVariant][variant]
-
-          const constructedClassNames = getConstructedClassNames({
-            interactions: providedState as MakUiVerboseVariant,
-            state: "all",
+          console.log("providedStates", providedStates)
+          const constructedStates = getConstructedStates({
+            providedStates,
+            defaultShades: defaultShades.defaultStateShades,
           })
 
-          ensureNestedObject({
-            parent: finalVerbosePalette,
-            keys: [theme, paletteVariant, variant],
-            value: constructedClassNames,
-          })
+          // const constructedClassNames = getConstructedClassNames({
+          //   interactions: providedState as MakUiState,
+          //   state: "all",
+          //   defaultShades,
+          // })
 
-          const {
-            baseRoot: base,
-            clickRoot: click,
-            hoverRoot: hover,
-            focusRoot: focus,
-          } = constructedClassNames.default
+          // ensureNestedObject({
+          //   parent: finalVerbosePalette,
+          //   keys: [theme, paletteVariant, variant],
+          //   value: constructedClassNames,
+          // })
 
-          ensureNestedObject({
-            parent: finalSimplePalette,
-            keys: [theme, paletteVariant, variant],
-            value: {
-              base,
-              click,
-              hover,
-              focus,
-            },
-          })
+          // const {
+          //   baseRoot: base,
+          //   clickRoot: click,
+          //   hoverRoot: hover,
+          //   focusRoot: focus,
+          // } = constructedClassNames.default
+
+          // ensureNestedObject({
+          //   parent: finalSimplePalette,
+          //   keys: [theme, paletteVariant, variant],
+          //   value: {
+          //     base,
+          //     click,
+          //     hover,
+          //     focus,
+          //   },
+          // })
         } else if (
           !initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]
         ) {
@@ -248,95 +274,97 @@ export const paletteFactory = ({
             })
           }
         }
-        const shorthand = paletteShorthand[variant]
-        Object.defineProperty(
-          finalVerbosePalette[theme][paletteVariant],
-          shorthand,
-          {
-            get: function () {
-              return finalVerbosePalette[theme][paletteVariant][variant]
-            },
-          }
-        )
-        Object.defineProperty(
-          finalSimplePalette[theme][paletteVariant],
-          shorthand,
-          {
-            get: function () {
-              return finalSimplePalette[theme][paletteVariant][variant]
-            },
-          }
-        )
-        for (const interaction of uiInteractions) {
-          const shorthand = paletteShorthand[interaction]
-          Object.defineProperty(
-            finalSimplePalette[theme][paletteVariant][variant],
-            shorthand,
-            {
-              get: function () {
-                const asdf = finalSimplePalette[theme][paletteVariant][variant]
-                return finalSimplePalette[theme][paletteVariant][variant][
-                  interaction
-                ]
-              },
-            }
-          )
-        }
-        for (const state of uiStates) {
-          const shorthand = paletteShorthand[state]
+        // const shorthand = paletteShorthand[variant]
+        // Object.defineProperty(
+        //   finalVerbosePalette[theme][paletteVariant],
+        //   shorthand,
+        //   {
+        //     get: function () {
+        //       return finalVerbosePalette[theme][paletteVariant][variant]
+        //     },
+        //   }
+        // )
+        // Object.defineProperty(
+        //   finalSimplePalette[theme][paletteVariant],
+        //   shorthand,
+        //   {
+        //     get: function () {
+        //       return finalSimplePalette[theme][paletteVariant][variant]
+        //     },
+        //   }
+        // )
+        // for (const interaction of uiInteractions) {
+        //   const shorthand = paletteShorthand[interaction]
+        //   Object.defineProperty(
+        //     finalSimplePalette[theme][paletteVariant][variant],
+        //     shorthand,
+        //     {
+        //       get: function () {
+        //         const asdf = finalSimplePalette[theme][paletteVariant][variant]
+        //         return finalSimplePalette[theme][paletteVariant][variant][
+        //           interaction
+        //         ]
+        //       },
+        //     }
+        //   )
+        // }
+        // for (const state of uiStates) {
+        //   const shorthand = paletteShorthand[state]
 
-          Object.defineProperty(
-            finalVerbosePalette[theme][paletteVariant][variant],
-            shorthand,
-            {
-              get: function () {
-                return finalVerbosePalette[theme][paletteVariant][variant][
-                  state
-                ]
-              },
-            }
-          )
-          for (const interaction of uiInteractionsAndRoots) {
-            const shorthand = paletteShorthand[interaction]
-            Object.defineProperty(
-              finalVerbosePalette[theme][paletteVariant][variant][state],
-              shorthand,
-              {
-                get: function () {
-                  return finalVerbosePalette[theme][paletteVariant][variant][
-                    state
-                  ][interaction]
-                },
-              }
-            )
-          }
-        }
+        //   Object.defineProperty(
+        //     finalVerbosePalette[theme][paletteVariant][variant],
+        //     shorthand,
+        //     {
+        //       get: function () {
+        //         return finalVerbosePalette[theme][paletteVariant][variant][
+        //           state
+        //         ]
+        //       },
+        //     }
+        //   )
+        //   for (const interaction of uiInteractionsAndRoots) {
+        //     const shorthand = paletteShorthand[interaction]
+        //     Object.defineProperty(
+        //       finalVerbosePalette[theme][paletteVariant][variant][state],
+        //       shorthand,
+        //       {
+        //         get: function () {
+        //           return finalVerbosePalette[theme][paletteVariant][variant][
+        //             state
+        //           ][interaction]
+        //         },
+        //       }
+        //     )
+        //   }
+        // }
       }
       const shorthand = paletteShorthand[paletteVariant]
-      Object.defineProperty(finalVerbosePalette[theme], shorthand, {
-        get: function () {
-          return finalVerbosePalette[theme][paletteVariant]
-        },
-      })
-      Object.defineProperty(finalSimplePalette[theme], shorthand, {
-        get: function () {
-          return finalSimplePalette[theme][paletteVariant]
-        },
-      })
+      // Object.defineProperty(finalVerbosePalette[theme], shorthand, {
+      //   get: function () {
+      //     return finalVerbosePalette[theme][paletteVariant]
+      //   },
+      // })
+      // Object.defineProperty(finalSimplePalette[theme], shorthand, {
+      //   get: function () {
+      //     return finalSimplePalette[theme][paletteVariant]
+      //   },
+      // })
     }
     const shorthand = paletteShorthand[theme]
-    Object.defineProperty(finalVerbosePalette, shorthand, {
-      get: function () {
-        return finalVerbosePalette[theme]
-      },
-    })
-    Object.defineProperty(finalSimplePalette, shorthand, {
-      get: function () {
-        return finalSimplePalette[theme]
-      },
-    })
+    // Object.defineProperty(finalVerbosePalette, shorthand, {
+    //   get: function () {
+    //     return finalVerbosePalette[theme]
+    //   },
+    // })
+    // Object.defineProperty(finalSimplePalette, shorthand, {
+    //   get: function () {
+    //     return finalSimplePalette[theme]
+    //   },
+    // })
   }
 
+  // console.log("finalVerbosePalette", finalVerbosePalette)
+  // console.log("finalSimplePalette", finalSimplePalette)
   return {
     verbose: finalVerbosePalette as
       | MakUiVerbosePalettes
