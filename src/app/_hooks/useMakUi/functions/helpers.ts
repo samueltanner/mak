@@ -290,7 +290,20 @@ export const getConstructedStates = ({
     baseShade: twObj.shade,
     multiplier: theme === "dark" ? 1 : -1,
   })
-  const resolvedStatesObject = mergeWithFallback(providedStates, statesObject)
+
+  const resolvedProvidedStates = {} as MakUiState
+  for (const [state, color] of Object.entries(providedStates)) {
+    const twObj = twColorHelper({
+      colorString: color,
+      defaults: makUiDefaultStates,
+      defaultKey: state as keyof MakUiStateShades,
+    })
+    resolvedProvidedStates[state as MakUiStateKey] = twObj.rootString
+  }
+  const resolvedStatesObject = mergeWithFallback(
+    resolvedProvidedStates,
+    statesObject
+  )
 
   return resolvedStatesObject
 }
@@ -336,146 +349,146 @@ export const getShades = ({
   return shadesResponseObj
 }
 
-export const getConstructedClassNames = ({
-  interactions,
-  color,
-  state = "default",
-  theme = "light",
-  defaultShades,
-}: {
-  interactions?: MakUiVerboseVariant | MakUiState
-  state?: MakUiState | "all"
-  color?: string
-  type?: "default" | "theme"
-  theme?: MakUiThemeKey | "all"
-  defaultShades: {
-    defaultThemeShades: MakUiThemeShades
-    defaultStateShades: MakUiStateShades
-  }
-}) => {
-  const states = state === "all" ? uiStates : [state]
-  const themes = theme === "all" ? uiThemes : [theme]
-  let relativeClassNamesResponse: MakUiVerboseVariant = {
-    default: {} as MakUiState,
-    active: {} as MakUiState,
-    selected: {} as MakUiState,
-    invalid: {} as MakUiState,
-    disabled: {} as MakUiState,
-  }
+// export const getConstructedClassNames = ({
+//   interactions,
+//   color,
+//   state = "default",
+//   theme = "light",
+//   defaultShades,
+// }: {
+//   interactions?: MakUiVerboseVariant | MakUiState
+//   state?: MakUiState | "all"
+//   color?: string
+//   type?: "default" | "theme"
+//   theme?: MakUiThemeKey | "all"
+//   defaultShades: {
+//     defaultThemeShades: MakUiThemeShades
+//     defaultStateShades: MakUiStateShades
+//   }
+// }) => {
+//   const states = state === "all" ? uiStates : [state]
+//   const themes = theme === "all" ? uiThemes : [theme]
+//   let relativeClassNamesResponse: MakUiVerboseVariant = {
+//     default: {} as MakUiState,
+//     active: {} as MakUiState,
+//     selected: {} as MakUiState,
+//     invalid: {} as MakUiState,
+//     disabled: {} as MakUiState,
+//   }
 
-  const variantObjectKey = Object.keys(interactions || {}).find((key) => {
-    return makUiStates.includes(key as MakUiStateKey)
-  }) as MakUiStateKey
+//   const variantObjectKey = Object.keys(interactions || {}).find((key) => {
+//     return makUiStates.includes(key as MakUiStateKey)
+//   }) as MakUiStateKey
 
-  if (variantObjectKey) {
-    interactions as MakUiVerboseVariant
-  } else {
-    interactions as MakUiInteractions
-  }
+//   if (variantObjectKey) {
+//     interactions as MakUiVerboseVariant
+//   } else {
+//     interactions as MakUiInteractions
+//   }
 
-  if (variantObjectKey) {
-    relativeClassNamesResponse = {
-      ...relativeClassNamesResponse,
-      ...(interactions as MakUiInteractions),
-    }
-  } else if (state !== "all") {
-    relativeClassNamesResponse = {
-      ...relativeClassNamesResponse,
-      [state]: {
-        ...interactions,
-      } as MakUiInteractions,
-    }
-  }
+//   if (variantObjectKey) {
+//     relativeClassNamesResponse = {
+//       ...relativeClassNamesResponse,
+//       ...(interactions as MakUiInteractions),
+//     }
+//   } else if (state !== "all") {
+//     relativeClassNamesResponse = {
+//       ...relativeClassNamesResponse,
+//       [state]: {
+//         ...interactions,
+//       } as MakUiInteractions,
+//     }
+//   }
 
-  const getColorString = () => {
-    if (color) return color
-    if ((interactions as MakUiStates)?.["base"])
-      return (interactions as MakUiStates)?.["base"]
+//   const getColorString = () => {
+//     if (color) return color
+//     if ((interactions as MakUiStates)?.["base"])
+//       return (interactions as MakUiStates)?.["base"]
 
-    if (
-      !!variantObjectKey &&
-      (interactions as MakUiVerboseVariant)?.[variantObjectKey]?.["base"]
-    ) {
-      return (interactions as MakUiVerboseVariant)?.[variantObjectKey]?.["base"]
-    }
-    if (isObject(interactions) && Object.values(interactions)[0]) {
-      return Object.values(interactions)[0]
-    }
-  }
+//     if (
+//       !!variantObjectKey &&
+//       (interactions as MakUiVerboseVariant)?.[variantObjectKey]?.["base"]
+//     ) {
+//       return (interactions as MakUiVerboseVariant)?.[variantObjectKey]?.["base"]
+//     }
+//     if (isObject(interactions) && Object.values(interactions)[0]) {
+//       return Object.values(interactions)[0]
+//     }
+//   }
 
-  const colorString = getColorString()
+//   const colorString = getColorString()
 
-  const globalDefaultColor = twColorHelper({
-    colorString: colorString,
-  })
+//   const globalDefaultColor = twColorHelper({
+//     colorString: colorString,
+//   })
 
-  for (const theme of themes) {
-    for (const state of states) {
-      const providedState = relativeClassNamesResponse?.default
-      const providedStatesObj = {
-        base: providedState?.base
-          ? twColorHelper({
-              colorString:
-                providedState?.base || globalDefaultColor.colorString,
-            })
-          : globalDefaultColor,
-        hover: providedState?.hover
-          ? twColorHelper({
-              colorString:
-                providedState?.hover || globalDefaultColor.colorString,
-            })
-          : globalDefaultColor,
-        focus: providedState?.focus
-          ? twColorHelper({
-              colorString:
-                providedState?.focus || globalDefaultColor.colorString,
-            })
-          : globalDefaultColor,
-        click: providedState?.click
-          ? twColorHelper({
-              colorString:
-                providedState?.click || globalDefaultColor.colorString,
-            })
-          : globalDefaultColor,
-      }
+//   for (const theme of themes) {
+//     for (const state of states) {
+//       const providedState = relativeClassNamesResponse?.default
+//       const providedStatesObj = {
+//         base: providedState?.base
+//           ? twColorHelper({
+//               colorString:
+//                 providedState?.base || globalDefaultColor.colorString,
+//             })
+//           : globalDefaultColor,
+//         hover: providedState?.hover
+//           ? twColorHelper({
+//               colorString:
+//                 providedState?.hover || globalDefaultColor.colorString,
+//             })
+//           : globalDefaultColor,
+//         focus: providedState?.focus
+//           ? twColorHelper({
+//               colorString:
+//                 providedState?.focus || globalDefaultColor.colorString,
+//             })
+//           : globalDefaultColor,
+//         click: providedState?.click
+//           ? twColorHelper({
+//               colorString:
+//                 providedState?.click || globalDefaultColor.colorString,
+//             })
+//           : globalDefaultColor,
+//       }
 
-      for (const interaction of uiInteractions) {
-        if (typeof relativeClassNamesResponse[state] !== "string") {
-          if (
-            !Object.keys(relativeClassNamesResponse[state]).includes(
-              interaction
-            )
-          ) {
-            const updatedColorString = twColorHelper({
-              colorString: providedStatesObj[interaction].colorString,
-              shade: getShades({
-                altBaseShade: globalDefaultColor.shade,
-              })[state][interaction],
-              opacity: 100,
-            })
-            if (typeof relativeClassNamesResponse[state] === "string") {
-              console.log(relativeClassNamesResponse[state])
-            }
-            relativeClassNamesResponse[state][interaction] =
-              updatedColorString.colorString
-            relativeClassNamesResponse[state][`${interaction}Root`] =
-              updatedColorString.rootString
-          } else {
-            const updatedColorString = twColorHelper({
-              colorString: relativeClassNamesResponse[state][interaction],
-            })
-            relativeClassNamesResponse[state][interaction] =
-              updatedColorString.colorString
-            relativeClassNamesResponse[state][`${interaction}Root`] =
-              updatedColorString.rootString
-          }
-        }
-      }
-    }
-  }
+//       for (const interaction of uiInteractions) {
+//         if (typeof relativeClassNamesResponse[state] !== "string") {
+//           if (
+//             !Object.keys(relativeClassNamesResponse[state]).includes(
+//               interaction
+//             )
+//           ) {
+//             const updatedColorString = twColorHelper({
+//               colorString: providedStatesObj[interaction].colorString,
+//               shade: getShades({
+//                 altBaseShade: globalDefaultColor.shade,
+//               })[state][interaction],
+//               opacity: 100,
+//             })
+//             if (typeof relativeClassNamesResponse[state] === "string") {
+//               console.log(relativeClassNamesResponse[state])
+//             }
+//             relativeClassNamesResponse[state][interaction] =
+//               updatedColorString.colorString
+//             relativeClassNamesResponse[state][`${interaction}Root`] =
+//               updatedColorString.rootString
+//           } else {
+//             const updatedColorString = twColorHelper({
+//               colorString: relativeClassNamesResponse[state][interaction],
+//             })
+//             relativeClassNamesResponse[state][interaction] =
+//               updatedColorString.colorString
+//             relativeClassNamesResponse[state][`${interaction}Root`] =
+//               updatedColorString.rootString
+//           }
+//         }
+//       }
+//     }
+//   }
 
-  return relativeClassNamesResponse
-}
+//   return relativeClassNamesResponse
+// }
 
 export const handleThemes = (colorString: string) => {
   let responseObject: { [key: string]: string | undefined } = {

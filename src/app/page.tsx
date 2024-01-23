@@ -51,8 +51,7 @@ export default function Home() {
           onFocus={() => {
             console.log("focused")
           }}
-          
-          className="disabled:bg-red-500 bg-blue-500 focus:bg-purple-500 h-fit w-fit"
+          className={`disabled:bg-${verboseTheme.color.primary.disabled} hover:bg-${verboseTheme.color.primary.hover} bg-${verboseTheme.color.primary.base} h-fit w-fit px-4 py-2 rounded-md fade-in-out`}
           // className={mcn("mak(dark:text-primary bg-secondary-hover) h-fit w-fit px-4 py-2 rounded-md")}
         >
           Test

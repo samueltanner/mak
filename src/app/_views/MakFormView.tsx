@@ -28,8 +28,8 @@ const formConfig = {
 }
 
 const MakFormView = () => {
-  const { verboseTheme } = useMakUi()
-
+  const { verboseTheme, simpleTheme } = useMakUi()
+  console.log({ verboseTheme, simpleTheme })
   const {
     form,
     components: { FirstName, Pick, LastName },

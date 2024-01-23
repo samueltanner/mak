@@ -162,6 +162,8 @@ export const paletteFactory = ({
             theme,
           })
 
+          console.log(theme, paletteVariant, variant, constructedStates)
+
           ensureNestedObject({
             parent: finalVerbosePalette,
             keys: [theme, paletteVariant, variant],
