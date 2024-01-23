@@ -175,19 +175,21 @@ const MakUiProviderChild = ({
     className: MakUiClassNameHelperClassNames,
     options?: MakUiClassNameHelperOptions
   ) => {
-    const { type, states } = options || {}
+    const { type, states, theme } = options || {}
     const configKey: keyof MakUiComponentConfigInput = type
       ? `${type}Config`
       : "buttonConfig"
     enabledStates = states || componentConfig[configKey]?.enabledStates || []
     const defaultConfig = componentConfig?.[configKey]
-    console.log("defaultConfig", defaultConfig)
+    const defaultTheme: MakUiThemeKey | undefined =
+      theme || (themeMode as MakUiThemeKey | undefined)
 
     return makClassNameHelper({
       string: className,
       verbosePalette,
       enabledStates,
       defaultConfig,
+      themeMode: defaultTheme,
     })
   }
   const value = {
@@ -220,6 +222,7 @@ type MakUiClassNameHelperClassNames = string
 type MakUiClassNameHelperOptions = {
   type?: HtmlElementKey
   states?: MakUiInteractionStateKey[]
+  theme?: MakUiThemeKey
 }
 
 interface MakUiContext {

@@ -47,6 +47,7 @@ import {
   makUiPalettesSet,
   makUiStates,
   makUiStatesSet,
+  makUiThemeVariantsSet,
   makUiThemesSet,
   makUiVariants,
   makUiVariantsSet,
@@ -995,76 +996,100 @@ export const makClassNameHelper = ({
   verbosePalette,
   enabledStates,
   defaultConfig,
+  themeMode,
 }: {
   string: string
   verbosePalette: MakUiVerbosePalette
   enabledStates: MakUiInteractionStateKey[]
   defaultConfig?: MakUiRootComponentConfigInput
+  themeMode?: MakUiThemeKey
 }) => {
-  console.log({ enabledStates, defaultConfig })
   if (!string) return ""
   let finalClassName = []
-  const splitClassNames = string.split(" ")
-  let makClassNames = []
-
-  let insideMakArray = false
-  for (let className of splitClassNames) {
-    if (className.includes("mak(")) {
-      insideMakArray = true
-      makClassNames.push(className.slice(4))
-      continue
-    }
-
-    if (className.includes(")")) {
-      makClassNames.push(className.slice(0, -1))
-      insideMakArray = false
-      continue
-    }
-    if (insideMakArray) {
-      makClassNames.push(className)
-      continue
-    } else {
-      finalClassName.push(className)
-    }
+  const splitClassNames = string.split(")")
+  let initialMakClassNames = splitClassNames.find((cn) => cn.includes("mak("))
+  const initialRootClassNames = splitClassNames.find(
+    (cn) => !cn.includes("mak(")
+  )
+  const rootClassNames = ` ${initialRootClassNames} ${defaultConfig?.className}`
+  if (initialMakClassNames) {
+    initialMakClassNames = initialMakClassNames.replace("mak(", "")
+  } else {
+    return rootClassNames
   }
 
-  for (const makCn of makClassNames) {
-    const { theme, palette, variant, state, twVariant } =
+  for (const makCn of initialMakClassNames.split(" ")) {
+    let { theme, themeVariant, palette, variant, state, twVariant, opacity } =
       parseMakClassName(makCn)
-
+    const opacityString = opacity ? `/${opacity}` : ""
+    if (!theme) theme = themeMode
     let target
     if (palette === "theme") {
-      const themePalette = verbosePalette[theme][palette]
-      target = themePalette[variant as MakUiThemeVariantKey]
-    } else {
-      target = verbosePalette[theme][palette][variant]
-      const baseClassName = `${twVariant}-${target.base}`
-      finalClassName.push(baseClassName)
-      if (!state) {
+      console.log({ theme, themeVariant, palette, variant, state, twVariant })
+      const themePalette = verbosePalette[theme!][palette]
+      target = themePalette
+      console.log({ themePalette, target })
+      if (state) {
+        const constructedClassName =
+          `${state}:${twVariant}-${target[themeVariant]}` + opacityString
+        finalClassName.push(constructedClassName)
+      } else {
+        const baseClassName =
+          `${twVariant}-${target[themeVariant]}` + opacityString
+        finalClassName.push(baseClassName)
         for (const state of enabledStates) {
-          const constructedClassName = `${state}:${twVariant}-${target[state]}`
+          const constructedClassName =
+            `${state}:${twVariant}-${target[themeVariant]}` + opacityString
 
           finalClassName.push(constructedClassName)
         }
       }
+    } else {
+      target = verbosePalette[theme!][palette][variant]
+
+      if (!state) {
+        const baseClassName = `${twVariant}-${target.base}` + opacityString
+        finalClassName.push(baseClassName)
+        for (const state of enabledStates) {
+          const constructedClassName =
+            `${state}:${twVariant}-${target[state]}` + opacityString
+
+          finalClassName.push(constructedClassName)
+        }
+      } else {
+        const constructedClassName =
+          `${state}:${twVariant}-${target[state]}` + opacityString
+        finalClassName.push(constructedClassName)
+      }
     }
   }
-  const finalClassNamesString =
-    finalClassName.join(" ") + ` ${defaultConfig?.className}`
+
+  console.log({ finalClassName })
+  const finalClassNamesString = finalClassName.join(" ") + ` ${rootClassNames}`
 
   return finalClassNamesString
 }
 
 const parseMakClassName = (string: string) => {
   const makClassNameObj: ParsedClassNameResponse = {
-    theme: "light",
+    theme: undefined,
     palette: "color",
     variant: "primary",
+    themeVariant: "primary",
     state: undefined,
     twVariant: "bg",
+    opacity: undefined,
   }
-  const delimiters = /[:\.-]+/
+
+  if (string.includes("ring-offset")) {
+    makClassNameObj.twVariant = "ring-offset"
+  }
+  const delimiters = /ring-offset:|[:\/.-]+/
   const splitString = string.split(delimiters)
+  const opacity = splitString[1]
+  if (opacity) {
+    makClassNameObj.opacity = opacity
+  }
 
   splitString.forEach((str) => {
     if (makUiThemesSet.has(str as MakUiThemeKey)) {
@@ -1084,12 +1109,19 @@ const parseMakClassName = (string: string) => {
     }
 
     if (tailwindVariantsSet.has(str as TailwindVariantKey)) {
-      makClassNameObj.twVariant = str as TailwindVariantKey
+      if (makClassNameObj.twVariant !== "ring-offset") {
+        makClassNameObj.twVariant = str as TailwindVariantKey
+      }
     } else if (str === "color") {
       makClassNameObj.twVariant = "bg"
     }
+
+    if (makUiThemeVariantsSet.has(str as MakUiThemeVariantKey)) {
+      makClassNameObj.themeVariant = str as MakUiThemeVariantKey
+    }
   })
 
+  console.log({ splitString, makClassNameObj })
   return makClassNameObj
 }
 

@@ -1,4 +1,7 @@
-import { MakUiComponentConfigInput, MakUiRootComponentConfigInput } from "../types/component-types"
+import {
+  MakUiComponentConfigInput,
+  MakUiRootComponentConfigInput,
+} from "../types/component-types"
 import {
   HtmlElementKey,
   MakUiCustomInteractionStateKey,
@@ -247,7 +250,7 @@ export const makUiDefaultStates: MakUiDefaultStateColors = {
 
 export const defaultButtonConfig: MakUiRootComponentConfigInput = {
   className:
-    "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold border border-2",
+    "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold",
 }
 
 export const defaultInputConfig: MakUiRootComponentConfigInput = {

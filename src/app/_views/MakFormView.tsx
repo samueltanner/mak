@@ -28,17 +28,15 @@ const formConfig = {
 }
 
 const MakFormView = () => {
-  const { verboseTheme, simpleTheme } = useMakUi()
-  console.log({ verboseTheme, simpleTheme })
+  const { verboseTheme, verbosePalette, simpleTheme } = useMakUi()
+  console.log({ verbosePalette, simpleTheme })
   const {
     form,
     components: { FirstName, Pick, LastName },
   } = useMakForm({ formConfig })
   return (
     <div>
-      <FirstName
-        className={`p-2 text-${verboseTheme.text.primary.base}`}
-      />
+      <FirstName className={`p-2 text-${verboseTheme.text.primary.base}`} />
       <Pick />
     </div>
   )

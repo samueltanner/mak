@@ -13,26 +13,36 @@ const config: Config = {
     {
       pattern:
         /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover"],
+      variants: ["hover", "focus", "disabled"],
     },
     {
       pattern: /bg-(white|black)/,
-      variants: ["hover"],
+      variants: ["hover", "focus", "disabled"],
     },
     {
       pattern:
         /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover"],
+      variants: ["hover", "focus", "disabled"],
     },
     {
       pattern:
         /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover"],
+      variants: ["hover", "focus", "disabled"],
     },
     {
       pattern:
         /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["focus"],
+      variants: ["hover", "focus", "disabled"],
+    },
+    {
+      pattern:
+        /ring-offset-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+      variants: ["hover", "focus", "disabled"],
+    },
+    {
+      pattern:
+        /outline-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+      variants: ["hover", "focus", "disabled"],
     },
   ],
   theme: {

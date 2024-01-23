@@ -22,7 +22,7 @@ const palette: MakUiFlexiblePaletteInput = {
 const componentConfig: MakUiComponentConfigInput = {
   buttonConfig: {
     className:
-      "px-2 py-1.5 h-fit w-fit text-sm rounded-md font-semibold border border-[3px] fade-in-out",
+      "px-2 py-1.5 h-fit w-fit text-sm rounded-md font-semibold fade-in-out",
   },
 }
 

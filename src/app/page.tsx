@@ -48,13 +48,16 @@ export default function Home() {
           )}
         </Button>
         <button
-          className={mcn(
-            "mak(dark:text-primary bg-primary border-primary focus:ring-offset-primary) focus:ring-2",
-            { type: "button", states: ["disabled", "hover", "focus"] }
-          )}
+          disabled
+          className={mcn("mak(disabled/50) focus:ring-2 focus:ring-offset-2", {
+            type: "button",
+            states: ["disabled", "hover", "focus"],
+            theme: "light",
+          })}
         >
           Test
         </button>
+
         <input
           type="text"
           className="rounded-md h-fit w-fit bg-white px-4 py-2 font-normal text-mak-teal-900 focus:outline-none shadow-hard-sm"

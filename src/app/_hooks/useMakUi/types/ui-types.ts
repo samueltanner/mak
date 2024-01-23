@@ -290,9 +290,11 @@ export type TWColorHelperResponse = {
 }
 
 export type ParsedClassNameResponse = {
-  theme: MakUiThemeKey
+  theme: MakUiThemeKey | undefined
   palette: MakUiPaletteKey
   variant: MakUiVariantKey
+  themeVariant: MakUiThemeVariantKey
   state: MakUiStateKey | undefined
   twVariant: TailwindVariantKey
+  opacity: string | undefined
 }
