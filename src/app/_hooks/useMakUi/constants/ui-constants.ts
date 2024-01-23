@@ -51,6 +51,7 @@ export const makUiStates: MakUiStateKey[] = [
   "enabled",
   "hover",
   "target",
+  "click",
 
   "autofill",
   "checked",
@@ -77,15 +78,15 @@ export const makUiStates: MakUiStateKey[] = [
 export const makUiStatesSet: Set<MakUiStateKey> = new Set(makUiStates)
 
 export const makUiDefaultColors: MakUiDefaultColors = {
-  primary: "mak-teal-500",
-  secondary: "green-500",
-  tertiary: "yellow-500",
-  success: "green-500",
-  error: "red-500",
-  danger: "red-500",
-  warning: "yellow-500",
-  info: "blue-500",
-  custom: "zinc-500",
+  primary: "mak-teal",
+  secondary: "green",
+  tertiary: "yellow",
+  success: "green",
+  error: "red",
+  danger: "red",
+  warning: "yellow",
+  info: "blue",
+  custom: "zinc",
 }
 
 export const makUiDefaultPalette: MakUiDefaultPalette = {
@@ -149,6 +150,7 @@ export const makUiDefaultStateShades: MakUiStateShades = {
   base: 500,
   active: 600,
   autofill: 500,
+  click: 400,
   checked: 500,
   closed: 500,
   default: 500,
@@ -176,6 +178,7 @@ export const makUiDefaultStateShades: MakUiStateShades = {
 
 export const makUiDefaultStates: MakUiDefaultStateColors = {
   base: "zinc-500",
+  click: "zinc-600",
   active: "zinc-600",
   autofill: "zinc-500",
   checked: "zinc-500",

@@ -52,6 +52,7 @@ export type MakUiStateKey =
   | "checked"
   | "closed"
   | "default"
+  | "click"
   | "disabled"
   | "empty"
   | "enabled"

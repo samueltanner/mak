@@ -256,11 +256,13 @@ export const getConstructedTheme = ({
 }
 
 export const getConstructedStates = ({
-  providedStates,
+  providedStates = {} as MakUiState,
   defaultShades,
+  theme = "light",
 }: {
-  providedStates: MakUiState
-  defaultShades: MakUiStateShades
+  providedStates?: MakUiState
+  defaultShades?: MakUiStateShades
+  theme?: MakUiThemeKey
 }) => {
   let baseColor = providedStates?.base
   let baseState = "base" as keyof MakUiStateShades
@@ -279,7 +281,18 @@ export const getConstructedStates = ({
     defaults: makUiDefaultStates,
     defaultKey: baseState,
   })
-  // console.log(twObj)
+
+  providedStates.base = twObj.rootString
+
+  const statesObject = generateDefaultStatesObject({
+    defaultColor: twObj.color,
+    defaultShades,
+    baseShade: twObj.shade,
+    multiplier: theme === "dark" ? 1 : -1,
+  })
+  const resolvedStatesObject = mergeWithFallback(providedStates, statesObject)
+
+  return resolvedStatesObject
 }
 
 export const getShades = ({
@@ -538,69 +551,43 @@ export const getOpacity = ({
     value: opacityNum,
   }
 }
+
+export const generateDefaultShadesDiffOject = ({
+  defaultShades = makUiDefaultStateShades,
+}: {
+  defaultShades?: MakUiStateShades
+}) => {
+  let defaultShadesDiffObject = {} as MakUiStateShades
+  const baseShade = defaultShades.base
+  Object.entries(defaultShades).forEach(([state, shade]) => {
+    const shadeDiff = shade - baseShade
+    defaultShadesDiffObject[state as MakUiStateKey] = shadeDiff
+  })
+  return defaultShadesDiffObject
+}
+
 export const generateDefaultStatesObject = ({
   defaultShades = makUiDefaultStateShades,
   defaultColor = "zinc",
+  baseShade = 500,
+  multiplier = 1,
 }: {
-  defaultShades: MakUiStateShades
-  defaultColor: string
+  defaultShades?: MakUiStateShades
+  defaultColor?: string
+  baseShade?: number
+  multiplier?: number
 }) => {
-  const {
-    base,
-    active,
-    autofill,
-    checked,
-    closed,
-    default: defaultShade,
-    disabled,
-    empty,
-    enabled,
-    focus,
-    "focus-visible": focusVisible,
-    "focus-within": focusWithin,
-    hover,
-    "in-range": inRange,
-    indeterminate,
-    invalid,
-    open,
-    "out-of-range": outOfRange,
-    "placeholder-shown": placeholderShown,
-    "read-only": readOnly,
-    required,
-    selected,
-    selection,
-    target,
-    valid,
-    visited,
-  } = defaultShades
-  return {
-    base: `${defaultColor}-${base}`,
-    active: `${defaultColor}-${active}`,
-    autofill: `${defaultColor}-${autofill}`,
-    checked: `${defaultColor}-${checked}`,
-    closed: `${defaultColor}-${closed}`,
-    default: `${defaultColor}-${defaultShade}`,
-    disabled: `${defaultColor}-${disabled}`,
-    empty: `${defaultColor}-${empty}`,
-    enabled: `${defaultColor}-${enabled}`,
-    focus: `${defaultColor}-${focus}`,
-    "focus-visible": `${defaultColor}-${focusVisible}`,
-    "focus-within": `${defaultColor}-${focusWithin}`,
-    hover: `${defaultColor}-${hover}`,
-    "in-range": `${defaultColor}-${inRange}`,
-    indeterminate: `${defaultColor}-${indeterminate}`,
-    invalid: `${defaultColor}-${invalid}`,
-    open: `${defaultColor}-${open}`,
-    "out-of-range": `${defaultColor}-${outOfRange}`,
-    "placeholder-shown": `${defaultColor}-${placeholderShown}`,
-    "read-only": `${defaultColor}-${readOnly}`,
-    required: `${defaultColor}-${required}`,
-    selected: `${defaultColor}-${selected}`,
-    selection: `${defaultColor}-${selection}`,
-    target: `${defaultColor}-${target}`,
-    valid: `${defaultColor}-${valid}`,
-    visited: `${defaultColor}-${visited}`,
+  const shadesDiff = generateDefaultShadesDiffOject({ defaultShades })
+
+  let defaultStatesObject = {} as MakUiState
+  for (const [state, diff] of Object.entries(shadesDiff)) {
+    const shade = baseShade + diff * multiplier
+    defaultStatesObject[
+      state as MakUiStateKey
+    ] = `${defaultColor}-${getNormalizedShadeNumber(shade)}`
   }
+
+  return defaultStatesObject
 }
 
 export const twColorHelper = ({

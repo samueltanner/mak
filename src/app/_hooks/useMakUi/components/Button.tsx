@@ -6,8 +6,8 @@ import {
   MakUiInteraction,
   MakUiState,
   MakUiVariant,
-  MakUiVerboseTheme,
 } from "../types/default-types"
+import { MakUiVerboseTheme } from "../types/ui-types"
 import { MakUiButtonConfig } from "../types/button-types"
 
 interface ButtonProps {
@@ -134,9 +134,9 @@ const buttonClassName = ({
   const cursorAction = disabled ? "cursor-not-allowed" : "cursor-pointer"
   const outlinedOrFilled = outlined ? "border" : "bg"
 
-  const variantObject = colorPalette?.[buttonStyle]?.[buttonState]
-  const textVariantObject = textPalette?.[textStyle]?.[buttonState]
-  const borderVariantObject = borderPalette?.[borderStyle]?.[buttonState]
+  const variantObject = colorPalette?.[buttonStyle]
+  const textVariantObject = textPalette?.[textStyle]
+  const borderVariantObject = borderPalette?.[borderStyle]
 
   const baseClass = `${buttonConfig.className} fade-in-out ${
     disabled && "cursor-not-allowed"
@@ -146,7 +146,7 @@ const buttonClassName = ({
   const borderClass = `border-${borderVariantObject?.base} border-2 hover:border-${borderVariantObject?.hover}`
   const selectedClass =
     selected && showFocusRing && !disabled
-      ? `ring-2 ring-${variantObject?.baseRoot}/50 outline-none ring-offset-2`
+      ? `ring-2 ring-${variantObject?.base}/50 outline-none ring-offset-2`
       : ""
   const focusedClass =
     focus && showFocusRing && !disabled

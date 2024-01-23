@@ -1,28 +1,12 @@
 import {
-  getConstructedClassNames,
   ensureNestedObject,
   extractInitialPalette,
   getConstructedTheme,
   getConstructedStates,
+  twColorHelper,
 } from "../functions/helpers"
-// import {
-//   MakUiInteraction,
-//   MakUiPaletteInput,
-//   MakUiSimplePalettes,
-//   MakUiVerbosePalettes,
-//   MakUiVariants,
-//   MakUiVerbosePalettesShortHand,
-//   MakUiSimplePalettesShortHand,
-//   MakUiThemeMode,
-// } from "../types/default-types"
 import {
-  uiDefaultColorPaletteInput,
-  uiStates,
-  uiVariants,
-  uiInteractions,
-  uiDefaultSimpleTextPalette,
   paletteShorthand,
-  uiInteractionsAndRoots,
   uiThemeColorVariantsAndRoots,
 } from "../constants/defaults/default-constants"
 import {
@@ -33,13 +17,11 @@ import {
   MakUiThemeKey,
   MakUiThemeShades,
   MakUiVerbosePalette,
-  MakUiVerboseVariant,
 } from "../types/ui-types"
-
 import {
+  makUiDefaultColors,
   makUiDefaultPalette,
   makUiPalettes,
-  makUiThemeVariants,
   makUiVariants,
 } from "../constants/ui-constants"
 
@@ -173,170 +155,97 @@ export const paletteFactory = ({
         if (initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]) {
           const providedStates =
             initialVerbosePalette[theme][paletteVariant][variant]
-          console.log("providedStates", providedStates)
+
           const constructedStates = getConstructedStates({
             providedStates,
             defaultShades: defaultShades.defaultStateShades,
+            theme,
           })
 
-          // const constructedClassNames = getConstructedClassNames({
-          //   interactions: providedState as MakUiState,
-          //   state: "all",
-          //   defaultShades,
-          // })
+          ensureNestedObject({
+            parent: finalVerbosePalette,
+            keys: [theme, paletteVariant, variant],
+            value: constructedStates,
+          })
 
-          // ensureNestedObject({
-          //   parent: finalVerbosePalette,
-          //   keys: [theme, paletteVariant, variant],
-          //   value: constructedClassNames,
-          // })
+          const {
+            base,
+            focus,
+            hover,
+            disabled,
+            active,
+            selected,
+            default: defaultState,
+            click,
+          } = constructedStates
 
-          // const {
-          //   baseRoot: base,
-          //   clickRoot: click,
-          //   hoverRoot: hover,
-          //   focusRoot: focus,
-          // } = constructedClassNames.default
-
-          // ensureNestedObject({
-          //   parent: finalSimplePalette,
-          //   keys: [theme, paletteVariant, variant],
-          //   value: {
-          //     base,
-          //     click,
-          //     hover,
-          //     focus,
-          //   },
-          // })
+          ensureNestedObject({
+            parent: finalSimplePalette,
+            keys: [theme, paletteVariant, variant],
+            value: {
+              base,
+              active,
+              click,
+              focus,
+              hover,
+              disabled,
+              selected,
+              default: defaultState,
+            },
+          })
         } else if (
           !initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]
         ) {
-          if (paletteVariant === "color" || paletteVariant === "border") {
-            const classNames = getConstructedClassNames({
-              color: uiDefaultColorPaletteInput?.[variant] as MakUiInteraction,
-              state: "all",
-              theme,
-            })
+          const shade =
+            paletteVariant === "text" && theme === "dark"
+              ? 950
+              : paletteVariant === "text" && theme === "light"
+              ? 50
+              : 500
+          const baseColor = twColorHelper({
+            colorString: makUiDefaultColors[variant],
+            shade: shade,
+          }).rootString
+          const constructedStates = getConstructedStates({
+            providedStates: {
+              base: baseColor,
+            } as MakUiState,
+            defaultShades: defaultShades.defaultStateShades,
+            theme,
+          })
 
-            ensureNestedObject({
-              parent: finalVerbosePalette,
-              keys: [theme, paletteVariant, variant],
-              value: classNames,
-            })
+          ensureNestedObject({
+            parent: finalVerbosePalette,
+            keys: [theme, paletteVariant, variant],
+            value: constructedStates,
+          })
 
-            const {
-              baseRoot: base,
-              clickRoot: click,
-              hoverRoot: hover,
-              focusRoot: focus,
-            } = classNames.default
+          const {
+            base,
+            focus,
+            hover,
+            disabled,
+            active,
+            selected,
+            default: defaultState,
+            click,
+          } = constructedStates
 
-            ensureNestedObject({
-              parent: finalSimplePalette,
-              keys: [theme, paletteVariant, variant],
-              value: {
-                base,
-                click,
-                hover,
-                focus,
-              },
-            })
-          }
-          if (paletteVariant === "text") {
-            const classNames = getConstructedClassNames({
-              color: uiDefaultSimpleTextPalette?.[variant] as MakUiInteraction,
-              state: "all",
-              theme,
-            })
-
-            ensureNestedObject({
-              parent: finalVerbosePalette,
-              keys: [theme, paletteVariant, variant],
-              value: classNames,
-            })
-
-            const {
-              baseRoot: base,
-              clickRoot: click,
-              hoverRoot: hover,
-              focusRoot: focus,
-            } = classNames.default
-
-            ensureNestedObject({
-              parent: finalSimplePalette,
-              keys: [theme, paletteVariant, variant],
-              value: {
-                base,
-                click,
-                hover,
-                focus,
-              },
-            })
-          }
+          ensureNestedObject({
+            parent: finalSimplePalette,
+            keys: [theme, paletteVariant, variant],
+            value: {
+              base,
+              active,
+              click,
+              focus,
+              hover,
+              disabled,
+              selected,
+              default: defaultState,
+            },
+          })
         }
-        // const shorthand = paletteShorthand[variant]
-        // Object.defineProperty(
-        //   finalVerbosePalette[theme][paletteVariant],
-        //   shorthand,
-        //   {
-        //     get: function () {
-        //       return finalVerbosePalette[theme][paletteVariant][variant]
-        //     },
-        //   }
-        // )
-        // Object.defineProperty(
-        //   finalSimplePalette[theme][paletteVariant],
-        //   shorthand,
-        //   {
-        //     get: function () {
-        //       return finalSimplePalette[theme][paletteVariant][variant]
-        //     },
-        //   }
-        // )
-        // for (const interaction of uiInteractions) {
-        //   const shorthand = paletteShorthand[interaction]
-        //   Object.defineProperty(
-        //     finalSimplePalette[theme][paletteVariant][variant],
-        //     shorthand,
-        //     {
-        //       get: function () {
-        //         const asdf = finalSimplePalette[theme][paletteVariant][variant]
-        //         return finalSimplePalette[theme][paletteVariant][variant][
-        //           interaction
-        //         ]
-        //       },
-        //     }
-        //   )
-        // }
-        // for (const state of uiStates) {
-        //   const shorthand = paletteShorthand[state]
-
-        //   Object.defineProperty(
-        //     finalVerbosePalette[theme][paletteVariant][variant],
-        //     shorthand,
-        //     {
-        //       get: function () {
-        //         return finalVerbosePalette[theme][paletteVariant][variant][
-        //           state
-        //         ]
-        //       },
-        //     }
-        //   )
-        //   for (const interaction of uiInteractionsAndRoots) {
-        //     const shorthand = paletteShorthand[interaction]
-        //     Object.defineProperty(
-        //       finalVerbosePalette[theme][paletteVariant][variant][state],
-        //       shorthand,
-        //       {
-        //         get: function () {
-        //           return finalVerbosePalette[theme][paletteVariant][variant][
-        //             state
-        //           ][interaction]
-        //         },
-        //       }
-        //     )
-        //   }
-        // }
       }
       const shorthand = paletteShorthand[paletteVariant]
       // Object.defineProperty(finalVerbosePalette[theme], shorthand, {
@@ -363,14 +272,8 @@ export const paletteFactory = ({
     // })
   }
 
-  // console.log("finalVerbosePalette", finalVerbosePalette)
-  // console.log("finalSimplePalette", finalSimplePalette)
   return {
-    verbose: finalVerbosePalette as
-      | MakUiVerbosePalettes
-      | MakUiVerbosePalettesShortHand,
-    simple: finalSimplePalette as
-      | MakUiSimplePalettes
-      | MakUiSimplePalettesShortHand,
+    verbose: finalVerbosePalette as MakUiVerbosePalette,
+    simple: finalSimplePalette as MakUiSimplePalette,
   }
 }
