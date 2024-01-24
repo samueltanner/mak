@@ -57,6 +57,7 @@ import {
   nearestMultiple,
 } from "@/globals/global-helper-functions"
 import { split } from "postcss/lib/list"
+import { init } from "next/dist/compiled/webpack/webpack"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
@@ -259,7 +260,7 @@ export const getConstructedStates = ({
   let providedState = !!providedStates?.base ? "base" : undefined
   let inferredBaseShade
   let stateShade
-  const multiplier = theme === "dark" ? 1 : -1
+  const multiplier = theme === "dark" ? -1 : 1
   if (!providedColor) {
     for (const state of makUiStates) {
       providedColor = providedStates?.[state]
@@ -981,25 +982,42 @@ export const makClassNameHelper = ({
   if (!string && makClassName) {
     string = `mak(${makClassName}) ${className}`
   }
-  let finalClassName = []
+  if (string && !string?.includes("mak(")) {
+    string = `mak(${string})`
+  }
   const splitClassNames = string?.split(")") || []
   let initialMakClassNames = splitClassNames.find((cn) => cn.includes("mak("))
   const initialRootClassNames = splitClassNames.find(
     (cn) => !cn.includes("mak(")
   )
-  let rootClassNames = ` ${initialRootClassNames} ${defaultConfig?.className}`
+
+  let rootClassNames =
+    initialRootClassNames && defaultConfig?.className
+      ? ` ${initialRootClassNames} ${defaultConfig?.className}`
+      : initialRootClassNames || defaultConfig?.className || ""
   if (initialMakClassNames) {
     initialMakClassNames = initialMakClassNames.replace("mak(", "")
   } else {
     return rootClassNames
   }
 
-  initialMakClassNames = `${initialMakClassNames} ${makClassName}`
-  rootClassNames = `${rootClassNames} ${className}`
+  initialMakClassNames = makClassName
+    ? `${initialMakClassNames} ${makClassName}`
+    : initialMakClassNames
+  rootClassNames = className ? `${rootClassNames} ${className}` : rootClassNames
 
+  let finalClassName = []
   for (const makCn of initialMakClassNames.split(" ")) {
-    let { theme, themeVariant, palette, variant, state, twVariant, opacity } =
-      parseMakClassName(makCn)
+    let {
+      theme,
+      themeVariant,
+      palette,
+      variant,
+      state,
+      twVariant,
+      opacity,
+      string,
+    } = parseMakClassName(makCn)
 
     const opacityString = opacity ? `/${opacity}` : ""
     if (!theme) theme = themeMode
@@ -1036,12 +1054,18 @@ export const makClassNameHelper = ({
           finalClassName.push(constructedClassName)
         }
       } else {
-        const constructedClassName =
-          `${state}:${twVariant}-${target[state]}` + opacityString
+        let constructedClassName
+        if (twVariant) {
+          constructedClassName = `${twVariant}:${palette}-${target[state]}` + opacityString
+        } else {
+          constructedClassName = `${state}:${target[state]}` + opacityString
+        }
         finalClassName.push(constructedClassName)
       }
     }
   }
+
+  console.log({ finalClassName })
 
   const finalClassNamesString = finalClassName.join(" ") + ` ${rootClassNames}`
 
@@ -1057,12 +1081,17 @@ const parseMakClassName = (string: string) => {
     state: undefined,
     twVariant: "bg",
     opacity: undefined,
+    string,
   }
 
   if (string.includes("ring-offset")) {
     makClassNameObj.twVariant = "ring-offset"
   }
-  const delimiters = /ring-offset:|[:\/.-]+/
+  if (string.includes("group-hover")) {
+    console.log("group-hover")
+    makClassNameObj.twVariant = "group-hover"
+  }
+  const delimiters = /group-offset:|ring-offset:|[:\/.-]+/
   const splitString = string.split(delimiters)
 
   let opacity
@@ -1089,7 +1118,10 @@ const parseMakClassName = (string: string) => {
     }
 
     if (tailwindVariantsSet.has(str as TailwindVariantKey)) {
-      if (makClassNameObj.twVariant !== "ring-offset") {
+      if (
+        makClassNameObj.twVariant !== "ring-offset" &&
+        makClassNameObj.twVariant !== "group-hover"
+      ) {
         makClassNameObj.twVariant = str as TailwindVariantKey
       }
     } else if (str === "color") {

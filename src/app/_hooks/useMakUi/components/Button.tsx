@@ -383,18 +383,18 @@ const Button = forwardRef(
       let className
       if (outlined) {
         makClassName = `border-${buttonStyle}`
-        className = `border-2`
+        className = `border-[3px]`
         return mcn("", {
           makClassName,
           className,
           type: "button",
-          states: ["focus", "hover"],
+          states: ["focus", "hover", "group-hover"],
         })
       } else {
         makClassName = `bg-${buttonStyle}`
         return mcn("", {
           makClassName,
-          states: ["focus", "hover"],
+          states: ["focus", "hover", "group-hover"],
         })
       }
     }, [outlined])
@@ -408,7 +408,7 @@ const Button = forwardRef(
         makClassName,
         className,
         type: "button",
-        states: ["focus", "hover"],
+        states: ["focus", "hover", "group-hover"],
       })
     }, [textStyle])
 
@@ -457,7 +457,7 @@ const Button = forwardRef(
             focus: false,
           })
         }}
-        className={`flex items-center justify-center gap-1 ${textClassNames} ${borderBgClassNames} ${focusClassNames} ${className}`}
+        className={`group flex items-center justify-center gap-1 ${textClassNames} ${borderBgClassNames} ${focusClassNames} ${className}`}
         disabled={isDisabled}
         type={type}
         id={id}
@@ -469,14 +469,10 @@ const Button = forwardRef(
         )}
         {icon && iconSide === "left" && icon}
         {children ? (
-          <span
-            className={`${textClassName} ${
-              wrapButtonText ? "" : "whitespace-nowrap"
-            }`}
-          >
-            {children}
-          </span>
+          // <span className={`group ${wrapButtonText ? "" : "whitespace-nowrap"}`}>
+          children
         ) : (
+          // </span>
           <p
             className={`${textClassName} ${
               wrapButtonText ? "" : "whitespace-nowrap"

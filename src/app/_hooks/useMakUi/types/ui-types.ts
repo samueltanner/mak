@@ -11,6 +11,7 @@ export type TailwindVariantKey =
   | "ring"
   | "outline"
   | "ring-offset"
+  | "group-hover"
   | "fill"
   | "stroke"
 
@@ -76,6 +77,7 @@ export type MakUiInteractionStateKey =
   | "focus-visible"
   | "focus-within"
   | "hover"
+  | "group-hover"
   | "in-range"
   | "indeterminate"
   | "invalid"
@@ -297,4 +299,5 @@ export type ParsedClassNameResponse = {
   state: MakUiStateKey | undefined
   twVariant: TailwindVariantKey
   opacity: string | undefined
+  string: string
 }

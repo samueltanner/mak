@@ -14,22 +14,22 @@ const config: Config = {
     {
       // Backgrounds
       pattern: /^bg-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled"],
+      variants: ["dark", "hover", "disabled", "group-hover"],
     },
     {
       // Borders
       pattern: /^border-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled"],
+      variants: ["dark", "hover", "disabled", "group-hover"],
     },
     {
       // Ring Color
       pattern: /^ring-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled"],
+      variants: ["dark", "hover", "disabled", "group-hover"],
     },
     {
       // Text Color
       pattern: /^text-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled"],
+      variants: ["dark", "hover", "disabled", "group-hover"],
     },
     // {
     //   pattern:

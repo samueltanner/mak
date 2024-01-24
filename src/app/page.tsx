@@ -11,20 +11,22 @@ export default function Home() {
     isDark,
     isLight,
     isCustom,
-    verboseTheme,
+    simplePalette,
+    simpleTheme,
     enabledThemeModes,
     mcn,
   } = useMakUi()
 
+  console.log(mcn("text-primary group-hover:text-primary"))
+
   return (
-    <main className={`h-screen w-screen p-4 bg-${verboseTheme.theme.primary}`}>
+    <main className={`h-screen w-screen p-4 ${mcn("theme-primary")}`}>
       <div className="flex w-full h-full justify-between">
         <MakUiView />
         <MakFormView />
         <Button
-          secondary
+          tertiary
           outline
-          textPrimary
           onClick={() => {
             setTheme(
               isDark
@@ -34,17 +36,24 @@ export default function Home() {
                 : "dark"
             )
           }}
+          showFocusRing={false}
         >
           {isDark && (
-            <BiSun className={`size-6 text-${verboseTheme.text.secondary}`} />
+            <BiSun
+              className={`size-6 text-${simpleTheme.text.primary.base} hover:text-${simpleTheme.color.primary.base} fade-in-out`}
+            />
           )}
           {isLight && (
             <BiSolidMoon
-              className={`size-6 text-${verboseTheme.text.secondary}`}
+              // className="text-zinc-500 group-hover:text-blue-500"
+
+              className={`size-6 text-${simpleTheme.text.primary.base} hover:text-${simpleTheme.color.primary.base} fade-in-out`}
             />
           )}
           {isCustom && (
-            <BiParty className={`size-6 text-${verboseTheme.text.secondary}`} />
+            <BiParty
+              className={`size-6 text-${simpleTheme.text.primary.base} hover:text-${simpleTheme.color.primary.base}`}
+            />
           )}
         </Button>
 
