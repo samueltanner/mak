@@ -174,7 +174,7 @@ const MakUiProviderChild = ({
       simplePalette: simple as MakUiSimplePalette,
       verbosePalette: verbose as MakUiVerbosePalette,
     }
-  }, [paletteInput, enabledThemeModes])
+  }, [JSON.stringify(paletteInput), enabledThemeModes])
 
   const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>(
     {} as MakUiSimpleTheme
@@ -202,10 +202,10 @@ const MakUiProviderChild = ({
   const { simplePalette, verbosePalette } = palettesMemo
 
   const makClassName = (
-    className: MakUiClassNameHelperClassNames | undefined,
+    string: MakUiClassNameHelperClassNames | undefined,
     options?: MakUiClassNameHelperOptions
   ) => {
-    const { type, states, theme, makClassNames, classNames } = options || {}
+    const { type, states, theme, makClassName, className } = options || {}
     const configKey: keyof MakUiComponentConfigInput = type
       ? `${type}Config`
       : "buttonConfig"
@@ -215,13 +215,13 @@ const MakUiProviderChild = ({
       theme || (themeMode as MakUiThemeKey | undefined)
 
     return makClassNameHelper({
-      string: className,
+      string,
       verbosePalette,
       enabledStates,
       defaultConfig: type ? defaultConfig : undefined,
       themeMode: defaultTheme,
-      makClassNames,
-      classNames,
+      makClassName,
+      className,
     })
   }
 
@@ -287,8 +287,8 @@ type MakUiClassNameHelperOptions = {
   states?: MakUiInteractionStateKey[]
   theme?: MakUiThemeKey
   useConfig?: boolean
-  makClassNames?: string
-  classNames?: string
+  makClassName?: string
+  className?: string
 }
 export type MakUiClassNameHelper = (
   className: string,

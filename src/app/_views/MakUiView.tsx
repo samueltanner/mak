@@ -30,10 +30,18 @@ const MakUiView = () => {
           onClose={() => {
             setModalIsOpen(false)
           }}
+          className={`bg-${simpleTheme.theme.secondary} h-10 rounded-md`}
+          backdropClassName="backdrop-blur-sm"
         >
-          <ModalHeader>header</ModalHeader>
-          <ModalContent>content</ModalContent>
-          <ModalFooter>footer</ModalFooter>
+          <ModalHeader className="text-md font-semibold p-4">
+            Modal Header
+          </ModalHeader>
+          <ModalContent className="text-md font-semibold p-4">
+            content
+          </ModalContent>
+          <ModalFooter className="text-md font-semibold p-4">
+            <Button tertiary>Close</Button>
+          </ModalFooter>
         </Modal>
       </div>
       <Button

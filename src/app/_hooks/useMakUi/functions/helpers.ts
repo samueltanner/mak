@@ -635,7 +635,15 @@ export const splitStringAtCapital = (string: string) => {
   return string.split(/(?=[A-Z])/)
 }
 
-const getNestedClassNameObjects = (key: string, value: object) => {
+const getNestedClassNameObjects = ({
+  key,
+  value,
+  enabledThemeModes,
+}: {
+  key: string
+  value: GenericObject
+  enabledThemeModes: MakUiThemeKey[]
+}) => {
   const classNamesArray = [] as {
     variant: string
     theme: string | undefined
@@ -652,41 +660,53 @@ const getNestedClassNameObjects = (key: string, value: object) => {
       const splitClassName = className.split(":")
       let theme
       let altStates: MakUiStateKey[] = []
+      let altThemes: MakUiThemeKey[] = []
       className = splitClassName[splitClassName.length - 1]
+      if (makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)) {
+        theme = splitClassName[0] as MakUiThemeKey
+      } else {
+        altThemes.push(...enabledThemeModes)
+      }
       splitClassName.forEach((cn) => {
-        if (makUiThemesSet.has(cn as MakUiThemeKey)) {
-          theme = cn
-        } else if (makUiStatesSet.has(cn as MakUiStateKey)) {
+        if (makUiStatesSet.has(cn as MakUiStateKey)) {
           altStates.push(cn as MakUiStateKey)
         }
       })
 
-      theme = theme ? theme : "light"
+      for (const t of enabledThemeModes) {
+        for (const s of altStates) {
+          classNamesArray.push({
+            variant,
+            theme: t,
+            state: s,
+            paletteVariant,
+            className,
+          })
+        }
 
-      for (const s of altStates) {
         classNamesArray.push({
           variant,
-          theme,
-          state: s,
+          theme: t,
+          state,
           paletteVariant,
           className,
         })
       }
-
-      classNamesArray.push({
-        variant,
-        theme,
-        state,
-        paletteVariant,
-        className,
-      })
     })
   })
 
   return classNamesArray
 }
 
-const getClassNameAsObject = (key: string, value: string) => {
+const getClassNameAsObject = ({
+  key,
+  value,
+  enabledThemeModes,
+}: {
+  key: string
+  value: string
+  enabledThemeModes: MakUiThemeKey[]
+}) => {
   const variant =
     makUiVariants.find((v) => {
       if (key.toLowerCase().includes(v)) {
@@ -711,47 +731,53 @@ const getClassNameAsObject = (key: string, value: string) => {
   }[]
 
   const splitClassName = value.split(":")
-  let theme
+
   const state =
     splitClassName.find((el) => makUiStates.includes(el as MakUiStateKey)) ||
     "base"
+  let altThemes: MakUiThemeKey[] = []
   let altStates: MakUiStateKey[] = []
   className = splitClassName[splitClassName.length - 1]
+  if (makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)) {
+    altThemes.push(splitClassName[0] as MakUiThemeKey)
+  } else {
+    altThemes.push(...enabledThemeModes)
+  }
   splitClassName.forEach((cn) => {
-    if (makUiThemesSet.has(cn as MakUiThemeKey)) {
-      theme = cn
-    } else if (makUiStatesSet.has(cn as MakUiStateKey)) {
+    if (makUiStatesSet.has(cn as MakUiStateKey)) {
       altStates.push(cn as MakUiStateKey)
     }
   })
 
-  theme = theme ? theme : "light"
+  for (const t of altThemes) {
+    for (const s of altStates) {
+      classNamesArray.push({
+        variant,
+        theme: t,
+        state: s,
+        paletteVariant,
+        className,
+      })
+    }
 
-  for (const s of altStates) {
     classNamesArray.push({
       variant,
-      theme,
-      state: s,
+      theme: t,
+      state,
       paletteVariant,
       className,
     })
   }
-
-  classNamesArray.push({
-    variant,
-    theme,
-    state,
-    paletteVariant,
-    className,
-  })
 
   return classNamesArray
 }
 
 export const extractInitialPalette = ({
   palette,
+  enabledThemeModes,
 }: {
   palette: MakUiFlexiblePaletteInput
+  enabledThemeModes: MakUiThemeKey[]
 }) => {
   let themePalette = {
     light: {},
@@ -759,6 +785,7 @@ export const extractInitialPalette = ({
     custom: {},
   } as MakUiVerbosePalette
   let paletteObject = {} as MakUiPaletteInput
+
   for (const [key, value] of Object.entries(palette)) {
     if (key === "theme") {
       if (typeof value === "string") {
@@ -770,9 +797,15 @@ export const extractInitialPalette = ({
         } as { [Key in MakUiThemeKey]: string | undefined }
 
         classNamesArray.forEach((className: string) => {
-          if (className.includes("dark:")) {
+          if (
+            className.includes("dark:") &&
+            enabledThemeModes.includes("dark")
+          ) {
             themeObject.dark = className.split(":")[1]
-          } else if (className.includes("custom:")) {
+          } else if (
+            className.includes("custom:") &&
+            enabledThemeModes.includes("custom")
+          ) {
             themeObject.custom = className.split(":")[1]
           } else {
             themeObject.light = className
@@ -807,7 +840,11 @@ export const extractInitialPalette = ({
       continue
     }
     if (isObject(value)) {
-      const classNamesArray = getNestedClassNameObjects(key, value)
+      const classNamesArray = getNestedClassNameObjects({
+        key,
+        value,
+        enabledThemeModes,
+      })
       for (const obj of classNamesArray) {
         const { variant, theme, paletteVariant, state, className } = obj
 
@@ -822,7 +859,11 @@ export const extractInitialPalette = ({
       }
     } else {
       for (const classNameString of value.split(" ")) {
-        const classNamesArray = getClassNameAsObject(key, classNameString)
+        const classNamesArray = getClassNameAsObject({
+          key,
+          value: classNameString,
+          enabledThemeModes,
+        })
 
         for (const obj of classNamesArray) {
           const { variant, theme, paletteVariant, state, className } = obj
@@ -870,20 +911,23 @@ export const makClassNameHelper = ({
   enabledStates,
   defaultConfig,
   themeMode,
-  makClassNames,
-  classNames,
+  makClassName,
+  className,
 }: {
   string?: string
   verbosePalette: MakUiVerbosePalette
   enabledStates: MakUiInteractionStateKey[]
   defaultConfig?: MakUiRootComponentConfigInput
   themeMode?: MakUiThemeKey
-  makClassNames?: string
-  classNames?: string
+  makClassName?: string
+  className?: string
 }) => {
-  if (!string) return ""
+  if (!string && !makClassName && !className) return
+  if (!string && makClassName) {
+    string = `mak(${makClassName}) ${className}`
+  }
   let finalClassName = []
-  const splitClassNames = string.split(")")
+  const splitClassNames = string?.split(")") || []
   let initialMakClassNames = splitClassNames.find((cn) => cn.includes("mak("))
   const initialRootClassNames = splitClassNames.find(
     (cn) => !cn.includes("mak(")
@@ -895,8 +939,8 @@ export const makClassNameHelper = ({
     return rootClassNames
   }
 
-  initialMakClassNames = `${initialMakClassNames} ${makClassNames}`
-  rootClassNames = `${rootClassNames} ${classNames}`
+  initialMakClassNames = `${initialMakClassNames} ${makClassName}`
+  rootClassNames = `${rootClassNames} ${className}`
 
   for (const makCn of initialMakClassNames.split(" ")) {
     let { theme, themeVariant, palette, variant, state, twVariant, opacity } =

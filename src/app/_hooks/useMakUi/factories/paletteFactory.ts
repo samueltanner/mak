@@ -36,7 +36,10 @@ export const paletteFactory = ({
     defaultStateShades: MakUiStateShades
   }
 }) => {
-  const initialVerbosePalette = extractInitialPalette({ palette: paletteInput })
+  const initialVerbosePalette = extractInitialPalette({
+    palette: paletteInput,
+    enabledThemeModes,
+  })
 
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
@@ -166,6 +169,7 @@ export const paletteFactory = ({
             },
             {} as MakUiState
           )
+
           enabledSimpleStates.base = constructedStates.base
 
           ensureNestedObject({
@@ -242,7 +246,7 @@ export const paletteFactory = ({
     //   },
     // })
   }
-
+  console.log({ finalVerbosePalette, finalSimplePalette })
   return {
     verbose: finalVerbosePalette as MakUiVerbosePalette,
     simple: finalSimplePalette as MakUiSimplePalette,

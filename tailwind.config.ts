@@ -10,40 +10,61 @@ const config: Config = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   safelist: [
+    "dark",
     {
-      pattern:
-        /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
+      // Backgrounds
+      pattern: /^bg-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
+      variants: ["dark", "hover", "disabled"],
     },
     {
-      pattern: /bg-(white|black)/,
-      variants: ["hover", "focus", "disabled"],
+      // Borders
+      pattern: /^border-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
+      variants: ["dark", "hover", "disabled"],
     },
     {
-      pattern:
-        /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
+      // Ring Color
+      pattern: /^ring-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
+      variants: ["dark", "hover", "disabled"],
     },
     {
-      pattern:
-        /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
+      // Text Color
+      pattern: /^text-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
+      variants: ["dark", "hover", "disabled"],
     },
-    {
-      pattern:
-        /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
-    },
-    {
-      pattern:
-        /ring-offset-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
-    },
-    {
-      pattern:
-        /outline-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
-    },
+    // {
+    //   pattern:
+    //     /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+    //   variants: ["hover", "focus", "disabled"],
+    // },
+    // {
+    //   pattern: /bg-(white|black)/,
+    //   variants: ["hover", "focus", "disabled"],
+    // },
+    // {
+    //   pattern:
+    //     /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+    //   variants: ["hover", "focus", "disabled"],
+    // },
+    // {
+    //   pattern:
+    //     /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+    //   variants: ["hover", "focus", "disabled"],
+    // },
+    // {
+    //   pattern:
+    //     /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+    //   variants: ["hover", "focus", "disabled"],
+    // },
+    // {
+    //   pattern:
+    //     /ring-offset-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+    //   variants: ["hover", "focus", "disabled"],
+    // },
+    // {
+    //   pattern:
+    //     /outline-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+    //   variants: ["hover", "focus", "disabled"],
+    // },
   ],
   theme: {
     extend: {

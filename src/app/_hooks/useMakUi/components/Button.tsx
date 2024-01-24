@@ -363,32 +363,54 @@ const Button = forwardRef(
       }
     }
 
-    const { makClassNames, classNames } = useMemo(() => {
+    const focusClassNames = useMemo(() => {
+      let makClassName
+      let className
       if (showFocusRing) {
-        return {
-          makClassNames: `focus:focus-ring-${buttonStyle} focus:ring-offset-theme-primary`,
-          classNames: `focus:ring-2 focus:ring-offset-2`,
-        }
-      } else {
-        return {
-          makClassNames: "",
-          classNames: "",
-        }
+        makClassName = `focus:focus-ring-${buttonStyle} focus:ring-offset-theme-primary`
+        className = `focus:ring-2 focus:ring-offset-2`
+        return mcn("", {
+          makClassName,
+          className,
+          type: "button",
+          states: ["hover"],
+        })
       }
     }, [showFocusRing])
 
-    const cn = useMemo(() => {
-      return mcn(
-        `mak(dark:text-${textStyle} bg-${buttonStyle} border-${borderStyle})`,
-        {
+    const borderBgClassNames = useMemo(() => {
+      let makClassName
+      let className
+      if (outlined) {
+        makClassName = `border-${buttonStyle}`
+        className = `border-2`
+        return mcn("", {
+          makClassName,
+          className,
           type: "button",
-          states: ["disabled", "hover", "focus"],
-          theme: "light",
-          makClassNames,
-          classNames,
-        }
-      )
-    }, [])
+          states: ["focus", "hover"],
+        })
+      } else {
+        makClassName = `bg-${buttonStyle}`
+        return mcn("", {
+          makClassName,
+          states: ["focus", "hover"],
+        })
+      }
+    }, [outlined])
+
+    const textClassNames = useMemo(() => {
+      let makClassName
+      let className
+      makClassName = `text-${textStyle}`
+      className = `text-sm`
+      return mcn("", {
+        makClassName,
+        className,
+        type: "button",
+        states: ["focus", "hover"],
+      })
+    }, [textStyle])
 
     return (
       <button
@@ -435,7 +457,7 @@ const Button = forwardRef(
             focus: false,
           })
         }}
-        className={`flex items-center justify-center gap-1 ${cn} `}
+        className={`flex items-center justify-center gap-1 ${textClassNames} ${borderBgClassNames} ${focusClassNames} ${className}`}
         disabled={isDisabled}
         type={type}
         id={id}
