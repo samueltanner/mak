@@ -1,3 +1,4 @@
+import chroma from "chroma-js"
 import {
   GenericObject,
   MakUiDefaultColors,
@@ -18,13 +19,6 @@ import {
   ParsedClassNameResponse,
   TailwindVariantKey,
 } from "../types/ui-types"
-import chroma from "chroma-js"
-
-import {
-  absoluteRegex,
-  uiVariants,
-  uiPaletteVariants,
-} from "../constants/defaults/default-constants"
 import colors from "tailwindcss/colors"
 import twConfig from "../../../../../tailwind.config"
 import {
@@ -36,6 +30,7 @@ import {
   makUiDefaultColors,
   makUiDefaultStateShades,
   makUiDefaultStates,
+  makUiPalettes,
   makUiPalettesSet,
   makUiStates,
   makUiStatesSet,
@@ -46,7 +41,6 @@ import {
   tailwindVariants,
   tailwindVariantsSet,
 } from "../constants/ui-constants"
-
 import {
   MakUiComponentConfigInput,
   MakUiRootComponentConfigInput,
@@ -407,6 +401,9 @@ export const twColorHelper = ({
     }
   }
 
+  const absoluteRegex =
+    /^((white|black)\/\[*0*(?:[0-9][0-9]?|100)%*\]*|(white|black))$/
+
   const isAbsoluteColor = !colorString
     ? false
     : absoluteRegex.test(colorString) ||
@@ -691,13 +688,13 @@ const getNestedClassNameObjects = (key: string, value: object) => {
 
 const getClassNameAsObject = (key: string, value: string) => {
   const variant =
-    uiVariants.find((v) => {
+    makUiVariants.find((v) => {
       if (key.toLowerCase().includes(v)) {
         return v
       }
     }) || "primary"
   const paletteVariant =
-    uiPaletteVariants.find((v) => {
+    makUiPalettes.find((v) => {
       if (key.toLowerCase().includes(v)) {
         return v
       }

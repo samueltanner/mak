@@ -5,10 +5,6 @@ import {
   twColorHelper,
 } from "../functions/helpers"
 import {
-  paletteShorthand,
-  uiThemeColorVariantsAndRoots,
-} from "../constants/defaults/default-constants"
-import {
   MakUiFlexiblePaletteInput,
   MakUiInteractionStateKey,
   MakUiSimplePalette,
@@ -101,7 +97,7 @@ export const paletteFactory = ({
             },
           })
         }
-        const shorthand = paletteShorthand[paletteVariant]
+        // const shorthand = paletteShorthand[paletteVariant]
         // Object.defineProperty(finalVerbosePalette[theme], shorthand, {
         //   get: function () {
         //     return finalVerbosePalette[theme][paletteVariant]
@@ -114,34 +110,34 @@ export const paletteFactory = ({
         //   },
         // })
 
-        for (const colorVariant of uiThemeColorVariantsAndRoots) {
-          const shorthand = paletteShorthand[colorVariant]
-          // Object.defineProperty(
-          //   finalVerbosePalette[theme][paletteVariant],
-          //   shorthand,
-          //   {
-          //     get: function () {
-          //       return finalVerbosePalette[theme][paletteVariant][colorVariant]
-          //     },
-          //   }
-          // )
-          if (
-            colorVariant !== "customRoot" &&
-            colorVariant !== "primaryRoot" &&
-            colorVariant !== "secondaryRoot" &&
-            colorVariant !== "tertiaryRoot"
-          ) {
-            // Object.defineProperty(
-            //   finalSimplePalette[theme][paletteVariant],
-            //   shorthand,
-            //   {
-            //     get: function () {
-            //       return finalSimplePalette[theme][paletteVariant][colorVariant]
-            //     },
-            //   }
-            // )
-          }
-        }
+        // for (const colorVariant of uiThemeColorVariantsAndRoots) {
+        //   const shorthand = paletteShorthand[colorVariant]
+        //   // Object.defineProperty(
+        //   //   finalVerbosePalette[theme][paletteVariant],
+        //   //   shorthand,
+        //   //   {
+        //   //     get: function () {
+        //   //       return finalVerbosePalette[theme][paletteVariant][colorVariant]
+        //   //     },
+        //   //   }
+        //   // )
+        //   if (
+        //     colorVariant !== "customRoot" &&
+        //     colorVariant !== "primaryRoot" &&
+        //     colorVariant !== "secondaryRoot" &&
+        //     colorVariant !== "tertiaryRoot"
+        //   ) {
+        //     // Object.defineProperty(
+        //     //   finalSimplePalette[theme][paletteVariant],
+        //     //   shorthand,
+        //     //   {
+        //     //     get: function () {
+        //     //       return finalSimplePalette[theme][paletteVariant][colorVariant]
+        //     //     },
+        //     //   }
+        //     // )
+        //   }
+        // }
         continue
       }
       for (const variant of makUiVariants) {
@@ -222,7 +218,7 @@ export const paletteFactory = ({
           })
         }
       }
-      const shorthand = paletteShorthand[paletteVariant]
+      // const shorthand = paletteShorthand[paletteVariant]
       // Object.defineProperty(finalVerbosePalette[theme], shorthand, {
       //   get: function () {
       //     return finalVerbosePalette[theme][paletteVariant]
@@ -234,7 +230,7 @@ export const paletteFactory = ({
       //   },
       // })
     }
-    const shorthand = paletteShorthand[theme]
+    // const shorthand = paletteShorthand[theme]
     // Object.defineProperty(finalVerbosePalette, shorthand, {
     //   get: function () {
     //     return finalVerbosePalette[theme]

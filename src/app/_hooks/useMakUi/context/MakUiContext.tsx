@@ -1,11 +1,5 @@
 "use client"
-import React, {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+import React, { createContext, useEffect, useMemo, useState } from "react"
 import { paletteFactory } from "../factories/paletteFactory"
 import { ThemeProvider, useTheme } from "next-themes"
 import {
@@ -14,7 +8,7 @@ import {
   getTwConfigSafelist,
   makClassNameHelper,
 } from "../functions/helpers"
-import { paletteShorthand } from "../constants/defaults/default-constants"
+
 import {
   HtmlElementKey,
   MakUiFlexiblePaletteInput,
@@ -32,7 +26,6 @@ import {
   htmlElements,
   makUiDefaultStateShades,
   makUiDefaultThemeShades,
-  makUiInteractionStates,
   makUiThemes,
   defaultComponentConfig,
 } from "../constants/ui-constants"
@@ -126,7 +119,6 @@ const MakUiProviderChild = ({
 
   let currentTheme: MakUiThemeKey =
     (themeMode as MakUiThemeKey | undefined) || defaultTheme
-  let currentThemeShorthand = paletteShorthand[currentTheme] as MakUiThemeKeySH
 
   const componentConfig = useMemo(() => {
     const configObject = {} as MakUiComponentConfigInput
