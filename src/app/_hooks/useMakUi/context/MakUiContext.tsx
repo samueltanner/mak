@@ -9,10 +9,9 @@ import React, {
 import { paletteFactory } from "../factories/paletteFactory"
 import { ThemeProvider, useTheme } from "next-themes"
 import {
-  deepMerge,
+  constructTailwindObject,
   getActiveTwVariants,
   getTwConfigSafelist,
-  isEmptyObject,
   makClassNameHelper,
 } from "../functions/helpers"
 import { paletteShorthand } from "../constants/defaults/default-constants"
@@ -41,6 +40,7 @@ import {
   MakUiComponentConfigInput,
   MakUiRootComponentConfigInput,
 } from "../types/component-types"
+import { isEmptyObject } from "@/globals/global-helper-functions"
 
 type MakUiProviderProps = {
   children: React.ReactNode
@@ -258,6 +258,7 @@ const MakUiProviderChild = ({
     makClassName,
     mcn: makClassName,
     getSafeList,
+    constructTailwindColorScale: constructTailwindObject,
   }
 
   return (
@@ -297,6 +298,15 @@ interface MakUiContext {
   ) => string | undefined
   makClassName: (className: string) => string | undefined
   getSafeList: () => void
+  constructTailwindColorScale: ({
+    hex,
+    step,
+    includeNearAbsolutes,
+  }: {
+    hex: string
+    step?: number | undefined
+    includeNearAbsolutes?: boolean | undefined
+  }) => Record<number, string>
 }
 
 export const useMakUi = () => {

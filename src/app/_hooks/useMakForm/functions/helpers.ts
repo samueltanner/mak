@@ -1,5 +1,3 @@
-type GenericObject = Record<string, any>
-
 const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
 
@@ -24,8 +22,8 @@ function getDifference(
         ? { isEqual: true }
         : { isEqual: false, object: temp }
       : allEqual
-        ? true
-        : temp
+      ? true
+      : temp
   } else if (isObject(x) && isObject(y)) {
     // Handle object comparison
     const temp: GenericObject = {}
@@ -51,8 +49,8 @@ function getDifference(
         ? { isEqual: true }
         : { isEqual: false, object: temp }
       : allEqual
-        ? true
-        : temp
+      ? true
+      : temp
   } else {
     // Direct value comparison
     return x === y

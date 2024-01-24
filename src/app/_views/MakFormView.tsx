@@ -29,7 +29,7 @@ const formConfig = {
 
 const MakFormView = () => {
   const { verboseTheme, verbosePalette, simplePalette } = useMakUi()
-  console.log({ verbosePalette, simplePalette })
+
   const {
     form,
     components: { FirstName, Pick, LastName },

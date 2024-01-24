@@ -1,5 +1,4 @@
 import {
-  ensureNestedObject,
   extractInitialPalette,
   getConstructedTheme,
   getConstructedStates,
@@ -25,6 +24,7 @@ import {
   makUiPalettes,
   makUiVariants,
 } from "../constants/ui-constants"
+import { ensureNestedObject } from "@/globals/global-helper-functions"
 
 export const paletteFactory = ({
   paletteInput,
