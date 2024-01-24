@@ -16,7 +16,6 @@ import {
   MakUiThemeVariantKey,
   MakUiVariantKey,
   MakUiVerbosePalette,
-  MakUiVerboseTheme,
   ParsedClassNameResponse,
   TailwindVariantKey,
 } from "../types/ui-types"
@@ -36,7 +35,6 @@ import twConfig from "../../../../../tailwind.config"
 import {
   MakUiThemeKey,
   MakUiVerboseThemeVariant,
-  MakUiVerboseVariant,
   TWColorHelperResponse,
 } from "../types/ui-types"
 import {
@@ -54,12 +52,11 @@ import {
   tailwindVariants,
   tailwindVariantsSet,
 } from "../constants/ui-constants"
-import { MakUiInteraction, MakUiStates } from "../types/default-types"
+
 import {
   MakUiComponentConfigInput,
   MakUiRootComponentConfigInput,
 } from "../types/component-types"
-import { act } from "react-dom/test-utils"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
@@ -1191,20 +1188,70 @@ export const getActiveTwVariants = ({
 
 export const getTwConfigSafelist = ({
   simplePalette,
-  componentConfig,
+  enabledTwVariants,
 }: {
   simplePalette: MakUiSimplePalette
-  componentConfig: MakUiComponentConfigInput
+  enabledTwVariants: string[]
 }) => {
   const twVariants = tailwindVariants
-  const variantsString = twVariants.forEach((variant) => {
-    return `(${variant})|`
+  const variantsArray: string[] = []
+  twVariants.forEach((variant) => {
+    const variantString = `(${variant})`
+    variantsArray.push(variantString)
   })
-  const safeListObject = {
-    pattern: /(bg|text|border|ring|ring-offset|outline|fill|stroke)-(mak-teal)/,
-    variants: ["hover", "focus", "disabled"],
+  const variantsString = `(${variantsArray.join("|")})`
+
+  const safeList = []
+
+  const paletteMap: Map<string, Set<number>> = new Map()
+
+  const recursiveCollectClassNames = (
+    obj: GenericObject,
+    result: GenericObject = {}
+  ): GenericObject => {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (typeof obj[key] === "object" && obj[key] !== null) {
+          recursiveCollectClassNames(obj[key], result)
+        } else {
+          const value = obj[key] // Changed to obj[key] instead of result[key]
+          if (value && typeof value === "string") {
+            const { color, shade } = twColorHelper({
+              colorString: value,
+            }) as TWColorHelperResponse
+
+            if (paletteMap.has(color!)) {
+              const shadesSet = paletteMap.get(color!)
+              shadesSet?.add(shade!)
+            } else {
+              paletteMap.set(color!, new Set([shade!]))
+            }
+          }
+          result[key] = obj[key]
+        }
+      }
+    }
+    return result
   }
-  const responseObj = {
-    safelist: [],
+
+  recursiveCollectClassNames(simplePalette)
+
+  for (const [color, shades] of paletteMap.entries()) {
+    const shadesArray = Array.from(shades)
+    shadesArray.sort((a, b) => a - b)
+    const shadesString = shadesArray.join("|")
+    const regex = `/${variantsString}-(${color})-(${shadesString})/`
+    const safeListObject = {
+      pattern: regex,
+      variants: enabledTwVariants,
+    }
+    safeList.push(safeListObject)
   }
+
+  safeList.push({
+    pattern: `/${variantsString}-(white|black)/`,
+    variants: enabledTwVariants,
+  })
+
+  return safeList
 }

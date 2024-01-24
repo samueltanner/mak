@@ -1,10 +1,17 @@
 "use client"
-import React, { createContext, useEffect, useMemo, useState } from "react"
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { paletteFactory } from "../factories/paletteFactory"
 import { ThemeProvider, useTheme } from "next-themes"
 import {
   deepMerge,
   getActiveTwVariants,
+  getTwConfigSafelist,
   isEmptyObject,
   makClassNameHelper,
 } from "../functions/helpers"
@@ -166,6 +173,8 @@ const MakUiProviderChild = ({
     {} as MakUiVerboseTheme
   )
 
+  const [safeList, setSafeList] = useState<any[]>([])
+
   const formattingThemes =
     isEmptyObject(simpleTheme) ||
     isEmptyObject(verboseTheme) ||
@@ -202,6 +211,35 @@ const MakUiProviderChild = ({
       themeMode: defaultTheme,
     })
   }
+
+  useEffect(() => {
+    const safeList = getTwConfigSafelist({
+      simplePalette,
+      enabledTwVariants,
+    })
+
+    setSafeList(safeList)
+  }, [])
+
+  const getSafeList = () => {
+    console.log(
+      "********************************************************************************************"
+    )
+    console.log(
+      "Copy this to your tailwind.config.js safelist array at the root level of the config object."
+    )
+    console.log(
+      "Please note that this contains stringified regex patterns. You will need to remove the quotes before and after each 'pattern' value."
+    )
+    console.log(
+      "If you add any additional colors, interaction states or need access to additional tailwind variants, you will need to add them to your palette input and/or the enabledStates array in your component config (or in the global enabled states passed as a prop to the MakUi context provider)."
+    )
+    console.log(JSON.stringify(safeList, null, 2))
+    console.log(
+      "********************************************************************************************"
+    )
+  }
+
   const value = {
     simplePalette,
     verbosePalette,
@@ -219,6 +257,7 @@ const MakUiProviderChild = ({
     enabledThemeModes,
     makClassName,
     mcn: makClassName,
+    getSafeList,
   }
 
   return (
@@ -257,6 +296,7 @@ interface MakUiContext {
     options?: MakUiClassNameHelperOptions
   ) => string | undefined
   makClassName: (className: string) => string | undefined
+  getSafeList: () => void
 }
 
 export const useMakUi = () => {

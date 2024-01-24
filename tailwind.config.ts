@@ -12,37 +12,99 @@ const config: Config = {
   safelist: [
     {
       pattern:
-        /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
-    },
-    {
-      pattern: /bg-(white|black)/,
-      variants: ["hover", "focus", "disabled"],
-    },
-    {
-      pattern:
-        /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
-    },
-    {
-      pattern:
-        /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(mak-teal)-(300|400|500|600)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
     },
     {
       pattern:
-        /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(blue)-(50|200|300|400|500|600|800|900|950)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
     },
     {
       pattern:
-        /ring-offset-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(purple)-(300|500|600)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
     },
     {
       pattern:
-        /outline-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-      variants: ["hover", "focus", "disabled"],
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(zinc)-(50|100|200|300|400|500|600|700|800|900|950)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
+    },
+    {
+      pattern:
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(green)-(50|200|300|400|500|600|800|900|950)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
+    },
+    {
+      pattern:
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(red)-(50|200|300|400|500|600|800|900|950)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
+    },
+    {
+      pattern:
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(yellow)-(50|200|300|400|500|600|800|900|950)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
+    },
+    {
+      pattern:
+        /((bg)|(text)|(border)|(ring)|(outline)|(ring-offset)|(fill)|(stroke))-(white|black)/,
+      variants: [
+        "hover",
+        "focus",
+        "disabled",
+        "dark:hover",
+        "dark:focus",
+        "dark:disabled",
+      ],
     },
   ],
   theme: {
