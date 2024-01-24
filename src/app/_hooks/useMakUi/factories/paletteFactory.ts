@@ -40,7 +40,7 @@ export const paletteFactory = ({
     palette: paletteInput,
     enabledThemeModes,
   })
-  console.log({ initialVerbosePalette })
+
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
   for (const theme of enabledThemeModes) {
@@ -178,8 +178,26 @@ export const paletteFactory = ({
             keys: [theme, paletteVariant, variant],
             value: enabledSimpleStates,
           })
+
+          if (
+            paletteVariant === "color" &&
+            !initialVerbosePalette?.[theme]?.border?.[variant]
+          ) {
+            ensureNestedObject({
+              parent: finalVerbosePalette,
+              keys: [theme, "border", variant],
+              value: constructedStates,
+            })
+
+            ensureNestedObject({
+              parent: finalSimplePalette,
+              keys: [theme, "border", variant],
+              value: enabledSimpleStates,
+            })
+          }
         } else if (
-          !initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]
+          !initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant] &&
+          !finalVerbosePalette?.[theme]?.[paletteVariant]?.[variant]
         ) {
           const shade =
             paletteVariant === "text" && theme === "dark"
@@ -247,7 +265,7 @@ export const paletteFactory = ({
     //   },
     // })
   }
-  console.log({ finalVerbosePalette, finalSimplePalette })
+
   return {
     verbose: finalVerbosePalette as MakUiVerbosePalette,
     simple: finalSimplePalette as MakUiSimplePalette,

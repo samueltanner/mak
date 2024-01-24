@@ -34,13 +34,23 @@ const MakUiView = () => {
           backdropClassName="backdrop-blur-sm"
         >
           <ModalHeader className="text-md font-semibold p-4">
-            Modal Header
+            Lorem ipsum
           </ModalHeader>
-          <ModalContent className="text-md font-semibold p-4">
-            content
+          <ModalContent className="text-md font-normal p-4">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
+            tempora accusantium ipsum, veniam dolores explicabo deserunt
+            suscipit possimus, error nihil adipisci animi hic nam molestiae
+            voluptatum saepe velit eveniet quam.
           </ModalContent>
           <ModalFooter className="text-md font-semibold p-4">
-            <Button tertiary>Close</Button>
+            <Button
+              tertiary
+              outline
+              onClick={() => setModalIsOpen(!modalIsOpen)}
+              showFocusRing={false}
+            >
+              Close
+            </Button>
           </ModalFooter>
         </Modal>
       </div>

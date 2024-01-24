@@ -162,7 +162,6 @@ export const getConstructedTheme = ({
   defaultShades: MakUiThemeShades
 }) => {
   const { primary, secondary, tertiary, custom } = providedVariants
-  console.log({ primary, secondary, tertiary, custom })
 
   const { shade: primaryShade, color: primaryColor } = twColorHelper({
     colorString: primary || makUiDefaultColors.primary,
