@@ -16,8 +16,8 @@ const palette: MakUiFlexiblePaletteInput = {
   primary: "light:red-200 dark:mak-teal-500",
   secondary: "blue",
   tertiary: "zinc",
-  text: "light:zinc-900 dark:zinc-50",
-  theme: "red-500",
+  text: "light:zinc-900 dark:zinc-500",
+  theme: "dark:zinc-950 light:zinc-50",
 }
 
 const componentConfig: MakUiComponentConfigInput = {

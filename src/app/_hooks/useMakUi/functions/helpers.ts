@@ -14,8 +14,10 @@ import {
   MakUiThemeShades,
   MakUiThemeShadesInput,
   MakUiThemeVariantKey,
+  MakUiThemeVariantShades,
   MakUiVariantKey,
   MakUiVerbosePalette,
+  MakUiVerboseTheme,
   ParsedClassNameResponse,
   TailwindVariantKey,
 } from "../types/ui-types"
@@ -30,6 +32,7 @@ import {
   makUiDefaultColors,
   makUiDefaultStateShades,
   makUiDefaultStates,
+  makUiDefaultThemeShades,
   makUiPalettes,
   makUiPalettesSet,
   makUiStates,
@@ -53,6 +56,7 @@ import {
   mergeWithFallback,
   nearestMultiple,
 } from "@/globals/global-helper-functions"
+import { split } from "postcss/lib/list"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
@@ -136,6 +140,13 @@ export const getThemeShadesObj = (shades?: MakUiThemeShadesInput) => {
   return responseObj
 }
 
+const includesShade = (string: string) => {
+  if (!string) return false
+  const splitString = string.split("-")
+  const shade = splitString[splitString.length - 1]
+  return !!parseInt(shade)
+}
+
 const getNormalizedShadeNumber = (num: number) => {
   if (num !== 0 && (!num || typeof num !== "number")) return 500
   return num <= 50 ? 50 : num >= 950 ? 950 : Math.round(num / 100) * 100
@@ -151,10 +162,11 @@ export const getConstructedTheme = ({
   defaultShades: MakUiThemeShades
 }) => {
   const { primary, secondary, tertiary, custom } = providedVariants
+  console.log({ primary, secondary, tertiary, custom })
 
   const { shade: primaryShade, color: primaryColor } = twColorHelper({
     colorString: primary || makUiDefaultColors.primary,
-    shade: defaultShades[theme].primary,
+    shade: includesShade(primary) ? undefined : defaultShades[theme].primary,
     useDefaults: false,
   })
   const { shade: secondaryShade, color: secondaryColor } = twColorHelper({
@@ -170,22 +182,58 @@ export const getConstructedTheme = ({
     useDefaults: false,
   })
 
+  const defaultShadesObj = makUiDefaultThemeShades[theme]
+  const shadeDiffs = Object.entries(defaultShadesObj).reduce(
+    (acc, [variant, shade]) => {
+      if (variant === "primary") {
+        ;(acc as MakUiThemeVariantShades)[variant] = 0
+      } else {
+        let value = shade - defaultShadesObj["primary"]
+        const isNeg = value < 0 ? -1 : 1
+        const absValue = Math.abs(value)
+        value = Math.round(absValue / 100) * 100 * isNeg
+        ;(acc as MakUiThemeVariantShades)[
+          variant as keyof MakUiThemeVariantShades
+        ] = value
+      }
+      return acc
+    },
+    {}
+  ) as MakUiThemeVariantShades
+  const resolvedPrimaryShade = includesShade(primary)
+    ? primaryShade
+    : defaultShades[theme].primary
+  const resolvedShadesObject = {
+    primary: resolvedPrimaryShade,
+    secondary: includesShade(secondary)
+      ? secondaryShade
+      : getNormalizedShadeNumber(resolvedPrimaryShade! + shadeDiffs.secondary),
+    tertiary: includesShade(tertiary)
+      ? tertiaryShade
+      : getNormalizedShadeNumber(resolvedPrimaryShade! + shadeDiffs.tertiary),
+    custom: includesShade(custom)
+      ? customShade
+      : getNormalizedShadeNumber(resolvedPrimaryShade! + shadeDiffs.custom),
+  }
+
   const resolvedThemeObject = {
     primary: twColorHelper({
       colorString: primaryColor,
-      shade: !primaryShade ? defaultShades[theme].primary : primaryShade,
+      shade: includesShade(primary)
+        ? primaryShade
+        : defaultShades[theme].primary,
     }),
     secondary: twColorHelper({
       colorString: secondaryColor || primaryColor,
-      shade: !secondaryShade ? defaultShades[theme].secondary : secondaryShade,
+      shade: resolvedShadesObject.secondary,
     }),
     tertiary: twColorHelper({
       colorString: tertiaryColor || primaryColor,
-      shade: !tertiaryShade ? defaultShades[theme].tertiary : tertiaryShade,
+      shade: resolvedShadesObject.tertiary,
     }),
     custom: twColorHelper({
       colorString: customColor || primaryColor,
-      shade: !customShade ? defaultShades[theme].custom : customShade,
+      shade: resolvedShadesObject.custom,
     }),
   }
 
@@ -380,6 +428,7 @@ export const twColorHelper = ({
       defaultKey as keyof MakUiDefaultStateColors
     ]
   }
+
   let autoShade = true
   if (typeof shade === "string" || typeof shade === "number") {
     autoShade = false
@@ -779,38 +828,37 @@ export const extractInitialPalette = ({
   palette: MakUiFlexiblePaletteInput
   enabledThemeModes: MakUiThemeKey[]
 }) => {
-  let themePalette = {
-    light: {},
-    dark: {},
-    custom: {},
-  } as MakUiVerbosePalette
+  let themePalette = {} as MakUiVerbosePalette
+
+  for (const theme of enabledThemeModes) {
+    themePalette[theme] = {} as MakUiVerboseTheme
+  }
+
   let paletteObject = {} as MakUiPaletteInput
 
   for (const [key, value] of Object.entries(palette)) {
     if (key === "theme") {
       if (typeof value === "string") {
         const classNamesArray = value.split(" ")
-        let themeObject = {
-          light: undefined,
-          dark: undefined,
-          custom: undefined,
-        } as { [Key in MakUiThemeKey]: string | undefined }
+        let themeObject = {} as { [Key in MakUiThemeKey]: string | undefined }
+        for (const theme of enabledThemeModes) {
+          themeObject[theme] = undefined
+        }
 
         classNamesArray.forEach((className: string) => {
-          if (
-            className.includes("dark:") &&
-            enabledThemeModes.includes("dark")
-          ) {
+          if (className.includes("dark:")) {
             themeObject.dark = className.split(":")[1]
-          } else if (
-            className.includes("custom:") &&
-            enabledThemeModes.includes("custom")
-          ) {
+          } else if (className.includes("custom:")) {
             themeObject.custom = className.split(":")[1]
+          } else if (className.includes("light:")) {
+            themeObject.light = className.split(":")[1]
           } else {
-            themeObject.light = className
+            for (const theme of enabledThemeModes) {
+              themeObject[theme] = className
+            }
           }
         })
+
         for (const [theme, classNames] of Object.entries(themeObject)) {
           ensureNestedObject({
             parent: paletteObject,
@@ -823,17 +871,25 @@ export const extractInitialPalette = ({
       }
 
       const themes = Object.entries(value)
-      themes.forEach(([theme, classNames]) => {
-        if (isObject(classNames)) {
-          themePalette = deepMerge(themePalette, {
-            [theme]: classNames,
-          }) as MakUiVerbosePalette
-        } else {
-          themePalette = deepMerge(themePalette, {
-            [theme]: {
-              primary: classNames,
-            },
-          }) as MakUiVerbosePalette
+
+      themes.forEach(([variant, classNames]) => {
+        console.log({ variant, classNames })
+        if (typeof classNames === "string") {
+          const splitClassNames = classNames.split(" ")
+          splitClassNames.forEach((className) => {
+            const splitClassName = className.split(":")
+            const color = splitClassName[splitClassName.length - 1]
+            const colorString = twColorHelper({ colorString: color }).rootString
+            const theme = makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)
+              ? (splitClassName[0] as MakUiThemeKey)
+              : "light"
+
+            ensureNestedObject({
+              parent: themePalette,
+              keys: [theme, "theme", variant],
+              value: colorString,
+            })
+          })
         }
       })
 

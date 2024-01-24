@@ -40,7 +40,7 @@ export const paletteFactory = ({
     palette: paletteInput,
     enabledThemeModes,
   })
-
+  console.log({ initialVerbosePalette })
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
   for (const theme of enabledThemeModes) {
@@ -48,6 +48,7 @@ export const paletteFactory = ({
       if (paletteVariant === "theme") {
         if (initialVerbosePalette?.[theme]?.["theme"]) {
           const providedVariant = initialVerbosePalette[theme].theme
+
           const constructedTheme = getConstructedTheme({
             providedVariants: providedVariant,
             theme,
