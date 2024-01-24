@@ -870,12 +870,16 @@ export const makClassNameHelper = ({
   enabledStates,
   defaultConfig,
   themeMode,
+  makClassNames,
+  classNames,
 }: {
-  string: string
+  string?: string
   verbosePalette: MakUiVerbosePalette
   enabledStates: MakUiInteractionStateKey[]
   defaultConfig?: MakUiRootComponentConfigInput
   themeMode?: MakUiThemeKey
+  makClassNames?: string
+  classNames?: string
 }) => {
   if (!string) return ""
   let finalClassName = []
@@ -884,24 +888,27 @@ export const makClassNameHelper = ({
   const initialRootClassNames = splitClassNames.find(
     (cn) => !cn.includes("mak(")
   )
-  const rootClassNames = ` ${initialRootClassNames} ${defaultConfig?.className}`
+  let rootClassNames = ` ${initialRootClassNames} ${defaultConfig?.className}`
   if (initialMakClassNames) {
     initialMakClassNames = initialMakClassNames.replace("mak(", "")
   } else {
     return rootClassNames
   }
 
+  initialMakClassNames = `${initialMakClassNames} ${makClassNames}`
+  rootClassNames = `${rootClassNames} ${classNames}`
+
   for (const makCn of initialMakClassNames.split(" ")) {
     let { theme, themeVariant, palette, variant, state, twVariant, opacity } =
       parseMakClassName(makCn)
+
     const opacityString = opacity ? `/${opacity}` : ""
     if (!theme) theme = themeMode
     let target
     if (palette === "theme") {
-      console.log({ theme, themeVariant, palette, variant, state, twVariant })
       const themePalette = verbosePalette[theme!][palette]
       target = themePalette
-      console.log({ themePalette, target })
+
       if (state) {
         const constructedClassName =
           `${state}:${twVariant}-${target[themeVariant]}` + opacityString
@@ -958,8 +965,10 @@ const parseMakClassName = (string: string) => {
   }
   const delimiters = /ring-offset:|[:\/.-]+/
   const splitString = string.split(delimiters)
-  const opacity = splitString[1]
-  if (opacity) {
+
+  let opacity
+  if (string.includes("/")) {
+    opacity = string.split("/")[1]
     makClassNameObj.opacity = opacity
   }
 

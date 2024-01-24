@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
 import { Dropdown } from "../_hooks/useMakUi/components/Dropdown"
@@ -9,18 +10,13 @@ import Modal, {
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
 
 const MakUiView = () => {
-  const { simpleTheme } = useMakUi()
+  const { simpleTheme, simplePalette, mcn } = useMakUi()
+
   const [modalIsOpen, setModalIsOpen] = useState(false)
   return (
     <div>
       <div>
-        <Dropdown
-          icon={
-            <span className={`text-${simpleTheme.text.primary.base}`}>
-              trigger
-            </span>
-          }
-        >
+        <Dropdown icon={<span className={mcn("text-primary")}>trigger</span>}>
           <span className="flex h-full w-full ">
             <ul>
               <li>Element 1</li>
@@ -44,6 +40,7 @@ const MakUiView = () => {
         onClick={() => {
           setModalIsOpen(true)
         }}
+        showFocusRing={false}
       >
         Open Modal
       </Button>

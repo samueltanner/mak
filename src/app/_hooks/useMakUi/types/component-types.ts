@@ -9,6 +9,15 @@ export type MakUiRootComponentConfigInput = {
   text?: string
   enabledStates?: MakUiInteractionStateKey[]
 }
+export type MakUiRootComponentConfig = {
+  [key: string]: string | undefined | MakUiInteractionStateKey[]
+  borderRadius?: string
+  borderWidth?: string
+  borderStyle?: string
+  className: string
+  text?: string
+  enabledStates: MakUiInteractionStateKey[]
+}
 export type MakUiComponentConfigInput = {
   buttonConfig?: MakUiRootComponentConfigInput
   inputConfig?: MakUiRootComponentConfigInput
@@ -17,6 +26,16 @@ export type MakUiComponentConfigInput = {
   dialogConfig?: MakUiRootComponentConfigInput
   selectConfig?: MakUiRootComponentConfigInput
   textareaConfig?: MakUiRootComponentConfigInput
+}
+
+export type MakUiComponentConfig = {
+  buttonConfig: MakUiRootComponentConfig
+  inputConfig: MakUiRootComponentConfig
+  textConfig: MakUiRootComponentConfig
+  formConfig: MakUiRootComponentConfig
+  dialogConfig: MakUiRootComponentConfig
+  selectConfig: MakUiRootComponentConfig
+  textareaConfig: MakUiRootComponentConfig
 }
 export type ButtonVariants = {
   [key: string]: ButtonStates

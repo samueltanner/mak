@@ -47,16 +47,6 @@ export default function Home() {
             <BiParty className={`size-6 text-${verboseTheme.text.secondary}`} />
           )}
         </Button>
-        <button
-          disabled
-          className={mcn("mak(disabled/50) focus:ring-2 focus:ring-offset-2", {
-            type: "button",
-            states: ["disabled", "hover", "focus"],
-            theme: "light",
-          })}
-        >
-          Test
-        </button>
 
         <input
           type="text"

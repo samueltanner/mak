@@ -17,7 +17,6 @@ import {
   MakUiSimpleTheme,
   MakUiStateShades,
   MakUiThemeKey,
-  MakUiThemeKeySH,
   MakUiThemeShades,
   MakUiVerbosePalette,
   MakUiVerboseTheme,
@@ -30,7 +29,9 @@ import {
   defaultComponentConfig,
 } from "../constants/ui-constants"
 import {
+  MakUiComponentConfig,
   MakUiComponentConfigInput,
+  MakUiRootComponentConfig,
   MakUiRootComponentConfigInput,
 } from "../types/component-types"
 import { isEmptyObject } from "@/globals/global-helper-functions"
@@ -121,12 +122,30 @@ const MakUiProviderChild = ({
     (themeMode as MakUiThemeKey | undefined) || defaultTheme
 
   const componentConfig = useMemo(() => {
-    const configObject = {} as MakUiComponentConfigInput
-    for (const key of htmlElements) {
-      const configKey = `${key}Config` as keyof MakUiComponentConfigInput
-      configObject[configKey] =
-        componentConfigInput?.[configKey] || defaultComponentConfig[configKey]
+    const configObject: MakUiComponentConfig = {
+      buttonConfig:
+        (componentConfigInput?.buttonConfig as MakUiRootComponentConfig) ||
+        defaultComponentConfig.buttonConfig,
+      inputConfig:
+        (componentConfigInput?.inputConfig as MakUiRootComponentConfig) ||
+        defaultComponentConfig.inputConfig,
+      textConfig:
+        (componentConfigInput?.textConfig as MakUiRootComponentConfig) ||
+        defaultComponentConfig.textConfig,
+      selectConfig:
+        (componentConfigInput?.selectConfig as MakUiRootComponentConfig) ||
+        defaultComponentConfig.selectConfig,
+      formConfig:
+        (componentConfigInput?.formConfig as MakUiRootComponentConfig) ||
+        defaultComponentConfig.formConfig,
+      dialogConfig:
+        (componentConfigInput?.dialogConfig as MakUiRootComponentConfig) ||
+        defaultComponentConfig.dialogConfig,
+      textareaConfig:
+        (componentConfigInput?.textareaConfig as MakUiRootComponentConfig) ||
+        defaultComponentConfig.textareaConfig,
     }
+
     return configObject
   }, [JSON.stringify(componentConfigInput)])
 
@@ -165,7 +184,7 @@ const MakUiProviderChild = ({
     {} as MakUiVerboseTheme
   )
 
-  const [safeList, setSafeList] = useState<any[]>([])
+  // const [safeList, setSafeList] = useState<any[]>([])
 
   const formattingThemes =
     isEmptyObject(simpleTheme) ||
@@ -183,10 +202,10 @@ const MakUiProviderChild = ({
   const { simplePalette, verbosePalette } = palettesMemo
 
   const makClassName = (
-    className: MakUiClassNameHelperClassNames,
+    className: MakUiClassNameHelperClassNames | undefined,
     options?: MakUiClassNameHelperOptions
   ) => {
-    const { type, states, theme } = options || {}
+    const { type, states, theme, makClassNames, classNames } = options || {}
     const configKey: keyof MakUiComponentConfigInput = type
       ? `${type}Config`
       : "buttonConfig"
@@ -199,38 +218,40 @@ const MakUiProviderChild = ({
       string: className,
       verbosePalette,
       enabledStates,
-      defaultConfig,
+      defaultConfig: type ? defaultConfig : undefined,
       themeMode: defaultTheme,
+      makClassNames,
+      classNames,
     })
   }
 
-  useEffect(() => {
-    const safeList = getTwConfigSafelist({
-      simplePalette,
-      enabledTwVariants,
-    })
+  // useEffect(() => {
+  //   const safeList = getTwConfigSafelist({
+  //     simplePalette,
+  //     enabledTwVariants,
+  //   })
 
-    setSafeList(safeList)
-  }, [])
+  //   setSafeList(safeList)
+  // }, [])
 
-  const getSafeList = () => {
-    console.log(
-      "********************************************************************************************"
-    )
-    console.log(
-      "Copy this to your tailwind.config.js safelist array at the root level of the config object."
-    )
-    console.log(
-      "Please note that this contains stringified regex patterns. You will need to remove the quotes before and after each 'pattern' value."
-    )
-    console.log(
-      "If you add any additional colors, interaction states or need access to additional tailwind variants, you will need to add them to your palette input and/or the enabledStates array in your component config (or in the global enabled states passed as a prop to the MakUi context provider)."
-    )
-    console.log(JSON.stringify(safeList, null, 2))
-    console.log(
-      "********************************************************************************************"
-    )
-  }
+  // const getSafeList = () => {
+  //   console.log(
+  //     "********************************************************************************************"
+  //   )
+  //   console.log(
+  //     "Copy this to your tailwind.config.js safelist array at the root level of the config object."
+  //   )
+  //   console.log(
+  //     "Please note that this contains stringified regex patterns. You will need to remove the quotes before and after each 'pattern' value."
+  //   )
+  //   console.log(
+  //     "If you add any additional colors, interaction states or need access to additional tailwind variants, you will need to add them to your palette input and/or the enabledStates array in your component config (or in the global enabled states passed as a prop to the MakUi context provider)."
+  //   )
+  //   console.log(JSON.stringify(safeList, null, 2))
+  //   console.log(
+  //     "********************************************************************************************"
+  //   )
+  // }
 
   const value = {
     simplePalette,
@@ -249,7 +270,7 @@ const MakUiProviderChild = ({
     enabledThemeModes,
     makClassName,
     mcn: makClassName,
-    getSafeList,
+    // getSafeList,
     constructTailwindColorScale: constructTailwindObject,
   }
 
@@ -265,11 +286,17 @@ type MakUiClassNameHelperOptions = {
   type?: HtmlElementKey
   states?: MakUiInteractionStateKey[]
   theme?: MakUiThemeKey
+  useConfig?: boolean
+  makClassNames?: string
+  classNames?: string
 }
+export type MakUiClassNameHelper = (
+  className: string,
+  options?: MakUiClassNameHelperOptions | undefined
+) => string | undefined
 
 interface MakUiContext {
-  buttonConfig: MakUiRootComponentConfigInput | undefined
-  componentConfig: MakUiComponentConfigInput
+  componentConfig: MakUiComponentConfig
 
   theme: string | undefined
   setTheme: (themeMode: string) => void
@@ -284,12 +311,9 @@ interface MakUiContext {
   simpleTheme: MakUiSimpleTheme
   verboseTheme: MakUiVerboseTheme
 
-  mcn: (
-    className: MakUiClassNameHelperClassNames,
-    options?: MakUiClassNameHelperOptions
-  ) => string | undefined
-  makClassName: (className: string) => string | undefined
-  getSafeList: () => void
+  mcn: MakUiClassNameHelper
+  makClassName: (className?: string) => string | undefined
+  // getSafeList: () => void
   constructTailwindColorScale: ({
     hex,
     step,

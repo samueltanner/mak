@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <MakUiProvider palette={palette} componentConfig={componentConfig}>
+        <MakUiProvider palette={palette} componentConfig={componentConfig} enableSystem>
           {children}
         </MakUiProvider>
       </body>

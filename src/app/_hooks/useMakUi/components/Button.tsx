@@ -1,14 +1,15 @@
 "use client"
-import { forwardRef, useEffect, useState } from "react"
+import { forwardRef, useEffect, useMemo, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
-import { useMakUi } from "../context/MakUiContext"
+import { MakUiClassNameHelper, useMakUi } from "../context/MakUiContext"
 import {
   MakUiInteraction,
   MakUiState,
   MakUiVariant,
 } from "../types/default-types"
-import { MakUiVerboseTheme } from "../types/ui-types"
-import { MakUiButtonConfig } from "../types/component-types"
+import { MakUiSimpleTheme, MakUiVerboseTheme } from "../types/ui-types"
+
+import { MakUiRootComponentConfig } from "../types/component-types"
 
 interface ButtonProps {
   text?: string
@@ -74,6 +75,7 @@ interface ButtonProps {
   iconSide?: "left" | "right"
   wrapButtonText?: boolean
   keepStatusVisible?: boolean
+  showFocusRing?: boolean
 }
 
 type ButtonStates = {
@@ -97,7 +99,7 @@ type ButtonInteractions = {
 const buttonClassName = ({
   text,
   buttonStyle,
-  textStyle = "secondary",
+  textStyle = "primary",
   borderStyle = buttonStyle,
   buttonStates,
   width = "fit",
@@ -108,6 +110,7 @@ const buttonClassName = ({
   buttonConfig,
   theme,
   showFocusRing = true,
+  mcn,
 }: {
   text: boolean
   buttonStyle: MakUiVariant
@@ -119,14 +122,34 @@ const buttonClassName = ({
   border?: boolean
   customClassName?: string
   customTextClassName?: string
-  buttonConfig: MakUiButtonConfig
-  theme: MakUiVerboseTheme
+  buttonConfig: MakUiRootComponentConfig
+  theme: MakUiSimpleTheme
   showFocusRing?: boolean
+  mcn: MakUiClassNameHelper
 }) => {
   const textPalette = theme.text
   const colorPalette = theme.color
   const borderPalette = theme.border
   const themePalette = theme.theme
+
+  // console.log({
+  //   mcn: mcn("dark:text-primary", {
+  //     type: "button",
+  //     states: ["disabled", "hover", "focus"],
+  //     theme: "light",
+  //   }),
+  // })
+
+  const className = mcn(
+    `mak(dark:text-${textStyle} bg-${buttonStyle} border-${borderStyle} focus:focus-ring-primary focus:ring-offset-theme-primary) focus:ring-2 focus:ring-offset-2 border-4`,
+    {
+      type: "button",
+      states: ["disabled", "hover", "focus"],
+      theme: "light",
+    }
+  )
+
+  return className
 
   const { state: buttonState, disabled, selected, active, focus } = buttonStates
 
@@ -138,7 +161,7 @@ const buttonClassName = ({
   const textVariantObject = textPalette?.[textStyle]
   const borderVariantObject = borderPalette?.[borderStyle]
 
-  const baseClass = `${buttonConfig.className} fade-in-out ${
+  const baseClass = `${buttonConfig.className} ${
     disabled && "cursor-not-allowed"
   }`
   const textClass = `font-semibold text-${textVariantObject?.base} text-sm hover:text-${textVariantObject?.hover}`
@@ -222,9 +245,10 @@ const Button = forwardRef(
       iconSide = "left",
       wrapButtonText = false,
       keepStatusVisible = false,
+      showFocusRing = true,
     } = buttonProps
 
-    const { verboseTheme, buttonConfig } = useMakUi()
+    const { simpleTheme, componentConfig, mcn } = useMakUi()
 
     const status = isLoading || isError || isSuccess
     const [showStatus, setShowStatus] = useState<boolean>(!!status)
@@ -248,7 +272,7 @@ const Button = forwardRef(
       }
     }, [isLoading, isError, isSuccess])
 
-    const buttonStyle = () => {
+    const buttonStyle = useMemo(() => {
       if (buttonType) return buttonType
       if (secondary) return "secondary"
       if (tertiary) return "tertiary"
@@ -260,9 +284,9 @@ const Button = forwardRef(
       if (custom) return "custom"
       if (primary) return "primary"
       return "primary"
-    }
+    }, [])
 
-    const textStyle = () => {
+    const textStyle = useMemo(() => {
       if (textType) return textType
       if (textSecondary) return "secondary"
       if (textTertiary) return "tertiary"
@@ -273,10 +297,10 @@ const Button = forwardRef(
       if (textInfo) return "info"
       if (textCustom) return "custom"
       if (textPrimary) return "primary"
-      return "secondary"
-    }
+      return "primary"
+    }, [])
 
-    const borderStyle = () => {
+    const borderStyle = useMemo(() => {
       if (borderType) return borderType
       if (borderSecondary) return "secondary"
       if (borderTertiary) return "tertiary"
@@ -287,8 +311,8 @@ const Button = forwardRef(
       if (borderInfo) return "info"
       if (borderCustom) return "custom"
       if (borderPrimary) return "primary"
-      return buttonStyle()
-    }
+      return buttonStyle
+    }, [])
 
     const isDisabled = disabled || isLoading
 
@@ -317,26 +341,54 @@ const Button = forwardRef(
       return "Submit"
     }
 
-    const computedButtonClassName = buttonClassName({
-      text: !!displayTextOrChildren(),
-      buttonStyle: buttonStyle(),
-      textStyle: textStyle(),
-      borderStyle: borderStyle(),
-      buttonStates: currentButtonState(),
-      width,
-      outlined,
-      border,
-      customClassName: className,
-      customTextClassName: textClassName,
-      buttonConfig,
-      theme: verboseTheme,
-    })
+    // const computedButtonClassName = buttonClassName({
+    //   text: !!displayTextOrChildren(),
+    //   buttonStyle: buttonStyle(),
+    //   textStyle: textStyle(),
+    //   borderStyle: borderStyle(),
+    //   buttonStates: currentButtonState(),
+    //   width,
+    //   outlined,
+    //   border,
+    //   customClassName: className,
+    //   customTextClassName: textClassName,
+    //   buttonConfig: componentConfig.buttonConfig,
+    //   theme: simpleTheme,
+    //   mcn: mcn,
+    // })
 
     const handleClick = () => {
       if (!isDisabled && onClick) {
         onClick()
       }
     }
+
+    const { makClassNames, classNames } = useMemo(() => {
+      if (showFocusRing) {
+        return {
+          makClassNames: `focus:focus-ring-${buttonStyle} focus:ring-offset-theme-primary`,
+          classNames: `focus:ring-2 focus:ring-offset-2`,
+        }
+      } else {
+        return {
+          makClassNames: "",
+          classNames: "",
+        }
+      }
+    }, [showFocusRing])
+
+    const cn = useMemo(() => {
+      return mcn(
+        `mak(dark:text-${textStyle} bg-${buttonStyle} border-${borderStyle})`,
+        {
+          type: "button",
+          states: ["disabled", "hover", "focus"],
+          theme: "light",
+          makClassNames,
+          classNames,
+        }
+      )
+    }, [])
 
     return (
       <button
@@ -383,7 +435,7 @@ const Button = forwardRef(
             focus: false,
           })
         }}
-        className={`flex items-center justify-center gap-1 ${computedButtonClassName} `}
+        className={`flex items-center justify-center gap-1 ${cn} `}
         disabled={isDisabled}
         type={type}
         id={id}
@@ -425,4 +477,5 @@ const Button = forwardRef(
 )
 
 Button.displayName = "Button"
+
 export default Button
