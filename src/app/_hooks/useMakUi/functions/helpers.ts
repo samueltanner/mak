@@ -54,8 +54,12 @@ import {
   tailwindVariants,
   tailwindVariantsSet,
 } from "../constants/ui-constants"
-import { MakUiStates } from "../types/default-types"
-import { MakUiRootComponentConfigInput } from "../types/component-types"
+import { MakUiInteraction, MakUiStates } from "../types/default-types"
+import {
+  MakUiComponentConfigInput,
+  MakUiRootComponentConfigInput,
+} from "../types/component-types"
+import { act } from "react-dom/test-utils"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
@@ -272,31 +276,59 @@ export const getConstructedStates = ({
   defaultShades?: MakUiStateShades
   theme?: MakUiThemeKey
 }) => {
-  let baseColor = providedStates?.base
-  let baseState = "base" as keyof MakUiStateShades
-  if (!baseColor) {
+  let providedColor = providedStates?.base as string | undefined
+  let providedState = !!providedStates?.base ? "base" : undefined
+  let inferredBaseShade
+  let stateShade
+  const multiplier = theme === "dark" ? 1 : -1
+  if (!providedColor) {
     for (const state of makUiStates) {
-      baseColor = providedStates?.[state]
-      if (baseColor) {
-        baseState = state
+      providedColor = providedStates?.[state]
+      if (providedColor) {
+        const providedTwObj = twColorHelper({
+          colorString: providedColor,
+        })
+        providedState = state
+        providedColor = providedTwObj.color
+        stateShade = providedTwObj.shade
+        let stateDiff = defaultShades![state] - defaultShades!.base
+        inferredBaseShade = providedTwObj.shade! - stateDiff * multiplier
         break
       }
     }
   }
 
   const twObj = twColorHelper({
-    colorString: baseColor,
+    colorString: providedColor,
     defaults: makUiDefaultStates,
-    defaultKey: baseState,
+    defaultKey: "base",
+    shade: inferredBaseShade
+      ? getNormalizedShadeNumber(inferredBaseShade)
+      : undefined,
   })
 
+  const disabledTwObj = twColorHelper({
+    colorString: providedStates.disabled || twObj.rootString,
+    shade: providedStates.disabled
+      ? undefined
+      : getNormalizedShadeNumber(twObj.shade! - 200),
+  })
+  const disabledShade = disabledTwObj.autoShade
+    ? twObj.shade! - 200
+    : disabledTwObj.shade!
+
+  const disabledColor = `${twObj.color}-${getNormalizedShadeNumber(
+    disabledShade
+  )}`
+
   providedStates.base = twObj.rootString
+  providedStates.disabled = disabledColor
 
   const statesObject = generateDefaultStatesObject({
     defaultColor: twObj.color,
     defaultShades,
     baseShade: twObj.shade,
-    multiplier: theme === "dark" ? 1 : -1,
+    multiplier,
   })
 
   const resolvedProvidedStates = {} as MakUiState
@@ -456,7 +488,10 @@ export const twColorHelper = ({
       defaultKey as keyof MakUiDefaultStateColors
     ]
   }
-  let autoShade = !!shade
+  let autoShade = true
+  if (typeof shade === "string" || typeof shade === "number") {
+    autoShade = false
+  }
   let autoColor = !!colorString
 
   if (!colorString && !useDefaults) {
@@ -465,7 +500,7 @@ export const twColorHelper = ({
       isTwColor: false,
       color: undefined,
       shade: undefined,
-      autoShade,
+      autoShade: false,
       autoColor,
       opacity: 0,
       colorString: "",
@@ -491,7 +526,7 @@ export const twColorHelper = ({
       isTwColor: true,
       color: absoluteColor,
       shade: undefined,
-      autoShade,
+      autoShade: false,
       autoColor,
       opacity: value,
       colorString: `${absoluteColor}${string}`,
@@ -505,9 +540,10 @@ export const twColorHelper = ({
     } else if (!colorString) {
       colorString = defaultValue
       autoColor = true
-      autoShade = true
+      autoShade = false
     }
     const colorArr = colorString!.split("-")
+    autoShade = !parseInt(colorArr[colorArr.length - 1])
 
     const lastElement = colorArr[colorArr.length - 1]
     let shadeAndOpacity
@@ -525,6 +561,8 @@ export const twColorHelper = ({
       const includesShade = Number(lastElement) > 0
       const computedShade = includesShade ? colorArr.pop() : 500
       variableShade = shade || computedShade
+      if (variableShade && Number(variableShade) < 50)
+        variableShade = getNormalizedShadeNumber(Number(variableShade))
       variableOpacity = 100
       color = colorArr.join("-")
     }
@@ -1064,7 +1102,6 @@ export const makClassNameHelper = ({
     }
   }
 
-  console.log({ finalClassName })
   const finalClassNamesString = finalClassName.join(" ") + ` ${rootClassNames}`
 
   return finalClassNamesString
@@ -1121,14 +1158,53 @@ const parseMakClassName = (string: string) => {
     }
   })
 
-  console.log({ splitString, makClassNameObj })
   return makClassNameObj
 }
 
-const generateTwClassName = ({
-  twVariant,
-  variant,
+export const getActiveTwVariants = ({
+  componentConfig,
+  enabledThemeModes,
 }: {
-  twVariant: string
-  variant: string
-}) => {}
+  componentConfig: MakUiComponentConfigInput
+  enabledThemeModes: MakUiThemeKey[]
+}) => {
+  console.log({ componentConfig, enabledThemeModes })
+
+  const enabledInteractionStates: MakUiInteractionStateKey[] = []
+  const enabledTwVariants: string[] = []
+  Object.values(componentConfig).forEach((config) => {
+    const themeModes = config?.enabledStates as MakUiInteractionStateKey[]
+    themeModes && enabledInteractionStates.push(...themeModes)
+  })
+  for (const theme of enabledThemeModes) {
+    for (const state of enabledInteractionStates) {
+      if (theme === "light") {
+        enabledTwVariants.push(`${state}`)
+      } else {
+        enabledTwVariants.push(`${theme}:${state}`)
+      }
+    }
+  }
+
+  return { enabledTwVariants, enabledInteractionStates }
+}
+
+export const getTwConfigSafelist = ({
+  simplePalette,
+  componentConfig,
+}: {
+  simplePalette: MakUiSimplePalette
+  componentConfig: MakUiComponentConfigInput
+}) => {
+  const twVariants = tailwindVariants
+  const variantsString = twVariants.forEach((variant) => {
+    return `(${variant})|`
+  })
+  const safeListObject = {
+    pattern: /(bg|text|border|ring|ring-offset|outline|fill|stroke)-(mak-teal)/,
+    variants: ["hover", "focus", "disabled"],
+  }
+  const responseObj = {
+    safelist: [],
+  }
+}

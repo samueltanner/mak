@@ -12,7 +12,7 @@ export default function Home() {
     isLight,
     isCustom,
     verboseTheme,
-    enabledModes,
+    enabledThemeModes,
     mcn,
   } = useMakUi()
 
@@ -29,7 +29,7 @@ export default function Home() {
             setTheme(
               isDark
                 ? "light"
-                : isLight && enabledModes.includes("custom")
+                : isLight && enabledThemeModes.includes("custom")
                 ? "custom"
                 : "dark"
             )

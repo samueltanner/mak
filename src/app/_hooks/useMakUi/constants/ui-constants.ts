@@ -196,7 +196,7 @@ export const makUiDefaultStateShades: MakUiStateShades = {
   checked: 500,
   closed: 500,
   default: 500,
-  disabled: 500,
+  disabled: 300,
   empty: 500,
   enabled: 500,
   focus: 500,
@@ -249,12 +249,13 @@ export const makUiDefaultStates: MakUiDefaultStateColors = {
 }
 
 export const defaultButtonConfig: MakUiRootComponentConfigInput = {
-  className:
-    "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold",
+  className: "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold",
+  enabledStates: ["hover", "focus", "disabled"],
 }
 
 export const defaultInputConfig: MakUiRootComponentConfigInput = {
   className: "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold",
+  enabledStates: ["hover", "focus", "disabled"],
 }
 
 export const defaultComponentConfig: MakUiComponentConfigInput = {

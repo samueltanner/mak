@@ -4,6 +4,7 @@ import { paletteFactory } from "../factories/paletteFactory"
 import { ThemeProvider, useTheme } from "next-themes"
 import {
   deepMerge,
+  getActiveTwVariants,
   isEmptyObject,
   makClassNameHelper,
 } from "../functions/helpers"
@@ -72,7 +73,7 @@ const MakUiProviderChild = ({
   enableCustomMode = false,
   themeShades = makUiDefaultThemeShades,
   stateShades = makUiDefaultStateShades,
-  enabledStates = makUiInteractionStates,
+  enabledStates = ["hover", "focus", "disabled"],
 }: MakUiProviderProps) => {
   let { theme: themeMode, setTheme: setThemeMode } = useTheme()
 
@@ -80,7 +81,7 @@ const MakUiProviderChild = ({
 
   const darkModeInPalette = stringifiedPalette.includes("dark:")
   const customModeInPalette = stringifiedPalette.includes("custom:")
-  const enabledModes = [
+  const enabledThemeModes = [
     "light",
     enableDarkMode || darkModeInPalette ? "dark" : null,
     enableCustomMode || customModeInPalette ? "custom" : null,
@@ -119,11 +120,30 @@ const MakUiProviderChild = ({
   let currentTheme: MakUiThemeKey =
     (themeMode as MakUiThemeKey | undefined) || defaultTheme
   let currentThemeShorthand = paletteShorthand[currentTheme] as MakUiThemeKeySH
+
+  const componentConfig = useMemo(() => {
+    const configObject = {} as MakUiComponentConfigInput
+    for (const key of htmlElements) {
+      const configKey = `${key}Config` as keyof MakUiComponentConfigInput
+      configObject[configKey] =
+        componentConfigInput?.[configKey] || defaultComponentConfig[configKey]
+    }
+    return configObject
+  }, [JSON.stringify(componentConfigInput)])
+
+  const { enabledTwVariants, enabledInteractionStates } = useMemo(() => {
+    return getActiveTwVariants({
+      enabledThemeModes,
+      componentConfig,
+    })
+  }, [componentConfig, enabledThemeModes])
+
   const palettesMemo = useMemo(() => {
     const { verbose, simple } =
       paletteFactory({
         paletteInput,
-        enabledModes,
+        enabledThemeModes,
+        enabledInteractionStates,
         defaultShades: {
           defaultStateShades: stateShades,
           defaultThemeShades: themeShades,
@@ -136,7 +156,7 @@ const MakUiProviderChild = ({
       simplePalette: simple as MakUiSimplePalette,
       verbosePalette: verbose as MakUiVerbosePalette,
     }
-  }, [paletteInput, enabledModes])
+  }, [paletteInput, enabledThemeModes])
 
   const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>(
     {} as MakUiSimpleTheme
@@ -145,16 +165,6 @@ const MakUiProviderChild = ({
   const [verboseTheme, setVerboseTheme] = useState<MakUiVerboseTheme>(
     {} as MakUiVerboseTheme
   )
-
-  const componentConfig = useMemo(() => {
-    const configObject = {} as MakUiComponentConfigInput
-    for (const key of htmlElements) {
-      const configKey = `${key}Config` as keyof MakUiComponentConfigInput
-      configObject[configKey] =
-        componentConfigInput?.[configKey] || defaultComponentConfig[configKey]
-    }
-    return configObject
-  }, [JSON.stringify(componentConfigInput)])
 
   const formattingThemes =
     isEmptyObject(simpleTheme) ||
@@ -206,7 +216,7 @@ const MakUiProviderChild = ({
     isDark: themeMode === "dark",
     isLight: themeMode === "light",
     isCustom: themeMode === "custom",
-    enabledModes,
+    enabledThemeModes,
     makClassName,
     mcn: makClassName,
   }
@@ -235,7 +245,7 @@ interface MakUiContext {
   isDark: boolean
   isLight: boolean
   isCustom: boolean
-  enabledModes: MakUiThemeKey[]
+  enabledThemeModes: MakUiThemeKey[]
 
   simplePalette: MakUiSimplePalette
   verbosePalette: MakUiVerbosePalette

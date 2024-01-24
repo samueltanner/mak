@@ -11,6 +11,7 @@ import {
 } from "../constants/defaults/default-constants"
 import {
   MakUiFlexiblePaletteInput,
+  MakUiInteractionStateKey,
   MakUiSimplePalette,
   MakUiState,
   MakUiStateShades,
@@ -27,11 +28,13 @@ import {
 
 export const paletteFactory = ({
   paletteInput,
-  enabledModes,
+  enabledThemeModes,
   defaultShades,
+  enabledInteractionStates,
 }: {
   paletteInput: MakUiFlexiblePaletteInput
-  enabledModes: MakUiThemeKey[]
+  enabledThemeModes: MakUiThemeKey[]
+  enabledInteractionStates: MakUiInteractionStateKey[]
   defaultShades: {
     defaultThemeShades: MakUiThemeShades
     defaultStateShades: MakUiStateShades
@@ -41,7 +44,7 @@ export const paletteFactory = ({
 
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
-  for (const theme of enabledModes) {
+  for (const theme of enabledThemeModes) {
     for (const paletteVariant of makUiPalettes) {
       if (paletteVariant === "theme") {
         if (initialVerbosePalette?.[theme]?.["theme"]) {
@@ -158,30 +161,21 @@ export const paletteFactory = ({
             value: constructedStates,
           })
 
-          const {
-            base,
-            focus,
-            hover,
-            disabled,
-            active,
-            selected,
-            default: defaultState,
-            click,
-          } = constructedStates
+          const enabledSimpleStates = enabledInteractionStates.reduce(
+            (acc, curr) => {
+              if (constructedStates[curr]) {
+                acc[curr] = constructedStates[curr]
+              }
+              return acc
+            },
+            {} as MakUiState
+          )
+          enabledSimpleStates.base = constructedStates.base
 
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant, variant],
-            value: {
-              base,
-              active,
-              click,
-              focus,
-              hover,
-              disabled,
-              selected,
-              default: defaultState,
-            },
+            value: enabledSimpleStates,
           })
         } else if (
           !initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]
@@ -210,30 +204,21 @@ export const paletteFactory = ({
             value: constructedStates,
           })
 
-          const {
-            base,
-            focus,
-            hover,
-            disabled,
-            active,
-            selected,
-            default: defaultState,
-            click,
-          } = constructedStates
+          const enabledSimpleStates = enabledInteractionStates.reduce(
+            (acc, curr) => {
+              if (constructedStates[curr]) {
+                acc[curr] = constructedStates[curr]
+              }
+              return acc
+            },
+            {} as MakUiState
+          )
+          enabledSimpleStates.base = constructedStates.base
 
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant, variant],
-            value: {
-              base,
-              active,
-              click,
-              focus,
-              hover,
-              disabled,
-              selected,
-              default: defaultState,
-            },
+            value: enabledSimpleStates,
           })
         }
       }

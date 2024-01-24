@@ -196,7 +196,7 @@ export type MakUiThemePaletteInput = {
 }
 
 export type MakUiVariantPaletteInput = {
-  [Key in MakUiVariantKey]: string | MakUiStateInput
+  [Key in MakUiVariantKey]?: string | MakUiStateInput
 }
 
 export type MakUiFlexiblePaletteInput =
