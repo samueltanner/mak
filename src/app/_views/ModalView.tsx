@@ -19,7 +19,7 @@ export const ModalView = () => {
         onClose={() => {
           setModalIsOpen(false)
         }}
-        className={`bg-${simpleTheme.theme.primary} h-10 rounded-md select-none text-${simpleTheme.text.primary.base} px-6 py-4 flex gap-6 drop-shadow-md`}
+        className={`bg-${simpleTheme.theme.secondary} h-10 rounded-md select-none text-${simpleTheme.text.primary.base} px-6 py-4 flex gap-6 drop-shadow-md`}
         backdropClassName="backdrop-blur-sm bg-black bg-opacity-10"
       >
         <ModalHeader className="text-md font-semibold">Lorem ipsum</ModalHeader>

@@ -1,16 +1,13 @@
 import { useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
-import {
-  DropdownTrigger,
-  DropdownMenu,
-} from "../_hooks/useMakUi/components/Dropdown"
+import Dropdown, { DropdownMenu } from "../_hooks/useMakUi/components/Dropdown"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
 
 const DropdownView = () => {
   const { simpleTheme } = useMakUi()
   const [buttonState, setButtonState] = useState<
-    "error" | "success" | "loading" | undefined
-  >(undefined)
+    "error" | "success" | "loading" | "default"
+  >("default")
 
   return (
     <div className="flex gap-4 items-center">
@@ -25,55 +22,37 @@ const DropdownView = () => {
         success={buttonState === "success"}
         info={buttonState === "loading"}
       >
-        State
+        <span className="capitalize">{buttonState}</span>
       </Button>
-      <DropdownTrigger
+
+      <Dropdown
+        label="Select"
+        chevronRight
+        onChange={(value) => setButtonState(value as any)}
+        value={buttonState}
         menuPosition="bottom-center"
-        icon={
-          <span
-            className={`text-${simpleTheme.text.primary.base} text-sm font-semibold`}
-          >
-            {buttonState ? (
-              <span className="capitalize">{buttonState}</span>
-            ) : (
-              <p>Select a State</p>
-            )}
-          </span>
-        }
-        dismissOnClick
+        valueKey="value"
+        options={[
+          {
+            label: "Default",
+            value: "default",
+          },
+          {
+            label: "Loading",
+            value: "loading",
+          },
+          {
+            label: "Error",
+            value: "error",
+          },
+          {
+            label: "Success",
+            value: "success",
+          },
+        ]}
       >
-        <DropdownMenu
-          options={[
-            {
-              label: "Default",
-              value: undefined,
-              onClick: () => setButtonState(undefined),
-            },
-            {
-              label: "Loading",
-              value: "loading",
-              onClick: () => setButtonState("loading"),
-            },
-            {
-              label: "Error",
-              value: "error",
-              onClick: () => setButtonState("error"),
-            },
-            {
-              label: "Success",
-              value: "success",
-              onClick: () => setButtonState("success"),
-            },
-          ]}
-        />
-        {/* <span className="flex h-full w-full px-2">
-          <select className="flex flex-col gap-4">
-            <li>Loading</li>
-            <li>Error</li>
-            <li>Success</li>
-          </select>
-        </span> */}
-      </DropdownTrigger>
+        <DropdownMenu />
+      </Dropdown>
     </div>
   )
 }

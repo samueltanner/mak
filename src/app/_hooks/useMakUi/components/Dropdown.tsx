@@ -1,12 +1,57 @@
 "use client"
-import { forwardRef, useEffect, useRef, useState } from "react"
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { BiChevronUp } from "react-icons/bi"
 import { useMakUi } from "../context/MakUiContext"
+import { isObject } from "@/globals/global-helper-functions"
+import { MakUiSimpleTheme } from "../types/ui-types"
 
-export const rootLevelBackgroundStyling = ""
-export const rootLevelMenuStyling =
-  "rounded-lg border-2" + rootLevelBackgroundStyling
+type Position = {
+  top?: number
+  left?: number
+  right?: string | number
+  bottom?: string | number
+}
+type MenuPositions =
+  | "bottom-right"
+  | "bottom-left"
+  | "top-right"
+  | "top-left"
+  | "bottom-center"
+  | "top-center"
+  | "bottom-align-right"
+  | "bottom-align-left"
+  | "top-align-right"
+  | "top-align-left"
+
+interface DropdownElementTriggerProps {
+  icon?: React.ReactNode
+  label?: string | React.ReactNode
+  labelLeft?: boolean
+  labelRight?: boolean
+  options?:
+    | Array<string | number>
+    | Array<{
+        label: string
+        value: any
+        onClick?: (props: any) => void
+      }>
+  selectedOption?: string | number | { label: string; value: string }
+  onChange?: (value: { label: string; value: string } | string | number) => void
+  menuPosition?: MenuPositions
+  chevronLeft?: boolean
+  chevronRight?: boolean
+  dismissOnClick?: boolean
+}
+
+export type OptionObject = { label: string; value: string }
 
 const menuVariants = {
   hidden: {
@@ -34,72 +79,61 @@ const menuVariants = {
   },
 }
 
-const DropdownMenu = forwardRef(
-  (
-    {
-      children,
-      options,
-      selectedOption,
-      capitalize,
-      nowrap,
-      setSelectedOption,
-    }: {
-      children?: React.ReactNode
-      options?:
-        | Array<string | number>
-        | Array<{
-            label: string
-            value: string | number | undefined
-            onClick?: () => void
-          }>
-      selectedOption?: string | number | { label: string; value: string }
-      capitalize?: boolean
-      nowrap?: boolean
-      setSelectedOption?: (
-        value: string | number | { label: string; value: string }
-      ) => void
-    },
-    ref: React.Ref<HTMLSpanElement>
-  ) => {
-    const { simpleTheme } = useMakUi()
-    const isSelect = (
-      option: string | number | { label: string; value: string }
-    ) => {
-      if (typeof option === "string" && typeof selectedOption === "string") {
-        return option.toLowerCase() === selectedOption.toLowerCase()
-      } else if (
-        typeof option === "number" &&
-        typeof selectedOption === "number"
-      ) {
-        return option === selectedOption
-      } else if (
-        typeof option === "object" &&
-        typeof selectedOption === "object"
-      ) {
-        return (
-          option.label.toLowerCase() === selectedOption.label.toLowerCase() ||
-          option.value.toLowerCase() === selectedOption.value.toLowerCase()
-        )
-      } else if (
-        typeof option === "object" &&
-        (typeof selectedOption === "string" ||
-          typeof selectedOption === "number")
-      ) {
-        return (
-          option.label.toLowerCase() ===
-            selectedOption?.toString().toLowerCase() ||
-          option.value.toLowerCase() ===
-            selectedOption?.toString().toLowerCase()
-        )
-      }
-
-      return false
-    }
+const LabelElement = ({
+  onClick,
+  label,
+}: {
+  onClick?: () => void
+  label?: string | React.ReactNode
+}) => {
+  if (!label) return null
+  if (typeof label === "string")
     return (
-      <span ref={ref}>
+      <label className={`cursor-pointer`} onClick={onClick}>
+        {label}
+      </label>
+    )
+  if (typeof label === "object")
+    return (
+      <span className="cursor-pointer" onClick={onClick}>
+        {label}
+      </span>
+    )
+}
+
+const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
+  const { simpleTheme } = useMakUi()
+  const { onChange, value, values, options, valueKey } = useDropdownContext()
+
+  const isSelect = (option: any) => {
+    if (typeof option === "string" && typeof value === "string") {
+      console.log(1)
+      return option.toLowerCase() === value.toLowerCase()
+    } else if (typeof option === "number" && typeof value === "number") {
+      console.log(2)
+      return option === value
+    } else if (isObject(option) && isObject(value)) {
+      console.log(3)
+      return JSON.stringify(option) === JSON.stringify(value)
+    } else if (
+      typeof option === "object" &&
+      (typeof value === "string" || typeof value === "number")
+    ) {
+      return (
+        option.label.toLowerCase() === value?.toString().toLowerCase() ||
+        option.value.toLowerCase() === value?.toString().toLowerCase()
+      )
+    }
+
+    return false
+  }
+
+  return (
+    <>
+      <span className="h-full">
         {!children && (
           <>
-            <ul className="flex flex-col gap-2 ">
+            <ul className="flex flex-col gap-2">
               {options?.map((option: any, i: number) => {
                 if (!i) {
                   i = Math.random()
@@ -107,26 +141,25 @@ const DropdownMenu = forwardRef(
                 return (
                   <li
                     key={i}
-                    className={`flex cursor-pointer select-none items-center space-x-2 text-sm text-${
-                      simpleTheme.text.primary.base
-                    } ${capitalize ? "capitalize" : ""} ${
-                      nowrap
-                        ? "overflow-hidden overflow-ellipsis whitespace-nowrap"
-                        : ""
-                    }`}
+                    className={`flex cursor-pointer select-none items-center space-x-2 text-sm font-semibold text-${simpleTheme.text.primary.base}`}
                   >
                     <span
-                      className={`w-full rounded-sm px-4 py-1.5 fade-in-out  ${
+                      className={`w-full rounded-md px-4 py-1.5 fade-in-out hover:bg-${
+                        simpleTheme.color.primary.base
+                      } hover:bg-opacity-50 ${
                         isSelect(option)
-                          ? " bg-opacity-20 hover:bg-opacity-30"
-                          : `hover:bg-${simpleTheme.color.primary.base} hover:bg-opacity-30`
+                          ? `bg-${simpleTheme.color.primary.base} bg-opacity-20 `
+                          : " bg-opacity-20 hover:bg-opacity-30"
                       }`}
                       onClick={() => {
-                        if (option?.onClick) {
-                          option?.onClick()
-                        }
-                        if (setSelectedOption) {
-                          setSelectedOption(option)
+                        if (onChange) {
+                          console.log("onChange", option)
+                          if (valueKey && isObject(option)) {
+                            onChange(option[valueKey])
+                          } else {
+                            onChange(option)
+                          }
+                          // onChange(option)
                         }
                       }}
                     >
@@ -142,76 +175,23 @@ const DropdownMenu = forwardRef(
         )}
         {!!children && children}
       </span>
-    )
-  }
-)
+    </>
+  )
+}
 
 DropdownMenu.displayName = "DropdownMenu"
-
-type Position = {
-  top?: number
-  left?: number
-  right?: string | number
-  bottom?: string | number
-}
-type MenuPositions =
-  | "bottom-right"
-  | "bottom-left"
-  | "top-right"
-  | "top-left"
-  | "bottom-center"
-  | "top-center"
-  | "bottom-align-right"
-  | "bottom-align-left"
-  | "top-align-right"
-  | "top-align-left"
-
-interface DropdownElementTriggerProps {
-  icon?: React.ReactNode
-  label?: string | React.ReactNode
-  labelLeft?: boolean
-  labelRight?: boolean
-  children?: React.ReactNode
-  options?: Array<string | number> | Array<{ label: string; value: string }>
-  selectedOption?: string | number | { label: string; value: string }
-  capitalize?: boolean
-  nowrap?: boolean
-  setSelectedOption?: (
-    value: { label: string; value: string } | string | number
-  ) => void
-  menuPosition?: MenuPositions
-  chevronLeft?: boolean
-  chevronRight?: boolean
-  dismissOnClick?: boolean
-}
-
-export type OptionObject = { label: string; value: string }
 
 const DropdownTrigger = ({
   icon,
   label,
   labelLeft,
   labelRight,
-  options,
-  selectedOption,
-  capitalize = true,
-  nowrap = true,
-  setSelectedOption,
-  menuPosition = "bottom-right",
-  children,
   chevronRight,
   chevronLeft,
-  dismissOnClick = true,
 }: DropdownElementTriggerProps) => {
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const hiddenDropdownRef = useRef<HTMLDivElement>(null)
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false)
-  const [position, setPosition] = useState<Position>({
-    top: 0,
-    right: 0,
-  })
-  const { simpleTheme } = useMakUi()
+  const { dropdownOpen, setDropdownOpen, triggerRef, simpleTheme } =
+    useDropdownContext()
+
   const { text } = simpleTheme
 
   if (!labelLeft && !labelRight) {
@@ -228,11 +208,144 @@ const DropdownTrigger = ({
     chevronRight = false
   }
 
-  if (!chevronLeft && !chevronRight) {
-    chevronRight = true
+  return (
+    <div className="relative flex w-fit select-none" ref={triggerRef}>
+      <div
+        onClick={() => {
+          setDropdownOpen(!dropdownOpen)
+          console.log("click", dropdownOpen)
+        }}
+        className="relative flex h-fit items-center justify-center gap-1"
+      >
+        {chevronLeft && (
+          <motion.span
+            initial={{ rotate: 0 }}
+            animate={{ rotate: dropdownOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center"
+          >
+            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
+          </motion.span>
+        )}
+        {label && labelLeft && (
+          <LabelElement
+            onClick={() => {
+              console.log("click", dropdownOpen)
+              setDropdownOpen(!dropdownOpen)
+            }}
+            label={label}
+          />
+        )}
+        <span className="flex cursor-pointer items-center gap-1">{icon}</span>
+        {label && labelRight && (
+          <LabelElement
+            onClick={() => {
+              console.log("click", dropdownOpen)
+              setDropdownOpen(!dropdownOpen)
+            }}
+            label={label}
+          />
+        )}
+        {chevronRight && (
+          <motion.span
+            initial={{ rotate: 0 }}
+            animate={{ rotate: dropdownOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center"
+          >
+            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
+          </motion.span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+interface DropdownProps {
+  children?: React.ReactNode
+  options?:
+    | Array<string | number>
+    | Array<{
+        label: string
+        value: any
+      }>
+  value?: string | number | { label: string; value: string }
+  values?: Array<string | number | { label: string; value: string }>
+  onChange?: (value: string | number | { label: string; value: string }) => void
+  menuPosition?: MenuPositions
+  icon?: React.ReactNode
+  label?: string | React.ReactNode
+  labelLeft?: boolean
+  labelRight?: boolean
+  chevronLeft?: boolean
+  chevronRight?: boolean
+  dismissOnClick?: boolean
+  valueKey?: string
+}
+
+interface DropdownContextValue extends DropdownProps {
+  dropdownOpen: boolean
+  setDropdownOpen: (value: boolean) => void
+  position: Position
+  setPosition?: (value: Position) => void
+  triggerRef: React.RefObject<HTMLDivElement> | null
+  dropdownRef: React.RefObject<HTMLDivElement> | null
+  hiddenDropdownRef: React.RefObject<HTMLDivElement> | null
+  simpleTheme: MakUiSimpleTheme
+}
+
+const DropdownContext = createContext<DropdownContextValue | undefined>(
+  undefined
+)
+
+const useDropdownContext = () => {
+  const context = useContext(DropdownContext)
+  if (!context) {
+    throw new Error(
+      "Dropdown compound components cannot be rendered outside the Dropdown component"
+    )
   }
+  return context
+}
+
+const Dropdown = ({
+  children,
+  options,
+  value,
+  values,
+  onChange,
+  menuPosition = "bottom-right",
+  icon,
+  label,
+  labelLeft,
+  labelRight,
+  chevronRight,
+  chevronLeft,
+  valueKey,
+}: DropdownProps) => {
+  const { simpleTheme } = useMakUi()
+
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false)
+  const [position, setPosition] = useState<Position>({
+    top: 0,
+    right: 0,
+  })
+
+  const [dismissOnClick, setDismissOnClick] = useState<boolean>(true)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const hiddenDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (triggerRef.current) {
+      console.log("trigger ref", triggerRef.current.getBoundingClientRect())
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!dropdownOpen) {
+      return
+    }
     const handleClickOutside = (event: any) => {
       if (
         dropdownRef.current &&
@@ -240,41 +353,31 @@ const DropdownTrigger = ({
         triggerRef.current &&
         !triggerRef.current.contains(event.target)
       ) {
-        console.log("click outside")
+        setDropdownOpen(false)
+      }
+    }
+    const handleClickMenuItem = (event: any) => {
+      if (
+        dismissOnClick &&
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target)
+      ) {
         setDropdownOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("click", handleClickMenuItem)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("click", handleClickMenuItem)
     }
   }, [dropdownOpen])
 
   useEffect(() => {
-    if (selectedOption && dismissOnClick) {
+    if ((value || values) && dismissOnClick) {
       setDropdownOpen(false)
     }
-  }, [selectedOption])
-
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen)
-  }
-
-  const LabelElement = ({ onClick }: { onClick?: () => void }) => {
-    if (!label) return null
-    if (typeof label === "string")
-      return (
-        <label className={`cursor-pointer`} onClick={onClick}>
-          {label}
-        </label>
-      )
-    if (typeof label === "object")
-      return (
-        <span className="cursor-pointer" onClick={onClick}>
-          {label}
-        </span>
-      )
-  }
+  }, [value, values])
 
   const getDropdownPosition = () => {
     if (
@@ -285,23 +388,20 @@ const DropdownTrigger = ({
       const triggerRect = triggerRef.current.getBoundingClientRect()
       const hiddenDropdownRect =
         hiddenDropdownRef.current.getBoundingClientRect()
-
       const menuHeight = hiddenDropdownRect.height
       const menuWidth = hiddenDropdownRect.width
+      console.log({ menuHeight, menuWidth })
       const triggerWidth = triggerRect.width
       const padding = 8
-
       let triggerLeft = triggerRect.left
       let triggerTop = triggerRect.top
       let triggerRight = triggerRect.right
       let triggerBottom = triggerRect.bottom
-
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
-
       let menuTop = 0
       let menuLeft = 0
-
+      console.log({ triggerLeft, triggerTop, triggerRight, triggerBottom })
       if (menuPosition.includes("top")) {
         menuTop = triggerTop - menuHeight - padding
       }
@@ -323,27 +423,23 @@ const DropdownTrigger = ({
       if (menuPosition.includes("center")) {
         menuLeft = triggerLeft + triggerWidth / 2 - menuWidth / 2
       }
-
       if (menuLeft + menuWidth > viewportWidth) {
         menuLeft = triggerLeft - menuWidth + triggerWidth
       }
-
       if (menuPosition.includes("top") && menuTop - menuHeight < 0) {
         menuTop = triggerBottom + padding
       }
-
       if (
         menuPosition.includes("bottom") &&
         menuTop + menuHeight > viewportHeight
       ) {
         menuTop = triggerTop - menuHeight - padding
       }
-
       if (menuPosition.includes("left") && menuLeft < 0) {
         menuLeft = triggerLeft
       }
       const position = { top: menuTop, left: menuLeft }
-
+      console.log({ position })
       setPosition(position)
     }
   }
@@ -353,106 +449,61 @@ const DropdownTrigger = ({
       getDropdownPosition()
     }
   }, [dropdownOpen])
-  const childrenType = (children as any)?.type.render.displayName
 
   return (
-    <div className="relative flex w-fit select-none">
-      <div
-        onClick={toggleDropdown}
-        ref={triggerRef}
-        className="relative flex h-fit items-center justify-center gap-1"
-      >
-        {chevronLeft && (
-          <motion.span
-            initial={{ rotate: 0 }}
-            animate={{ rotate: dropdownOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center"
-          >
-            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
-          </motion.span>
-        )}
-        {label && labelLeft && <LabelElement onClick={toggleDropdown} />}
-        <span className="flex cursor-pointer items-center gap-1">{icon}</span>
-        {label && labelRight && <LabelElement onClick={toggleDropdown} />}
-        {chevronRight && (
-          <motion.span
-            initial={{ rotate: 0 }}
-            animate={{ rotate: dropdownOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center"
-          >
-            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
-          </motion.span>
-        )}
-      </div>
+    <DropdownContext.Provider
+      value={{
+        options,
+        value,
+        values,
+        onChange,
+        dropdownOpen,
+        setDropdownOpen,
+        position,
+        triggerRef,
+        dropdownRef,
+        hiddenDropdownRef,
+        simpleTheme,
+        valueKey,
+      }}
+    >
+      <DropdownTrigger
+        icon={icon}
+        label={label}
+        labelLeft={labelLeft}
+        labelRight={labelRight}
+        chevronLeft={chevronLeft}
+        chevronRight={chevronRight}
+      />
       <AnimatePresence>
-        <motion.div
-          className={`fixed z-30 flex w-fit p-2 overflow-hidden rounded-lg bg-${simpleTheme?.theme?.secondary}`}
-          variants={menuVariants}
-          initial="hidden"
-          animate={dropdownOpen ? "visible" : "exit"}
-          exit="exit"
-          style={position}
-          ref={dropdownRef}
-          key={`dropdown`}
-        >
-          {children && childrenType !== "DropdownMenu" && (
-            <DropdownMenu
-              key={"dropdown-children"}
-              options={options}
-              selectedOption={selectedOption}
-              capitalize={capitalize}
-              nowrap={nowrap}
-              setSelectedOption={setSelectedOption}
-            >
-              {children}
-            </DropdownMenu>
-          )}
-          {children && childrenType === "DropdownMenu" && <>{children}</>}
-          {options && !children && (
-            <DropdownMenu
-              key={"dropdown-options"}
-              options={options}
-              selectedOption={selectedOption}
-              capitalize={capitalize}
-              nowrap={nowrap}
-              setSelectedOption={setSelectedOption}
-            />
-          )}
-        </motion.div>
-
-        <div
-          className={`fixed left-[-9999px] top-[-9999px] z-[-1000] flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg`}
-          ref={hiddenDropdownRef}
-          key={"dropdown-hidden"}
-        >
-          {children && (
-            <DropdownMenu
-              key={"dropdown-children"}
-              options={options}
-              selectedOption={selectedOption}
-              capitalize={capitalize}
-              nowrap={nowrap}
-              setSelectedOption={setSelectedOption}
-            >
-              {children}
-            </DropdownMenu>
-          )}
-          {options && !children && (
-            <DropdownMenu
-              key={"dropdown-options"}
-              options={options}
-              selectedOption={selectedOption}
-              capitalize={capitalize}
-              nowrap={nowrap}
-              setSelectedOption={setSelectedOption}
-            />
-          )}
-        </div>
+        {dropdownOpen && (
+          <motion.span
+            className={`fixed z-30 flex w-fit p-2 h-full overflow-hidden rounded-lg bg-${simpleTheme?.theme?.secondary}`}
+            variants={menuVariants}
+            initial="hidden"
+            animate={dropdownOpen ? "visible" : "exit"}
+            exit="exit"
+            style={position}
+            ref={dropdownRef}
+            key={`dropdown`}
+          >
+            {children ? children : <DropdownMenu />}
+          </motion.span>
+        )}
       </AnimatePresence>
-    </div>
+      <div
+        className={`fixed left-[-9999px] top-[-9999px] z-[-1000] flex w-fit p-2 overflow-hidden rounded-lg`}
+        ref={hiddenDropdownRef}
+        key={"dropdown-hidden"}
+      >
+        {children && (
+          <DropdownMenu key={"dropdown-children"}>{children}</DropdownMenu>
+        )}
+        {options && !children && <DropdownMenu key={"dropdown-options"} />}
+      </div>
+    </DropdownContext.Provider>
   )
 }
 
-export { DropdownMenu, DropdownTrigger }
+export { DropdownMenu }
+export default Dropdown

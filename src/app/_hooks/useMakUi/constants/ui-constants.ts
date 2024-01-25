@@ -194,6 +194,7 @@ export const makUiDefaultThemeShades: MakUiThemeShades = {
 
 export const makUiDefaultStateShades: MakUiStateShades = {
   base: 500,
+  hover: 400,
   active: 600,
   autofill: 500,
   click: 400,
@@ -206,7 +207,6 @@ export const makUiDefaultStateShades: MakUiStateShades = {
   focus: 500,
   "focus-visible": 500,
   "focus-within": 500,
-  hover: 300,
   "in-range": 500,
   indeterminate: 500,
   invalid: 500,

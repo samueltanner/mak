@@ -35,14 +35,14 @@ const DropdownElement = forwardRef(
       selectedOption,
       capitalize,
       nowrap,
-      setSelectedOption,
+      onChange,
     }: {
       children?: React.ReactNode
       options?: Array<string | number> | Array<{ label: string; value: string }>
       selectedOption?: string | number | { label: string; value: string }
       capitalize?: boolean
       nowrap?: boolean
-      setSelectedOption?: (
+      onChange?: (
         value: string | number | { label: string; value: string }
       ) => void
     },
@@ -103,8 +103,8 @@ const DropdownElement = forwardRef(
                       : "hover:bg-zinc-500 hover:bg-opacity-20"
                   }`}
                   onClick={() => {
-                    if (setSelectedOption) {
-                      setSelectedOption(option)
+                    if (onChange) {
+                      onChange(option)
                     }
                   }}
                 >
@@ -146,9 +146,7 @@ interface DropdownElementTriggerProps {
   selectedOption?: string | number | { label: string; value: string }
   capitalize?: boolean
   nowrap?: boolean
-  setSelectedOption?: (
-    value: { label: string; value: string } | string | number
-  ) => void
+  onChange?: (value: { label: string; value: string } | string | number) => void
   menuPosition?: MenuPositions
 }
 
@@ -163,7 +161,7 @@ const DropdownElementTrigger = ({
   selectedOption,
   capitalize = true,
   nowrap = true,
-  setSelectedOption,
+  onChange,
   menuPosition = "bottom-right",
   children,
 }: DropdownElementTriggerProps) => {
@@ -324,7 +322,7 @@ const DropdownElementTrigger = ({
                 selectedOption={selectedOption}
                 capitalize={capitalize}
                 nowrap={nowrap}
-                setSelectedOption={setSelectedOption}
+                onChange={onChange}
               >
                 {children}
               </DropdownElement>
@@ -336,7 +334,7 @@ const DropdownElementTrigger = ({
                 selectedOption={selectedOption}
                 capitalize={capitalize}
                 nowrap={nowrap}
-                setSelectedOption={setSelectedOption}
+                onChange={onChange}
               />
             </>
           )}
@@ -351,7 +349,7 @@ const DropdownElementTrigger = ({
             selectedOption={selectedOption}
             capitalize={capitalize}
             nowrap={nowrap}
-            setSelectedOption={setSelectedOption}
+            onChange={onChange}
           />
         </div>
       </AnimatePresence>

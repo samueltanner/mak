@@ -5,7 +5,10 @@ export const isNestedObject = (obj: GenericObject) =>
   isObject(obj) && Object.values(obj).some(isObject)
 
 export const isObject = (v: any): v is GenericObject =>
-  v !== null && typeof v === "object" && !Array.isArray(v)
+  v !== null &&
+  typeof v === "object" &&
+  !Array.isArray(v) &&
+  typeof v !== "string"
 
 export const deepMerge = (...objects: (GenericObject | undefined)[]) => {
   const result = {}
