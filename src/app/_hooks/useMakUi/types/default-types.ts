@@ -1,5 +1,3 @@
-import { MakUiButtonConfig } from "./component-types"
-
 export type SimpleRecord = Record<string, any>
 
 export type MakUiThemeModeShortHand = "drk" | "lgt" | "cst"

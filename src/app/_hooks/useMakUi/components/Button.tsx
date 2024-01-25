@@ -140,16 +140,16 @@ const buttonClassName = ({
   //   }),
   // })
 
-  const className = mcn(
-    `mak(dark:text-${textStyle} bg-${buttonStyle} border-${borderStyle} focus:focus-ring-primary focus:ring-offset-theme-primary) focus:ring-2 focus:ring-offset-2 border-4`,
-    {
-      type: "button",
-      states: ["disabled", "hover", "focus"],
-      theme: "light",
-    }
-  )
+  // const className = mcn(
+  //   `mak(dark:text-${textStyle} bg-${buttonStyle} border-${borderStyle} focus:focus-ring-primary focus:ring-offset-theme-primary) focus:ring-2 focus:ring-offset-2 border-4`,
+  //   {
+  //     type: "button",
+  //     states: ["disabled", "hover", "focus"],
+  //     theme: "light",
+  //   }
+  // )
 
-  return className
+  // return className
 
   const { state: buttonState, disabled, selected, active, focus } = buttonStates
 
@@ -164,9 +164,9 @@ const buttonClassName = ({
   const baseClass = `${buttonConfig.className} ${
     disabled && "cursor-not-allowed"
   }`
-  const textClass = `font-semibold text-${textVariantObject?.base} text-sm hover:text-${textVariantObject?.hover}`
+  const textClass = `text-${textVariantObject?.base} hover:text-${textVariantObject?.hover}`
   const backgroundClass = `${outlinedOrFilled}-${variantObject?.base} hover:${outlinedOrFilled}-${variantObject?.hover}`
-  const borderClass = `border-${borderVariantObject?.base} border-2 hover:border-${borderVariantObject?.hover}`
+  const borderClass = `border-${borderVariantObject?.base} border-[3px] hover:border-${borderVariantObject?.hover}`
   const selectedClass =
     selected && showFocusRing && !disabled
       ? `ring-2 ring-${variantObject?.base}/50 outline-none ring-offset-2`
@@ -245,7 +245,7 @@ const Button = forwardRef(
       iconSide = "left",
       wrapButtonText = false,
       keepStatusVisible = false,
-      showFocusRing = true,
+      showFocusRing = false,
     } = buttonProps
 
     const { simpleTheme, componentConfig, mcn } = useMakUi()
@@ -284,7 +284,7 @@ const Button = forwardRef(
       if (custom) return "custom"
       if (primary) return "primary"
       return "primary"
-    }, [])
+    }, [buttonProps])
 
     const textStyle = useMemo(() => {
       if (textType) return textType
@@ -298,7 +298,7 @@ const Button = forwardRef(
       if (textCustom) return "custom"
       if (textPrimary) return "primary"
       return "primary"
-    }, [])
+    }, [buttonProps])
 
     const borderStyle = useMemo(() => {
       if (borderType) return borderType
@@ -312,7 +312,7 @@ const Button = forwardRef(
       if (borderCustom) return "custom"
       if (borderPrimary) return "primary"
       return buttonStyle
-    }, [])
+    }, [buttonProps])
 
     const isDisabled = disabled || isLoading
 
@@ -341,21 +341,22 @@ const Button = forwardRef(
       return "Submit"
     }
 
-    // const computedButtonClassName = buttonClassName({
-    //   text: !!displayTextOrChildren(),
-    //   buttonStyle: buttonStyle(),
-    //   textStyle: textStyle(),
-    //   borderStyle: borderStyle(),
-    //   buttonStates: currentButtonState(),
-    //   width,
-    //   outlined,
-    //   border,
-    //   customClassName: className,
-    //   customTextClassName: textClassName,
-    //   buttonConfig: componentConfig.buttonConfig,
-    //   theme: simpleTheme,
-    //   mcn: mcn,
-    // })
+    const computedButtonClassName = buttonClassName({
+      text: !!displayTextOrChildren(),
+      buttonStyle: buttonStyle,
+      textStyle: textStyle,
+      borderStyle: borderStyle,
+      buttonStates: currentButtonState(),
+      width,
+      outlined,
+      border,
+      customClassName: className,
+      customTextClassName: textClassName,
+      buttonConfig: componentConfig.buttonConfig,
+      theme: simpleTheme,
+      showFocusRing,
+      mcn: mcn,
+    })
 
     const handleClick = () => {
       if (!isDisabled && onClick) {
@@ -363,54 +364,54 @@ const Button = forwardRef(
       }
     }
 
-    const focusClassNames = useMemo(() => {
-      let makClassName
-      let className
-      if (showFocusRing) {
-        makClassName = `focus:focus-ring-${buttonStyle} focus:ring-offset-theme-primary`
-        className = `focus:ring-2 focus:ring-offset-2`
-        return mcn("", {
-          makClassName,
-          className,
-          type: "button",
-          states: ["hover"],
-        })
-      }
-    }, [showFocusRing])
+    // const focusClassNames = useMemo(() => {
+    //   let makClassName
+    //   let className
+    //   if (showFocusRing) {
+    //     makClassName = `focus:focus-ring-${buttonStyle} focus:ring-offset-theme-primary`
+    //     className = `focus:ring-2 focus:ring-offset-2`
+    //     return mcn("", {
+    //       makClassName,
+    //       className,
+    //       type: "button",
+    //       states: ["hover"],
+    //     })
+    //   }
+    // }, [showFocusRing])
 
-    const borderBgClassNames = useMemo(() => {
-      let makClassName
-      let className
-      if (outlined) {
-        makClassName = `border-${buttonStyle}`
-        className = `border-[3px]`
-        return mcn("", {
-          makClassName,
-          className,
-          type: "button",
-          states: ["focus", "hover", "group-hover"],
-        })
-      } else {
-        makClassName = `bg-${buttonStyle}`
-        return mcn("", {
-          makClassName,
-          states: ["focus", "hover", "group-hover"],
-        })
-      }
-    }, [outlined])
+    // const borderBgClassNames = useMemo(() => {
+    //   let makClassName
+    //   let className
+    //   if (outlined) {
+    //     makClassName = `border-${buttonStyle}`
+    //     className = `border-[3px]`
+    //     return mcn("", {
+    //       makClassName,
+    //       className,
+    //       type: "button",
+    //       states: ["focus", "hover", "group-hover"],
+    //     })
+    //   } else {
+    //     makClassName = `bg-${buttonStyle}`
+    //     return mcn("", {
+    //       makClassName,
+    //       states: ["focus", "hover", "group-hover"],
+    //     })
+    //   }
+    // }, [outlined])
 
-    const textClassNames = useMemo(() => {
-      let makClassName
-      let className
-      makClassName = `text-${textStyle}`
-      className = `text-sm`
-      return mcn("", {
-        makClassName,
-        className,
-        type: "button",
-        states: ["focus", "hover", "group-hover"],
-      })
-    }, [textStyle])
+    // const textClassNames = useMemo(() => {
+    //   let makClassName
+    //   let className
+    //   makClassName = `text-${textStyle}`
+    //   className = `text-sm`
+    //   return mcn("", {
+    //     makClassName,
+    //     className,
+    //     type: "button",
+    //     states: ["focus", "hover", "group-hover"],
+    //   })
+    // }, [textStyle])
 
     return (
       <button
@@ -457,7 +458,7 @@ const Button = forwardRef(
             focus: false,
           })
         }}
-        className={`group flex items-center justify-center gap-1 ${textClassNames} ${borderBgClassNames} ${focusClassNames} ${className}`}
+        className={`group flex items-center justify-center gap-1 ${computedButtonClassName}`}
         disabled={isDisabled}
         type={type}
         id={id}

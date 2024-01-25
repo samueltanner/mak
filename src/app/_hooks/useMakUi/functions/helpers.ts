@@ -873,7 +873,6 @@ export const extractInitialPalette = ({
       const themes = Object.entries(value)
 
       themes.forEach(([variant, classNames]) => {
-        console.log({ variant, classNames })
         if (typeof classNames === "string") {
           const splitClassNames = classNames.split(" ")
           splitClassNames.forEach((className) => {
@@ -886,7 +885,7 @@ export const extractInitialPalette = ({
 
             ensureNestedObject({
               parent: themePalette,
-              keys: [theme, "theme", variant],
+              keys: [theme, variant],
               value: colorString,
             })
           })
@@ -1056,7 +1055,8 @@ export const makClassNameHelper = ({
       } else {
         let constructedClassName
         if (twVariant) {
-          constructedClassName = `${twVariant}:${palette}-${target[state]}` + opacityString
+          constructedClassName =
+            `${twVariant}:${palette}-${target[state]}` + opacityString
         } else {
           constructedClassName = `${state}:${target[state]}` + opacityString
         }
@@ -1087,10 +1087,7 @@ const parseMakClassName = (string: string) => {
   if (string.includes("ring-offset")) {
     makClassNameObj.twVariant = "ring-offset"
   }
-  if (string.includes("group-hover")) {
-    console.log("group-hover")
-    makClassNameObj.twVariant = "group-hover"
-  }
+
   const delimiters = /group-offset:|ring-offset:|[:\/.-]+/
   const splitString = string.split(delimiters)
 
@@ -1118,10 +1115,7 @@ const parseMakClassName = (string: string) => {
     }
 
     if (tailwindVariantsSet.has(str as TailwindVariantKey)) {
-      if (
-        makClassNameObj.twVariant !== "ring-offset" &&
-        makClassNameObj.twVariant !== "group-hover"
-      ) {
+      if (makClassNameObj.twVariant !== "ring-offset") {
         makClassNameObj.twVariant = str as TailwindVariantKey
       }
     } else if (str === "color") {

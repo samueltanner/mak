@@ -13,23 +13,65 @@ const config: Config = {
     "dark",
     {
       // Backgrounds
-      pattern: /^bg-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled", "group-hover"],
+      pattern:
+        /^bg-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+      variants: [
+        "dark",
+        "hover",
+        "disabled",
+        "group-hover",
+        "peer-checked",
+        "before",
+
+        "after",
+
+        "after:peer-checked",
+
+        "peer-disabled",
+        "checked",
+      ],
     },
     {
       // Borders
-      pattern: /^border-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled", "group-hover"],
+      pattern:
+        /^border-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+      variants: [
+        "dark",
+        "hover",
+        "disabled",
+        "group-hover",
+        "peer-checked",
+        "peer-disabled",
+        "checked",
+      ],
     },
     {
       // Ring Color
-      pattern: /^ring-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled", "group-hover"],
+      pattern:
+        /^ring-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+      variants: [
+        "dark",
+        "hover",
+        "disabled",
+        "group-hover",
+        "peer-checked",
+        "peer-disabled",
+        "checked",
+      ],
     },
     {
       // Text Color
-      pattern: /^text-(mak-teal|blue|purple|zinc|green|red|yellow)-[^/]+$/,
-      variants: ["dark", "hover", "disabled", "group-hover"],
+      pattern:
+        /^text-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+      variants: [
+        "dark",
+        "hover",
+        "disabled",
+        "group-hover",
+        "peer-checked",
+        "peer-disabled",
+        "checked",
+      ],
     },
     // {
     //   pattern:

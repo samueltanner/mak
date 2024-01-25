@@ -8,6 +8,7 @@ import Modal, {
   ModalHeader,
 } from "../_hooks/useMakUi/components/Modal"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
+import ButtonListView from "./ButtonListView"
 
 const MakUiView = () => {
   const { simpleTheme, simplePalette, mcn } = useMakUi()
@@ -16,7 +17,8 @@ const MakUiView = () => {
   return (
     <div>
       <div>
-        <Dropdown icon={<span className={mcn("text-primary")}>trigger</span>}>
+        <ButtonListView />
+        {/* <Dropdown icon={<span className={mcn("text-primary")}>trigger</span>}>
           <span className="flex h-full w-full ">
             <ul>
               <li>Element 1</li>
@@ -24,25 +26,25 @@ const MakUiView = () => {
               <li>Element 3</li>
             </ul>
           </span>
-        </Dropdown>
+        </Dropdown> */}
         <Modal
           isOpen={modalIsOpen}
           onClose={() => {
             setModalIsOpen(false)
           }}
-          className={`bg-${simpleTheme.theme.secondary} h-10 rounded-md select-none`}
+          className={`bg-${simpleTheme.theme.secondary} h-10 rounded-md select-none text-${simpleTheme.text.primary.base} px-6 py-4 flex gap-6`}
           backdropClassName="backdrop-blur-sm"
         >
-          <ModalHeader className="text-md font-semibold p-4">
+          <ModalHeader className="text-md font-semibold">
             Lorem ipsum
           </ModalHeader>
-          <ModalContent className="text-md font-normal p-4">
+          <ModalContent className={`text-md font-normal `}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
             tempora accusantium ipsum, veniam dolores explicabo deserunt
             suscipit possimus, error nihil adipisci animi hic nam molestiae
             voluptatum saepe velit eveniet quam.
           </ModalContent>
-          <ModalFooter className="text-md font-semibold p-4">
+          <ModalFooter className="text-md font-semibold">
             <Button
               tertiary
               outline

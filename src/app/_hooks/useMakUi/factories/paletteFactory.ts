@@ -47,10 +47,10 @@ export const paletteFactory = ({
     for (const paletteVariant of makUiPalettes) {
       if (paletteVariant === "theme") {
         if (initialVerbosePalette?.[theme]?.["theme"]) {
-          const providedVariant = initialVerbosePalette[theme].theme
+          const providedVariants = initialVerbosePalette[theme].theme
 
           const constructedTheme = getConstructedTheme({
-            providedVariants: providedVariant,
+            providedVariants,
             theme,
             defaultShades: defaultShades.defaultThemeShades,
           })

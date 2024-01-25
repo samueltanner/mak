@@ -11,9 +11,15 @@ export type TailwindVariantKey =
   | "ring"
   | "outline"
   | "ring-offset"
-  | "group-hover"
   | "fill"
   | "stroke"
+
+export type TailwindModifier =
+  | "peer"
+  | "group"
+  | "has"
+  | "group-has"
+  | "peer-has"
 
 export type HtmlElementKey =
   | "button"
@@ -77,7 +83,6 @@ export type MakUiInteractionStateKey =
   | "focus-visible"
   | "focus-within"
   | "hover"
-  | "group-hover"
   | "in-range"
   | "indeterminate"
   | "invalid"

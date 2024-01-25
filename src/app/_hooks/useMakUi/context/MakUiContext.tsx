@@ -183,6 +183,9 @@ const MakUiProviderChild = ({
   const [verboseTheme, setVerboseTheme] = useState<MakUiVerboseTheme>(
     {} as MakUiVerboseTheme
   )
+  const [theme, setTheme] = useState<MakUiThemeKey>(
+    (themeMode as MakUiThemeKey) || defaultTheme || "light"
+  )
 
   // const [safeList, setSafeList] = useState<any[]>([])
 
@@ -262,11 +265,11 @@ const MakUiProviderChild = ({
     componentConfig,
     themeMode,
     setTheme: setThemeMode,
-    theme: themeMode,
+    theme,
     formattingThemes,
-    isDark: themeMode === "dark",
-    isLight: themeMode === "light",
-    isCustom: themeMode === "custom",
+    isDark: theme === "dark",
+    isLight: theme === "light",
+    isCustom: theme === "custom",
     enabledThemeModes,
     makClassName,
     mcn: makClassName,
@@ -298,7 +301,7 @@ export type MakUiClassNameHelper = (
 interface MakUiContext {
   componentConfig: MakUiComponentConfig
 
-  theme: string | undefined
+  theme: MakUiThemeKey
   setTheme: (themeMode: string) => void
   formattingThemes: boolean
   isDark: boolean
