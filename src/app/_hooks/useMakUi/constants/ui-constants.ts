@@ -62,6 +62,8 @@ export const makUiThemeVariants: MakUiThemeVariantKey[] = [
   "secondary",
   "tertiary",
   "custom",
+  "light",
+  "dark",
 ]
 
 export const makUiThemeVariantsSet: Set<MakUiThemeVariantKey> = new Set(
@@ -75,8 +77,6 @@ export const makUiVariants: MakUiVariantKey[] = [
   "danger",
   "warning",
   "info",
-  "light",
-  "dark",
 ]
 
 export const makUiVariantsSet: Set<MakUiVariantKey> = new Set(makUiVariants)
@@ -145,6 +145,8 @@ export const makUiDefaultPalette: MakUiDefaultPalette = {
       secondary: "zinc-100",
       tertiary: "zinc-200",
       custom: "zinc-950",
+      light: "white",
+      dark: "black",
     },
   },
   dark: {
@@ -156,6 +158,8 @@ export const makUiDefaultPalette: MakUiDefaultPalette = {
       secondary: "zinc-900",
       tertiary: "zinc-800",
       custom: "zinc-700",
+      light: "white",
+      dark: "black",
     },
   },
   custom: {
@@ -167,6 +171,8 @@ export const makUiDefaultPalette: MakUiDefaultPalette = {
       secondary: "zinc-100",
       tertiary: "zinc-200",
       custom: "zinc-950",
+      light: "white",
+      dark: "black",
     },
   },
 }
@@ -177,18 +183,24 @@ export const makUiDefaultThemeShades: MakUiThemeShades = {
     secondary: 100,
     tertiary: 200,
     custom: 950,
+    light: 50,
+    dark: 950,
   },
   dark: {
     primary: 950,
     secondary: 900,
     tertiary: 800,
     custom: 700,
+    light: 50,
+    dark: 950,
   },
   custom: {
     primary: 50,
     secondary: 100,
     tertiary: 200,
     custom: 950,
+    light: 50,
+    dark: 950,
   },
 }
 

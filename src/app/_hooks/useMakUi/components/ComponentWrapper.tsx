@@ -110,8 +110,6 @@ const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
     ...restWithComputedProps,
   }
 
-  console.log({ response })
-
   return (
     <>
       {typeof children === "function"

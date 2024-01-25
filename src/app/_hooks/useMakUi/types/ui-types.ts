@@ -53,6 +53,8 @@ export type MakUiThemeVariantKey =
   | "secondary"
   | "tertiary"
   | "custom"
+  | "light"
+  | "dark"
 
 
 export type MakUiVariantRootKey =
@@ -281,6 +283,8 @@ export type MakUiDefaultPalette = {
       secondary: string
       tertiary: string
       custom: string
+      light: string
+      dark: string
     }
   }
 }

@@ -88,6 +88,8 @@ export type TypeProps = {
   danger?: boolean
   info?: boolean
   custom?: boolean
+  light?: boolean
+  dark?: boolean
   colorType?: MakUiVariantKey | undefined
   color?:
     | "primary"
@@ -99,6 +101,8 @@ export type TypeProps = {
     | "warning"
     | "danger"
     | "info"
+    | "light"
+    | "dark"
     | string
 
   textPrimary?: boolean
@@ -110,6 +114,8 @@ export type TypeProps = {
   textDanger?: boolean
   textInfo?: boolean
   textCustom?: boolean
+  textLight?: boolean
+  textDark?: boolean
   textType?: MakUiVariantKey | undefined
   text?:
     | "primary"
@@ -121,6 +127,8 @@ export type TypeProps = {
     | "warning"
     | "danger"
     | "info"
+    | "light"
+    | "dark"
     | string
 
   borderPrimary?: boolean
@@ -132,6 +140,8 @@ export type TypeProps = {
   borderDanger?: boolean
   borderInfo?: boolean
   borderCustom?: boolean
+  borderLight?: boolean
+  borderDark?: boolean
   borderType?: MakUiVariantKey | undefined
   border?:
     | "primary"
@@ -143,6 +153,8 @@ export type TypeProps = {
     | "warning"
     | "danger"
     | "info"
+    | "light"
+    | "dark"
     | string
 
   themeMode?: MakUiThemeKey | undefined

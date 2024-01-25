@@ -2,9 +2,11 @@ import { useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
 import Dropdown, { DropdownMenu } from "../_hooks/useMakUi/components/Dropdown"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
+import { objectToClassName } from "../_hooks/useMakUi/functions/helpers"
 
 const DropdownView = () => {
-  const { simpleTheme } = useMakUi()
+  const { simpleTheme, verboseTheme, simplePalette, verbosePalette } = useMakUi()
+  console.log({ simplePalette, verbosePalette })
   const [buttonState, setButtonState] = useState<
     "error" | "success" | "loading" | "default"
   >("default")
@@ -26,7 +28,16 @@ const DropdownView = () => {
       </Button>
 
       <Dropdown
-        label="Select"
+        label={
+          <span
+            className={`capitalize ${objectToClassName({
+              object: verboseTheme.text.primary,
+              variant: "text",
+            })}`}
+          >
+            {buttonState === "default" ? "default" : buttonState}
+          </span>
+        }
         chevronRight
         onChange={(value) => setButtonState(value as any)}
         value={buttonState}

@@ -41,6 +41,8 @@ export const paletteFactory = ({
     enabledThemeModes,
   })
 
+  console.log({ initialVerbosePalette })
+
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
   for (const theme of enabledThemeModes) {
@@ -61,7 +63,8 @@ export const paletteFactory = ({
             value: constructedTheme,
           })
 
-          const { primary, secondary, tertiary, custom } = constructedTheme
+          const { primary, secondary, tertiary, custom, light, dark } =
+            constructedTheme
 
           ensureNestedObject({
             parent: finalSimplePalette,
@@ -71,16 +74,18 @@ export const paletteFactory = ({
               secondary,
               tertiary,
               custom,
+              light,
+              dark,
             },
           })
         } else {
           const defaultVariant = makUiDefaultPalette[theme]!.theme
-
           const constructedTheme = getConstructedTheme({
             providedVariants: defaultVariant,
             theme,
             defaultShades: defaultShades.defaultThemeShades,
           })
+          console.log({ defaultVariant, constructedTheme })
 
           ensureNestedObject({
             parent: finalVerbosePalette,

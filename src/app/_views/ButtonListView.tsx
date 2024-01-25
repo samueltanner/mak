@@ -17,8 +17,8 @@ const ButtonListView = () => {
             key={index}
             outline={outlined}
             buttonType={cName as MakUiVariantKey}
-            textLight={cName !== "light" && !outlined}
-            textPrimary={cName === "light"}
+            textLight={!outlined && cName !== "light"}
+            textDark={cName === "light"}
             borderCustom={cName === "light"}
           >
             <span className="capitalize">{cName}</span>
@@ -38,6 +38,7 @@ const ButtonListView = () => {
           onChange={() => setOutlined(!outlined)}
           borderPx={4}
           borderSecondary
+          light
           custom
         />
         <span

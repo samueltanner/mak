@@ -166,7 +166,7 @@ export const getConstructedTheme = ({
   theme: MakUiThemeKey
   defaultShades: MakUiThemeShades
 }) => {
-  const { primary, secondary, tertiary, custom } = providedVariants
+  const { primary, secondary, tertiary, custom, light, dark } = providedVariants
 
   const { shade: primaryShade, color: primaryColor } = twColorHelper({
     colorString: primary || makUiDefaultColors.primary,
@@ -186,6 +186,14 @@ export const getConstructedTheme = ({
     useDefaults: false,
   })
 
+  const { shade: lightShade, color: lightColor } = twColorHelper({
+    colorString: light || "white",
+    useDefaults: false,
+  })
+  const { shade: darkShade, color: darkColor } = twColorHelper({
+    colorString: dark || "black",
+    useDefaults: false,
+  })
   const defaultShadesObj = makUiDefaultThemeShades[theme]
   const shadeDiffs = Object.entries(defaultShadesObj).reduce(
     (acc, [variant, shade]) => {
@@ -218,6 +226,12 @@ export const getConstructedTheme = ({
     custom: includesShade(custom)
       ? customShade
       : getNormalizedShadeNumber(resolvedPrimaryShade! + shadeDiffs.custom),
+    light: includesShade(light)
+      ? lightShade
+      : getNormalizedShadeNumber(resolvedPrimaryShade! + shadeDiffs.light),
+    dark: includesShade(dark)
+      ? darkShade
+      : getNormalizedShadeNumber(resolvedPrimaryShade! + shadeDiffs.dark),
   }
 
   const resolvedThemeObject = {
@@ -239,6 +253,14 @@ export const getConstructedTheme = ({
       colorString: customColor || primaryColor,
       shade: resolvedShadesObject.custom,
     }),
+    light: twColorHelper({
+      colorString: lightColor,
+      shade: resolvedShadesObject.light,
+    }),
+    dark: twColorHelper({
+      colorString: darkColor,
+      shade: resolvedShadesObject.dark,
+    }),
   }
 
   const themeResponse = {
@@ -246,6 +268,8 @@ export const getConstructedTheme = ({
     secondary: resolvedThemeObject.secondary.rootString,
     tertiary: resolvedThemeObject.tertiary.rootString,
     custom: resolvedThemeObject.custom.rootString,
+    light: resolvedThemeObject.light.rootString,
+    dark: resolvedThemeObject.dark.rootString,
   }
 
   return themeResponse
@@ -886,19 +910,23 @@ export const extractInitialPalette = ({
       themes.forEach(([variant, classNames]) => {
         if (typeof classNames === "string") {
           const splitClassNames = classNames.split(" ")
+
           splitClassNames.forEach((className) => {
             const splitClassName = className.split(":")
             const color = splitClassName[splitClassName.length - 1]
             const colorString = twColorHelper({ colorString: color }).rootString
-            const theme = makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)
-              ? (splitClassName[0] as MakUiThemeKey)
-              : "light"
+            const altThemes: MakUiThemeKey[] = []
+            makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)
+              ? altThemes.push(splitClassName[0] as MakUiThemeKey)
+              : altThemes.push(...enabledThemeModes)
 
-            ensureNestedObject({
-              parent: themePalette,
-              keys: [theme, variant],
-              value: colorString,
-            })
+            for (const t of altThemes) {
+              ensureNestedObject({
+                parent: themePalette,
+                keys: [t, variant],
+                value: colorString,
+              })
+            }
           })
         }
       })
@@ -1273,6 +1301,11 @@ export const objectToClassName = (
   }: ObjectToClassNameObjectProp): string {
     if (!isObject(object)) return ""
     let parsedStringArray: string[] = []
+
+    if (!allowedStates || !allowedStates.has("base")) {
+      allowedStates = new Set([...(allowedStates || []), "base"])
+    }
+
     Object.entries(object).forEach(([key, value]) => {
       if (!allowedStates || !allowedStates.has(key)) return ""
       if (key === "base") {

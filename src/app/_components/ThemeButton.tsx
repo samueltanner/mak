@@ -13,7 +13,7 @@ const ThemeButton = () => {
   } = useMakUi()
   return (
     <Button
-      tertiary
+      primary
       outline
       onClick={() => {
         setTheme(

@@ -15,6 +15,8 @@ export const typeProps: TypeProps = {
   danger: false,
   info: false,
   custom: false,
+  light: false,
+  dark: false,
   colorType: "primary",
 
   textPrimary: false,
@@ -26,6 +28,8 @@ export const typeProps: TypeProps = {
   textDanger: false,
   textInfo: false,
   textCustom: false,
+  textLight: false,
+  textDark: false,
   textType: "primary",
 
   borderPrimary: false,
@@ -37,6 +41,8 @@ export const typeProps: TypeProps = {
   borderDanger: false,
   borderInfo: false,
   borderCustom: false,
+  borderLight: false,
+  borderDark: false,
   borderType: "primary",
 
   themeMode: "light",
@@ -68,6 +74,8 @@ const getThemeValue = (props: TypeProps): MakUiThemeKey | undefined => {
   if (props.themeSecondary) return "secondary" as MakUiThemeKey
   if (props.themeTertiary) return "tertiary" as MakUiThemeKey
   if (props.themeCustom) return "custom" as MakUiThemeKey
+  if (props.themeLight) return "light" as MakUiThemeKey
+  if (props.themeDark) return "dark" as MakUiThemeKey
   return undefined
 }
 
