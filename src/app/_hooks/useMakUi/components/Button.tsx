@@ -3,12 +3,8 @@ import { forwardRef, useEffect, useMemo, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
 import { MakUiClassNameHelper, useMakUi } from "../context/MakUiContext"
 import {
-  MakUiInteraction,
-  MakUiState,
-  MakUiVariant,
-} from "../types/default-types"
-import {
   MakUiSimpleTheme,
+  MakUiStateKey,
   MakUiVariantKey,
   MakUiVerboseTheme,
 } from "../types/ui-types"
@@ -29,7 +25,7 @@ interface ButtonProps {
   custom?: boolean
   light?: boolean
   dark?: boolean
-  buttonType?: MakUiVariant | undefined
+  buttonType?: MakUiVariantKey | undefined
 
   textPrimary?: boolean
   textSecondary?: boolean
@@ -42,7 +38,7 @@ interface ButtonProps {
   textCustom?: boolean
   textLight?: boolean
   textDark?: boolean
-  textType?: MakUiVariant | undefined
+  textType?: MakUiVariantKey | undefined
 
   borderPrimary?: boolean
   borderSecondary?: boolean
@@ -55,12 +51,12 @@ interface ButtonProps {
   borderCustom?: boolean
   borderLight?: boolean
   borderDark?: boolean
-  borderType?: MakUiVariant | undefined
+  borderType?: MakUiVariantKey | undefined
 
   active?: boolean
   disabled?: boolean
   focus?: boolean
-  buttonState?: MakUiState | undefined
+  buttonState?: MakUiStateKey | undefined
 
   textClassName?: string
   border?: boolean
@@ -89,7 +85,7 @@ interface ButtonProps {
 }
 
 type ButtonStates = {
-  state: MakUiState
+  state: MakUiStateKey
   interaction: ButtonInteractions
   disabled: boolean
   loading: boolean
@@ -103,7 +99,10 @@ type ButtonStates = {
 }
 
 type ButtonInteractions = {
-  [Key in MakUiInteraction]: boolean
+  base: boolean
+  hover: boolean
+  click: boolean
+  focus: boolean
 }
 
 const buttonClassName = ({
@@ -120,7 +119,6 @@ const buttonClassName = ({
   buttonConfig,
   theme,
   showFocusRing = true,
-  mcn,
 }: {
   text: boolean
   buttonStyle: MakUiVariantKey
@@ -135,31 +133,11 @@ const buttonClassName = ({
   buttonConfig: MakUiRootComponentConfig
   theme: MakUiSimpleTheme
   showFocusRing?: boolean
-  mcn: MakUiClassNameHelper
 }) => {
   const textPalette = theme.text
   const colorPalette = theme.color
   const borderPalette = theme.border
   const themePalette = theme.theme
-
-  // console.log({
-  //   mcn: mcn("dark:text-primary", {
-  //     type: "button",
-  //     states: ["disabled", "hover", "focus"],
-  //     theme: "light",
-  //   }),
-  // })
-
-  // const className = mcn(
-  //   `mak(dark:text-${textStyle} bg-${buttonStyle} border-${borderStyle} focus:focus-ring-primary focus:ring-offset-theme-primary) focus:ring-2 focus:ring-offset-2 border-4`,
-  //   {
-  //     type: "button",
-  //     states: ["disabled", "hover", "focus"],
-  //     theme: "light",
-  //   }
-  // )
-
-  // return className
 
   const { state: buttonState, disabled, selected, active, focus } = buttonStates
 
@@ -171,14 +149,11 @@ const buttonClassName = ({
   const textVariantObject = textPalette?.[textStyle]
   const borderVariantObject = borderPalette?.[borderStyle]
 
-  
   const baseClass = `${buttonConfig.className} ${
     disabled && "cursor-not-allowed"
   }`
   const textClass = `text-${textVariantObject?.base} hover:text-${textVariantObject?.hover}`
-  if (textStyle === "light") {
-    console.log({ textClass })
-  }
+
   const backgroundClass = `${outlinedOrFilled}-${variantObject?.base} hover:${outlinedOrFilled}-${variantObject?.hover}`
   const borderClass = `border-${borderVariantObject?.base} border-[3px] hover:border-${borderVariantObject?.hover}`
   const selectedClass =
@@ -268,7 +243,7 @@ const Button = forwardRef(
       showFocusRing = false,
     } = buttonProps
 
-    const { simpleTheme, componentConfig, mcn } = useMakUi()
+    const { simpleTheme, componentConfig } = useMakUi()
 
     const status = isLoading || isError || isSuccess
     const [showStatus, setShowStatus] = useState<boolean>(!!status)
@@ -381,7 +356,6 @@ const Button = forwardRef(
       buttonConfig: componentConfig.buttonConfig,
       theme: simpleTheme,
       showFocusRing,
-      mcn: mcn,
     })
 
     const handleClick = () => {
@@ -389,55 +363,6 @@ const Button = forwardRef(
         onClick()
       }
     }
-
-    // const focusClassNames = useMemo(() => {
-    //   let makClassName
-    //   let className
-    //   if (showFocusRing) {
-    //     makClassName = `focus:focus-ring-${buttonStyle} focus:ring-offset-theme-primary`
-    //     className = `focus:ring-2 focus:ring-offset-2`
-    //     return mcn("", {
-    //       makClassName,
-    //       className,
-    //       type: "button",
-    //       states: ["hover"],
-    //     })
-    //   }
-    // }, [showFocusRing])
-
-    // const borderBgClassNames = useMemo(() => {
-    //   let makClassName
-    //   let className
-    //   if (outlined) {
-    //     makClassName = `border-${buttonStyle}`
-    //     className = `border-[3px]`
-    //     return mcn("", {
-    //       makClassName,
-    //       className,
-    //       type: "button",
-    //       states: ["focus", "hover", "group-hover"],
-    //     })
-    //   } else {
-    //     makClassName = `bg-${buttonStyle}`
-    //     return mcn("", {
-    //       makClassName,
-    //       states: ["focus", "hover", "group-hover"],
-    //     })
-    //   }
-    // }, [outlined])
-
-    // const textClassNames = useMemo(() => {
-    //   let makClassName
-    //   let className
-    //   makClassName = `text-${textStyle}`
-    //   className = `text-sm`
-    //   return mcn("", {
-    //     makClassName,
-    //     className,
-    //     type: "button",
-    //     states: ["focus", "hover", "group-hover"],
-    //   })
-    // }, [textStyle])
 
     return (
       <button

@@ -5,8 +5,8 @@ import MakUiView from "./_views/MakUiView"
 import ThemeButton from "./_components/ThemeButton"
 
 export default function Home() {
-  const { simplePalette, simpleTheme, mcn } = useMakUi()
-  console.log(simplePalette)
+  const { simplePalette, simpleTheme } = useMakUi()
+
   return (
     <main
       className={`relative h-screen w-screen p-4 bg-${simpleTheme.theme.primary}`}

@@ -2,7 +2,7 @@ import { useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
 import Toggle from "../_hooks/useMakUi/components/Toggle"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
-import { MakUiVariant } from "../_hooks/useMakUi/types/default-types"
+import { MakUiVariantKey } from "../_hooks/useMakUi/types/ui-types"
 
 const ButtonListView = () => {
   const { simpleTheme } = useMakUi()
@@ -16,7 +16,7 @@ const ButtonListView = () => {
           <Button
             key={index}
             outline={outlined}
-            buttonType={cName as MakUiVariant}
+            buttonType={cName as MakUiVariantKey}
             textLight={cName !== "light" && !outlined}
             borderCustom={cName === "light"}
           >

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { TypeProps, withComputedProps } from "./componentTypeProps"
-import { MakUiVariant } from "../types/default-types"
 import { useMakUi } from "../context/MakUiContext"
 import { isObject } from "@/globals/global-helper-functions"
 import { makUiVariantsSet } from "../constants/ui-constants"
@@ -54,7 +53,7 @@ const Toggle: React.FC<ToggleProps> = ({
 
   const objectToClassName = (
     object: GenericObject,
-    variant: MakUiVariant | string,
+    variant: MakUiVariantKey | string,
     modifier?: TailwindModifier
   ) => {
     if (!isObject(object)) return ""

@@ -8,8 +8,6 @@ export const rootLevelBackgroundStyling = ""
 export const rootLevelMenuStyling =
   "rounded-lg border-2" + rootLevelBackgroundStyling
 
-export const textThemeStyling = "text-zinc-800 dark:text-zinc-100"
-
 const menuVariants = {
   hidden: {
     opacity: 0,
@@ -36,7 +34,7 @@ const menuVariants = {
   },
 }
 
-const DropdownElement = forwardRef(
+const DropdownMenu = forwardRef(
   (
     {
       children,
@@ -47,7 +45,13 @@ const DropdownElement = forwardRef(
       setSelectedOption,
     }: {
       children?: React.ReactNode
-      options?: Array<string | number> | Array<{ label: string; value: string }>
+      options?:
+        | Array<string | number>
+        | Array<{
+            label: string
+            value: string | number | undefined
+            onClick?: () => void
+          }>
       selectedOption?: string | number | { label: string; value: string }
       capitalize?: boolean
       nowrap?: boolean
@@ -57,6 +61,7 @@ const DropdownElement = forwardRef(
     },
     ref: React.Ref<HTMLSpanElement>
   ) => {
+    const { simpleTheme } = useMakUi()
     const isSelect = (
       option: string | number | { label: string; value: string }
     ) => {
@@ -102,9 +107,9 @@ const DropdownElement = forwardRef(
                 return (
                   <li
                     key={i}
-                    className={`flex cursor-pointer select-none items-center space-x-2 text-sm ${textThemeStyling} ${
-                      capitalize ? "capitalize" : ""
-                    } ${
+                    className={`flex cursor-pointer select-none items-center space-x-2 text-sm text-${
+                      simpleTheme.text.primary.base
+                    } ${capitalize ? "capitalize" : ""} ${
                       nowrap
                         ? "overflow-hidden overflow-ellipsis whitespace-nowrap"
                         : ""
@@ -114,9 +119,12 @@ const DropdownElement = forwardRef(
                       className={`w-full rounded-sm px-4 py-1.5 fade-in-out  ${
                         isSelect(option)
                           ? " bg-opacity-20 hover:bg-opacity-30"
-                          : "hover:bg-zinc-500 hover:bg-opacity-20"
+                          : `hover:bg-${simpleTheme.color.primary.base} hover:bg-opacity-30`
                       }`}
                       onClick={() => {
+                        if (option?.onClick) {
+                          option?.onClick()
+                        }
                         if (setSelectedOption) {
                           setSelectedOption(option)
                         }
@@ -138,7 +146,7 @@ const DropdownElement = forwardRef(
   }
 )
 
-DropdownElement.displayName = "DropdownElement"
+DropdownMenu.displayName = "DropdownMenu"
 
 type Position = {
   top?: number
@@ -179,7 +187,7 @@ interface DropdownElementTriggerProps {
 
 export type OptionObject = { label: string; value: string }
 
-const Dropdown = ({
+const DropdownTrigger = ({
   icon,
   label,
   labelLeft,
@@ -203,8 +211,8 @@ const Dropdown = ({
     top: 0,
     right: 0,
   })
-  const { verboseTheme } = useMakUi()
-  const { text } = verboseTheme
+  const { simpleTheme } = useMakUi()
+  const { text } = simpleTheme
 
   if (!labelLeft && !labelRight) {
     labelLeft = true
@@ -232,6 +240,7 @@ const Dropdown = ({
         triggerRef.current &&
         !triggerRef.current.contains(event.target)
       ) {
+        console.log("click outside")
         setDropdownOpen(false)
       }
     }
@@ -255,10 +264,7 @@ const Dropdown = ({
     if (!label) return null
     if (typeof label === "string")
       return (
-        <label
-          className={`${textThemeStyling} cursor-pointer`}
-          onClick={onClick}
-        >
+        <label className={`cursor-pointer`} onClick={onClick}>
           {label}
         </label>
       )
@@ -347,6 +353,7 @@ const Dropdown = ({
       getDropdownPosition()
     }
   }, [dropdownOpen])
+  const childrenType = (children as any)?.type.render.displayName
 
   return (
     <div className="relative flex w-fit select-none">
@@ -362,9 +369,7 @@ const Dropdown = ({
             transition={{ duration: 0.2 }}
             className="flex items-center"
           >
-            <BiChevronUp
-              className={`size-4 text-${text.primary.default.base}`}
-            />
+            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
           </motion.span>
         )}
         {label && labelLeft && <LabelElement onClick={toggleDropdown} />}
@@ -377,15 +382,13 @@ const Dropdown = ({
             transition={{ duration: 0.2 }}
             className="flex items-center"
           >
-            <BiChevronUp
-              className={`size-4 text-${text.primary.default.base}`}
-            />
+            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
           </motion.span>
         )}
       </div>
       <AnimatePresence>
         <motion.div
-          className={`fixed z-30 flex w-fit p-2 ${rootLevelMenuStyling} overflow-hidden rounded-lg bg-${verboseTheme?.theme?.secondary}`}
+          className={`fixed z-30 flex w-fit p-2 overflow-hidden rounded-lg bg-${simpleTheme?.theme?.secondary}`}
           variants={menuVariants}
           initial="hidden"
           animate={dropdownOpen ? "visible" : "exit"}
@@ -394,8 +397,8 @@ const Dropdown = ({
           ref={dropdownRef}
           key={`dropdown`}
         >
-          {children && (
-            <DropdownElement
+          {children && childrenType !== "DropdownMenu" && (
+            <DropdownMenu
               key={"dropdown-children"}
               options={options}
               selectedOption={selectedOption}
@@ -404,10 +407,11 @@ const Dropdown = ({
               setSelectedOption={setSelectedOption}
             >
               {children}
-            </DropdownElement>
+            </DropdownMenu>
           )}
+          {children && childrenType === "DropdownMenu" && <>{children}</>}
           {options && !children && (
-            <DropdownElement
+            <DropdownMenu
               key={"dropdown-options"}
               options={options}
               selectedOption={selectedOption}
@@ -424,7 +428,7 @@ const Dropdown = ({
           key={"dropdown-hidden"}
         >
           {children && (
-            <DropdownElement
+            <DropdownMenu
               key={"dropdown-children"}
               options={options}
               selectedOption={selectedOption}
@@ -433,10 +437,10 @@ const Dropdown = ({
               setSelectedOption={setSelectedOption}
             >
               {children}
-            </DropdownElement>
+            </DropdownMenu>
           )}
           {options && !children && (
-            <DropdownElement
+            <DropdownMenu
               key={"dropdown-options"}
               options={options}
               selectedOption={selectedOption}
@@ -451,4 +455,4 @@ const Dropdown = ({
   )
 }
 
-export { DropdownElement, Dropdown }
+export { DropdownMenu, DropdownTrigger }
