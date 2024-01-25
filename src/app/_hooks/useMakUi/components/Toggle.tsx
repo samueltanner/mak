@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
-import { TypeProps, withComputedProps } from "./componentTypeProps"
+import { withComputedProps } from "./componentTypeProps"
 import { useMakUi } from "../context/MakUiContext"
 import { isObject } from "@/globals/global-helper-functions"
 import { makUiVariantsSet } from "../constants/ui-constants"
 import { MakUiVariantKey, TailwindModifier } from "../types/ui-types"
+import { ComponentWrapperResponse, TypeProps } from "../types/component-types"
+import ComponentWrapper from "./ComponentWrapper"
 
 type ToggleProps = TypeProps & {
   checked?: boolean
@@ -13,9 +15,10 @@ type ToggleProps = TypeProps & {
   checkedColor?: string
   bgColor?: string
   bgCheckedColor?: string
+  computedProps: ComponentWrapperResponse
 }
 
-const Toggle: React.FC<ToggleProps> = ({
+const ToggleComponent = ({
   checked: checkedProp,
   disabled,
   onChange,
@@ -23,95 +26,106 @@ const Toggle: React.FC<ToggleProps> = ({
   checkedColor,
   bgColor,
   bgCheckedColor,
-  ...props
-}) => {
-  const {
-    themeMode,
-    theme: themeProps,
-    color: colorProps,
-    text: textProps,
-    border: borderProps,
-    allowedDefaults: defaultStatesProp,
-    allowedModifiers: allowedModifiersProp,
-    borderPx,
-  } = withComputedProps(props)
+  computedProps,
+}: ToggleProps) => {
+  console.log("ToggleComponent", {
+    checkedProp,
+    disabled,
+    onChange,
+    color,
+    checkedColor,
+    bgColor,
+    bgCheckedColor,
+    computedProps,
+  })
+  console.log("colorString", computedProps.colorString)
+  // const {
+  //   themeMode,
+  //   theme: themeProps,
+  //   color: colorProps,
+  //   text: textProps,
+  //   border: borderProps,
+  //   allowedDefaults: defaultStatesProp,
+  //   allowedModifiers: allowedModifiersProp,
+  //   borderPx,
+  // } = withComputedProps(props)
 
-  const {
-    theme: makTheme,
-    verbosePalette: makVerbosePalette,
-    verboseTheme: makVerboseTheme,
-  } = useMakUi()
+  // const {
+  //   theme: makTheme,
+  //   verbosePalette: makVerbosePalette,
+  //   verboseTheme: makVerboseTheme,
+  // } = useMakUi()
 
-  const activeThemeMode = themeMode
-    ? themeMode
-    : makTheme
-    ? makTheme
-    : undefined
-  const activePalette = activeThemeMode
-    ? makVerbosePalette[activeThemeMode]
-    : makVerboseTheme
+  // const activeThemeMode = themeMode
+  //   ? themeMode
+  //   : makTheme
+  //   ? makTheme
+  //   : undefined
+  // const activePalette = activeThemeMode
+  //   ? makVerbosePalette[activeThemeMode]
+  //   : makVerboseTheme
 
-  const objectToClassName = (
-    object: GenericObject,
-    variant: MakUiVariantKey | string,
-    modifier?: TailwindModifier
-  ) => {
-    if (!isObject(object)) return ""
-    let parsedStringArray: string[] = []
-    Object.entries(object).forEach(([key, value]) => {
-      if (!defaultStatesProp || !defaultStatesProp.has(key)) return
-      if (key === "base") {
-        parsedStringArray.push(`${variant}-${value}`)
-        return
-      }
-      if (key! === "base" && modifier) {
-        parsedStringArray.push(`${modifier}-${variant}-${value}`)
-        return
-      }
-      if (key !== "base" && !modifier) {
-        parsedStringArray.push(`${key}:${variant}-${value}`)
-      }
-      if (key !== "base" && !modifier && allowedModifiersProp.size) {
-        ;[...allowedModifiersProp].forEach((allowedModifier) => {
-          parsedStringArray.push(
-            `${allowedModifier}-${key}:${variant}-${value}`
-          )
-        })
-        return
-      }
-    })
-    return parsedStringArray.join(" ")
-  }
+  // const objectToClassName = (
+  //   object: GenericObject,
+  //   variant: MakUiVariantKey | string,
+  //   modifier?: TailwindModifier
+  // ) => {
+  //   if (!isObject(object)) return ""
+  //   let parsedStringArray: string[] = []
+  //   Object.entries(object).forEach(([key, value]) => {
+  //     if (!defaultStatesProp || !defaultStatesProp.has(key)) return
+  //     if (key === "base") {
+  //       parsedStringArray.push(`${variant}-${value}`)
+  //       return
+  //     }
+  //     if (key! === "base" && modifier) {
+  //       parsedStringArray.push(`${modifier}-${variant}-${value}`)
+  //       return
+  //     }
+  //     if (key !== "base" && !modifier) {
+  //       parsedStringArray.push(`${key}:${variant}-${value}`)
+  //     }
+  //     if (key !== "base" && !modifier && allowedModifiersProp.size) {
+  //       ;[...allowedModifiersProp].forEach((allowedModifier) => {
+  //         parsedStringArray.push(
+  //           `${allowedModifier}-${key}:${variant}-${value}`
+  //         )
+  //       })
+  //       return
+  //     }
+  //   })
+  //   return parsedStringArray.join(" ")
+  // }
 
-  const { text, color: colorPalette, border, theme } = activePalette
-  let selectedText
-  let selectedBorder
-  let selectedColor
-  let textString
-  let colorString: string
-  let borderString
-  if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
-    textString = textProps
-  } else {
-    selectedText = text[textProps as MakUiVariantKey]
-    textString = objectToClassName(selectedText, "text")
-  }
-  if (!makUiVariantsSet.has(borderProps as MakUiVariantKey)) {
-    borderString = borderProps
-  } else {
-    selectedBorder = border[borderProps as MakUiVariantKey]
-    borderString = objectToClassName(selectedBorder, "border")
-  }
-  if (!makUiVariantsSet.has(colorProps as MakUiVariantKey)) {
-    colorString = colorProps
-  } else {
-    selectedColor = colorPalette[colorProps as MakUiVariantKey]
-    colorString = objectToClassName(selectedColor, "bg")
-  }
+  // const { text, color: colorPalette, border, theme } = activePalette
+  // let selectedText
+  // let selectedBorder
+  // let selectedColor
+  // let textString
+  // let colorString: string
+  // let borderString
+  // if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
+  //   textString = textProps
+  // } else {
+  //   selectedText = text[textProps as MakUiVariantKey]
+  //   textString = objectToClassName(selectedText, "text")
+  // }
+  // if (!makUiVariantsSet.has(borderProps as MakUiVariantKey)) {
+  //   borderString = borderProps
+  // } else {
+  //   selectedBorder = border[borderProps as MakUiVariantKey]
+  //   borderString = objectToClassName(selectedBorder, "border")
+  // }
+  // if (!makUiVariantsSet.has(colorProps as MakUiVariantKey)) {
+  //   colorString = colorProps
+  // } else {
+  //   selectedColor = colorPalette[colorProps as MakUiVariantKey]
+  //   colorString = objectToClassName(selectedColor, "bg")
+  // }
 
-  const computedBorder = `border-[${borderPx}px] ${borderString}`
+  const computedBorder = `border-[${computedProps.borderPx}px] ${computedProps.borderString}`
   const computedToggle = () => {
-    if (!color) return `after:bg-${theme.primary}`
+    if (!color) return `after:bg-${computedProps.componentTheme.primary}`
 
     if (!checkedColor) {
       return `after:${color}`
@@ -120,7 +134,7 @@ const Toggle: React.FC<ToggleProps> = ({
     }
   }
   const computedBackground = () => {
-    if (!bgColor) return colorString as string
+    if (!bgColor) return computedProps.colorString as string
 
     if (!bgCheckedColor) {
       return `${bgColor}`
@@ -147,6 +161,14 @@ const Toggle: React.FC<ToggleProps> = ({
         />
       </label>
     </span>
+  )
+}
+
+const Toggle = (props: any) => {
+  return (
+    <ComponentWrapper {...props}>
+      {(computedProps) => <ToggleComponent {...computedProps} />}
+    </ComponentWrapper>
   )
 }
 

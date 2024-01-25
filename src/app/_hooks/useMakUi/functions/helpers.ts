@@ -19,6 +19,7 @@ import {
   MakUiVerbosePalette,
   MakUiVerboseTheme,
   ParsedClassNameResponse,
+  TailwindModifier,
   TailwindVariantKey,
 } from "../types/ui-types"
 import colors from "tailwindcss/colors"
@@ -47,6 +48,9 @@ import {
 import {
   MakUiComponentConfigInput,
   MakUiRootComponentConfigInput,
+  ObjectToClassNameArrayProp,
+  ObjectToClassNameObjectProp,
+  ObjectToClassNameProps,
 } from "../types/component-types"
 import {
   deepMerge,
@@ -1229,4 +1233,69 @@ export const getTwConfigSafelist = ({
   })
 
   return safeList
+}
+
+export const objectToClassName = (
+  ...args: ObjectToClassNameObjectProp[] | ObjectToClassNameArrayProp
+): string => {
+  if (
+    args.length === 1 &&
+    typeof args[0] === "object" &&
+    !Array.isArray(args[0])
+  ) {
+    const {
+      object,
+      variant,
+      modifier,
+      allowedStates,
+      allowedModifiers,
+    }: ObjectToClassNameObjectProp = args[0]
+
+    return parseProps({
+      object,
+      variant,
+      modifier,
+      allowedStates,
+      allowedModifiers,
+    })
+  } else {
+    // Handle the tuple form
+    const [object, variant, modifier] = args as ObjectToClassNameArrayProp
+
+    return parseProps({ object, variant, modifier })
+  }
+  function parseProps({
+    object,
+    variant,
+    modifier,
+    allowedStates,
+    allowedModifiers,
+  }: ObjectToClassNameObjectProp): string {
+    if (!isObject(object)) return ""
+    let parsedStringArray: string[] = []
+    Object.entries(object).forEach(([key, value]) => {
+      if (!allowedStates || !allowedStates.has(key)) return ""
+      if (key === "base") {
+        parsedStringArray.push(`${variant}-${value}`)
+        return
+      }
+      if (key! === "base" && modifier) {
+        parsedStringArray.push(`${modifier}-${variant}-${value}`)
+        return
+      }
+      if (key !== "base" && !modifier) {
+        parsedStringArray.push(`${key}:${variant}-${value}`)
+      }
+      if (key !== "base" && !modifier && allowedModifiers?.size) {
+        ;[...allowedModifiers].forEach((allowedModifier) => {
+          parsedStringArray.push(
+            `${allowedModifier}-${key}:${variant}-${value}`
+          )
+        })
+        return
+      }
+    })
+
+    return parsedStringArray.join(" ")
+  }
 }

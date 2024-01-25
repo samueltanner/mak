@@ -1,94 +1,9 @@
-import { MakUiVariant } from "../types/default-types"
+import { TypeProps, WithComponentPropsResponse } from "../types/component-types"
 import {
   MakUiStateKey,
   MakUiThemeKey,
   TailwindModifier,
 } from "../types/ui-types"
-
-export type TypeProps = {
-  primary?: boolean
-  secondary?: boolean
-  tertiary?: boolean
-  success?: boolean
-  error?: boolean
-  warning?: boolean
-  danger?: boolean
-  info?: boolean
-  custom?: boolean
-  colorType?: MakUiVariant | undefined
-  color?:
-    | "primary"
-    | "secondary"
-    | "tertiary"
-    | "custom"
-    | "success"
-    | "error"
-    | "warning"
-    | "danger"
-    | "info"
-    | string
-
-  textPrimary?: boolean
-  textSecondary?: boolean
-  textTertiary?: boolean
-  textSuccess?: boolean
-  textError?: boolean
-  textWarning?: boolean
-  textDanger?: boolean
-  textInfo?: boolean
-  textCustom?: boolean
-  textType?: MakUiVariant | undefined
-  text?:
-    | "primary"
-    | "secondary"
-    | "tertiary"
-    | "custom"
-    | "success"
-    | "error"
-    | "warning"
-    | "danger"
-    | "info"
-    | string
-
-  borderPrimary?: boolean
-  borderSecondary?: boolean
-  borderTertiary?: boolean
-  borderSuccess?: boolean
-  borderError?: boolean
-  borderWarning?: boolean
-  borderDanger?: boolean
-  borderInfo?: boolean
-  borderCustom?: boolean
-  borderType?: MakUiVariant | undefined
-  border?:
-    | "primary"
-    | "secondary"
-    | "tertiary"
-    | "custom"
-    | "success"
-    | "error"
-    | "warning"
-    | "danger"
-    | "info"
-    | string
-
-  themeMode?: MakUiThemeKey | undefined
-  themeLight?: boolean
-  themeDark?: boolean
-  themePrimary?: boolean
-  themeSecondary?: boolean
-  themeTertiary?: boolean
-  themeCustom?: boolean
-  themeType?: MakUiThemeKey | undefined
-  theme?: "primary" | "secondary" | "tertiary" | "custom"
-
-  textSize?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
-  borderPx?: number
-  className?: string
-
-  allowedDefaults?: MakUiStateKey[]
-  allowedModifiers?: TailwindModifier[]
-}
 
 export const typeProps: TypeProps = {
   primary: false,
@@ -135,7 +50,7 @@ export const typeProps: TypeProps = {
 
   textSize: undefined,
   borderPx: undefined,
-  allowedDefaults: [],
+  allowedStates: [],
   allowedModifiers: [],
 }
 
@@ -201,19 +116,21 @@ const getTextValue = (props: TypeProps) => {
   return "primary"
 }
 
-const getAllowedStates = (props: TypeProps) => {
-  const allowedDefaults = ["base"]
-  if (props.allowedDefaults) allowedDefaults.push(...props.allowedDefaults)
-  return new Set(allowedDefaults)
+const getAllowedStates = (props: TypeProps): Set<MakUiStateKey> => {
+  const allowedStates = ["base" as MakUiStateKey]
+  if (props.allowedStates) allowedStates.push(...props.allowedStates)
+  return new Set(allowedStates)
 }
 
-const getAllowedModifiers = (props: TypeProps) => {
-  const allowedModifiers = []
+const getAllowedModifiers = (props: TypeProps): Set<TailwindModifier> => {
+  const allowedModifiers = [] as TailwindModifier[]
   if (props.allowedModifiers) allowedModifiers.push(...props.allowedModifiers)
   return new Set(allowedModifiers)
 }
 
-export const withComputedProps = (props: TypeProps) => {
+export const withComputedProps = (
+  props: TypeProps
+): WithComponentPropsResponse => {
   return {
     ...props,
     theme: getThemeValue(props),
@@ -221,7 +138,9 @@ export const withComputedProps = (props: TypeProps) => {
     border: getBorderValue(props),
     text: getTextValue(props),
     themeMode: getThemeModeValue(props),
-    allowedDefaults: getAllowedStates(props),
+    allowedStates: getAllowedStates(props),
     allowedModifiers: getAllowedModifiers(props),
+    borderPx: props.borderPx,
+    className: props.className,
   }
 }

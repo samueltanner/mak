@@ -18,6 +18,7 @@ const ButtonListView = () => {
             outline={outlined}
             buttonType={cName as MakUiVariantKey}
             textLight={cName !== "light" && !outlined}
+            textPrimary={cName === "light"}
             borderCustom={cName === "light"}
           >
             <span className="capitalize">{cName}</span>
@@ -31,10 +32,10 @@ const ButtonListView = () => {
           }`}
         />
         <Toggle
-          allowedDefaults={["disabled", "checked"]}
+          allowedStates={["disabled", "checked"]}
           allowedModifiers={["peer"]}
           checked={outlined}
-          onChange={(e) => setOutlined(!outlined)}
+          onChange={() => setOutlined(!outlined)}
           borderPx={4}
           borderSecondary
           custom
