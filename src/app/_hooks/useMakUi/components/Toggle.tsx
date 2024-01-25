@@ -134,7 +134,6 @@ const Toggle: React.FC<ToggleProps> = ({
     <span className="flex items-center">
       <label className="relative inline-flex items-center cursor-pointer">
         <input
-          // disabled
           type="checkbox"
           checked={checkedProp}
           disabled={disabled}
@@ -145,7 +144,7 @@ const Toggle: React.FC<ToggleProps> = ({
         />
 
         <span
-          className={`w-12 h-[25px] ${computedBackground()} ${computedBorder} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[3px] after:start-1 ${computedToggle()} after:rounded-full after:h-5 after:w-5 after:transition-all`}
+          className={`w-12 h-[25px] ${computedBackground()} ${computedBorder} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[3px] after:start-1 after:peer-checked:start-[4px] ${computedToggle()} after:rounded-full after:h-5 after:w-5 after:transition-all`}
         />
       </label>
     </span>

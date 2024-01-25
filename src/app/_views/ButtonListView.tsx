@@ -10,28 +10,41 @@ const ButtonListView = () => {
   const [outlined, setOutlined] = useState(false)
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 items-center">
       {Object.entries(color).map(([cName, cVal], index) => {
         return (
           <Button
             key={index}
             outline={outlined}
             buttonType={cName as MakUiVariant}
+            textLight={cName !== "light" && !outlined}
+            borderCustom={cName === "light"}
           >
             <span className="capitalize">{cName}</span>
           </Button>
         )
       })}
-      <Toggle
-        allowedDefaults={["disabled", "checked"]}
-        allowedModifiers={["peer"]}
-        checked={outlined}
-        onChange={(e) => setOutlined(!outlined)}
-        borderPx={4}
-        borderSecondary
-        custom
-
-      />
+      <div className="flex flex-shrink-0 gap-2 items-center justify-center ml-3">
+        <span
+          className={`size-5 rounded-md bg-${
+            color[outlined ? "custom" : "primary"].base
+          }`}
+        />
+        <Toggle
+          allowedDefaults={["disabled", "checked"]}
+          allowedModifiers={["peer"]}
+          checked={outlined}
+          onChange={(e) => setOutlined(!outlined)}
+          borderPx={4}
+          borderSecondary
+          custom
+        />
+        <span
+          className={`size-5 rounded-md border-4 border-${
+            color[!outlined ? "custom" : "primary"].focus
+          }`}
+        />
+      </div>
     </div>
   )
 }

@@ -12,6 +12,9 @@ const config: Config = {
   safelist: [
     "dark",
     {
+      pattern: /^(bg|border|ring|text|)-(white|black)/,
+    },
+    {
       // Backgrounds
       pattern:
         /^bg-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,

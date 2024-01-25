@@ -75,6 +75,8 @@ export const makUiVariants: MakUiVariantKey[] = [
   "danger",
   "warning",
   "info",
+  "light",
+  "dark",
 ]
 
 export const makUiVariantsSet: Set<MakUiVariantKey> = new Set(makUiVariants)
@@ -129,6 +131,8 @@ export const makUiDefaultColors: MakUiDefaultColors = {
   warning: "yellow",
   info: "blue",
   custom: "zinc",
+  light: "white",
+  dark: "black",
 }
 
 export const makUiDefaultPalette: MakUiDefaultPalette = {
@@ -195,7 +199,7 @@ export const makUiDefaultStateShades: MakUiStateShades = {
   click: 400,
   checked: 600,
   closed: 500,
-  default: 500,
+  default: 400,
   disabled: 300,
   empty: 500,
   enabled: 500,

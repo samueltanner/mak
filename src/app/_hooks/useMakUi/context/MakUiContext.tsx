@@ -187,6 +187,10 @@ const MakUiProviderChild = ({
     (themeMode as MakUiThemeKey) || defaultTheme || "light"
   )
 
+  useEffect(() => {
+    setTheme(themeMode as MakUiThemeKey)
+  }, [themeMode])
+
   // const [safeList, setSafeList] = useState<any[]>([])
 
   const formattingThemes =

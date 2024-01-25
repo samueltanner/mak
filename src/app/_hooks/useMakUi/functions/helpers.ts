@@ -268,6 +268,7 @@ export const getConstructedStates = ({
         const providedTwObj = twColorHelper({
           colorString: providedColor,
         })
+
         providedState = state
         providedColor = providedTwObj.color
         stateShade = providedTwObj.shade
@@ -293,13 +294,14 @@ export const getConstructedStates = ({
       ? undefined
       : getNormalizedShadeNumber(twObj.shade! - 200),
   })
+
   const disabledShade = disabledTwObj.autoShade
     ? twObj.shade! - 200
     : disabledTwObj.shade!
 
-  const disabledColor = `${twObj.color}-${getNormalizedShadeNumber(
-    disabledShade
-  )}`
+  const disabledColor = twObj.absolute
+    ? disabledTwObj.rootString
+    : `${twObj.color}-${getNormalizedShadeNumber(disabledShade)}`
 
   providedStates.base = twObj.rootString
   providedStates.disabled = disabledColor
@@ -389,13 +391,18 @@ export const generateDefaultStatesObject = ({
   multiplier?: number
 }) => {
   const shadesDiff = generateDefaultShadesDiffOject({ defaultShades })
+  const isAbsoluteColor = defaultColor === "white" || defaultColor === "black"
 
   let defaultStatesObject = {} as MakUiState
   for (const [state, diff] of Object.entries(shadesDiff)) {
     const shade = baseShade + diff * multiplier
-    defaultStatesObject[
-      state as MakUiStateKey
-    ] = `${defaultColor}-${getNormalizedShadeNumber(shade)}`
+    if (isAbsoluteColor) {
+      defaultStatesObject[state as MakUiStateKey] = defaultColor
+    } else {
+      defaultStatesObject[
+        state as MakUiStateKey
+      ] = `${defaultColor}-${getNormalizedShadeNumber(shade)}`
+    }
   }
 
   return defaultStatesObject
@@ -1064,8 +1071,6 @@ export const makClassNameHelper = ({
       }
     }
   }
-
-  console.log({ finalClassName })
 
   const finalClassNamesString = finalClassName.join(" ") + ` ${rootClassNames}`
 

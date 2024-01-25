@@ -84,6 +84,7 @@ export type TypeProps = {
 
   textSize?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
   borderPx?: number
+  className?: string
 
   allowedDefaults?: MakUiStateKey[]
   allowedModifiers?: TailwindModifier[]

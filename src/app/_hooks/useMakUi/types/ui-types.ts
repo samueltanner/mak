@@ -54,6 +54,7 @@ export type MakUiThemeVariantKey =
   | "tertiary"
   | "custom"
 
+
 export type MakUiVariantRootKey =
   | "primaryRoot"
   | "secondaryRoot"
@@ -67,6 +68,8 @@ export type MakUiVariantKey =
   | "danger"
   | "warning"
   | "info"
+  | "light"
+  | "dark"
 
 export type MakUiCustomInteractionStateKey = "base" | "click"
 

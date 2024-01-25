@@ -7,7 +7,11 @@ import {
   MakUiState,
   MakUiVariant,
 } from "../types/default-types"
-import { MakUiSimpleTheme, MakUiVerboseTheme } from "../types/ui-types"
+import {
+  MakUiSimpleTheme,
+  MakUiVariantKey,
+  MakUiVerboseTheme,
+} from "../types/ui-types"
 
 import { MakUiRootComponentConfig } from "../types/component-types"
 
@@ -23,6 +27,8 @@ interface ButtonProps {
   danger?: boolean
   info?: boolean
   custom?: boolean
+  light?: boolean
+  dark?: boolean
   buttonType?: MakUiVariant | undefined
 
   textPrimary?: boolean
@@ -34,6 +40,8 @@ interface ButtonProps {
   textDanger?: boolean
   textInfo?: boolean
   textCustom?: boolean
+  textLight?: boolean
+  textDark?: boolean
   textType?: MakUiVariant | undefined
 
   borderPrimary?: boolean
@@ -45,6 +53,8 @@ interface ButtonProps {
   borderDanger?: boolean
   borderInfo?: boolean
   borderCustom?: boolean
+  borderLight?: boolean
+  borderDark?: boolean
   borderType?: MakUiVariant | undefined
 
   active?: boolean
@@ -113,9 +123,9 @@ const buttonClassName = ({
   mcn,
 }: {
   text: boolean
-  buttonStyle: MakUiVariant
-  textStyle: MakUiVariant
-  borderStyle: MakUiVariant
+  buttonStyle: MakUiVariantKey
+  textStyle: MakUiVariantKey
+  borderStyle: MakUiVariantKey
   buttonStates: ButtonStates
   width: string
   outlined?: boolean
@@ -161,10 +171,14 @@ const buttonClassName = ({
   const textVariantObject = textPalette?.[textStyle]
   const borderVariantObject = borderPalette?.[borderStyle]
 
+  
   const baseClass = `${buttonConfig.className} ${
     disabled && "cursor-not-allowed"
   }`
   const textClass = `text-${textVariantObject?.base} hover:text-${textVariantObject?.hover}`
+  if (textStyle === "light") {
+    console.log({ textClass })
+  }
   const backgroundClass = `${outlinedOrFilled}-${variantObject?.base} hover:${outlinedOrFilled}-${variantObject?.hover}`
   const borderClass = `border-${borderVariantObject?.base} border-[3px] hover:border-${borderVariantObject?.hover}`
   const selectedClass =
@@ -194,6 +208,8 @@ const Button = forwardRef(
       warning = false,
       info = false,
       custom = false,
+      light = false,
+      dark = false,
       buttonType = undefined,
 
       // Button Border Colors
@@ -206,6 +222,8 @@ const Button = forwardRef(
       borderWarning = false,
       borderInfo = false,
       borderCustom = false,
+      borderLight = false,
+      borderDark = false,
       borderType = undefined,
 
       // Button Text Colors
@@ -218,6 +236,8 @@ const Button = forwardRef(
       textWarning = false,
       textInfo = false,
       textCustom = false,
+      textLight = false,
+      textDark = false,
       textType = undefined,
 
       // Button MakUiStates
@@ -282,6 +302,8 @@ const Button = forwardRef(
       if (warning) return "warning"
       if (info) return "info"
       if (custom) return "custom"
+      if (light) return "light"
+      if (dark) return "dark"
       if (primary) return "primary"
       return "primary"
     }, [buttonProps])
@@ -296,6 +318,8 @@ const Button = forwardRef(
       if (textDanger) return "danger"
       if (textInfo) return "info"
       if (textCustom) return "custom"
+      if (textLight) return "light"
+      if (textDark) return "dark"
       if (textPrimary) return "primary"
       return "primary"
     }, [buttonProps])
@@ -310,6 +334,8 @@ const Button = forwardRef(
       if (borderDanger) return "danger"
       if (borderInfo) return "info"
       if (borderCustom) return "custom"
+      if (borderLight) return "light"
+      if (borderDark) return "dark"
       if (borderPrimary) return "primary"
       return buttonStyle
     }, [buttonProps])
@@ -458,7 +484,7 @@ const Button = forwardRef(
             focus: false,
           })
         }}
-        className={`group flex items-center justify-center gap-1 ${computedButtonClassName}`}
+        className={`group flex items-center justify-center gap-1 ${computedButtonClassName} ${className}`}
         disabled={isDisabled}
         type={type}
         id={id}
