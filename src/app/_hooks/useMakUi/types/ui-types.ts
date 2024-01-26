@@ -21,8 +21,11 @@ export type TailwindModifier =
   | "group-has"
   | "peer-has"
 
-export type TailwindModifierState = `${TailwindModifier}-${MakUiInteractionStateKey}`
-export type TailwindPseudoState = TailwindModifierState | MakUiInteractionStateKey
+export type TailwindModifierState =
+  `${TailwindModifier}-${MakUiInteractionStateKey}`
+export type TailwindPseudoState =
+  | TailwindModifierState
+  | MakUiInteractionStateKey
 
 export type HtmlElementKey =
   | "button"
@@ -157,6 +160,64 @@ export type MakUiState = {
   [Key in MakUiStateKey]: string
 }
 
+type Shades =
+  | "0"
+  | "50"
+  | "100"
+  | "150"
+  | "200"
+  | "250"
+  | "300"
+  | "350"
+  | "400"
+  | "450"
+  | "500"
+  | "550"
+  | "600"
+  | "650"
+  | "700"
+  | "750"
+  | "800"
+  | "850"
+  | "900"
+  | "950"
+  | "1000"
+
+export type MakUiAbsoluteShades = {
+  "0": "#000000"
+  "1000": "#ffffff"
+}
+
+export type MakUiSimpleShades = {
+  "100": string
+  "200": string
+  "300": string
+  "400": string
+  "600": string
+  "700": string
+  "800": string
+  "900": string
+}
+
+export type MakUiVerboseShades = MakUiSimpleShades &
+  MakUiAbsoluteShades & {
+    [key: string]: string
+    "50": string
+    "150": string
+    "250": string
+    "350": string
+    "450": string
+    "500": string
+    "550": string
+    "650": string
+    "750": string
+    "850": string
+    "950": string
+  }
+
+export type MakUiShadesInput = {
+  [Key in Shades]?: string
+}
 // SIMPLE OUTPUT TYPES
 
 export type MakUiSimplePalette = {

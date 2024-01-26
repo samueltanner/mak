@@ -17,6 +17,7 @@ import {
   MakUiThemeVariantShades,
   MakUiVariantKey,
   MakUiVerbosePalette,
+  MakUiVerboseShades,
   MakUiVerboseTheme,
   ParsedClassNameResponse,
   TailwindVariantKey,
@@ -63,32 +64,42 @@ type TailwindCustomColors = Record<string, Record<string, string>>
 
 export const constructTailwindObject = ({
   hex,
-  step = 50,
+  step = 100,
   includeNearAbsolutes = true,
 }: {
   hex: string
   step?: number
   includeNearAbsolutes?: boolean
 }): Record<number, string> => {
+  if (hex.charAt(0) !== "#") hex = `#${hex}`
+
   const tailwindColors: Record<number, string> = {}
 
-  const lightestColor = chroma.mix("white", hex, 0.1, "rgb")
-  const darkestColor = chroma.mix("black", hex, 0.1, "rgb")
+  const lightestColor = chroma.mix("white", hex, 0, "rgb")
+  const darkestColor = chroma.mix("black", hex, 0, "rgb")
 
   const colorScale = chroma.scale([lightestColor, hex, darkestColor])
 
-  const start = 100 - step || step
-  const end = 900
+  const start = 0
+  const end = 1000
   const totalSteps = (end - start) / step
 
+  const scalePosition = (i: number) => {
+    return (i - start) / (totalSteps * step)
+  }
+
   for (let i = start; i <= end; i += step) {
-    const scalePosition = (i - start) / (totalSteps * step)
-    tailwindColors[i] = colorScale(scalePosition).hex()
+    if (i === 500) {
+      tailwindColors[i] = hex
+    } else {
+      const position = scalePosition(i)
+      tailwindColors[i] = colorScale(position).hex()
+    }
   }
 
   if (includeNearAbsolutes) {
-    tailwindColors[50] = lightestColor.hex()
-    tailwindColors[950] = darkestColor.hex()
+    tailwindColors[50] = colorScale(scalePosition(50)).hex()
+    tailwindColors[950] = colorScale(scalePosition(950)).hex()
   }
 
   return tailwindColors
@@ -268,6 +279,31 @@ export const getConstructedTheme = ({
   }
 
   return themeResponse
+}
+
+export const getGeneratedShades = ({
+  middleHex,
+  providedShades,
+  steps = 100,
+}: {
+  middleHex: string
+  providedShades?: Record<string, string>
+  steps: number
+}): MakUiVerboseShades => {
+  const tailwindColors = constructTailwindObject({
+    hex: middleHex,
+    step: steps,
+  })
+  const finalShades = {} as MakUiVerboseShades
+  for (const [shade, color] of Object.entries(tailwindColors)) {
+    if (providedShades && providedShades[shade]) {
+      const hex = twColorHelper({ colorString: providedShades[shade] }).hex
+      finalShades[shade] = hex
+    } else {
+      finalShades[shade] = color
+    }
+  }
+  return finalShades
 }
 
 export const getConstructedStates = ({

@@ -18,14 +18,7 @@ export default function Home() {
         <div className="absolute bottom-4 right-4">
           <ThemeButton />
         </div>
-        <div className="group">
-          <span className="bg-red-500 group-has-[:enabled]:bg-blue-500">
-            hi there
-          </span>
-          <a href="#" className="group-has-[:button]:bg-blue-500">
-            hi there
-          </a>
-        </div>
+        
       </div>
       {/* <mak.div
         className={`absolute bottom-4 left-4 p-4`}
