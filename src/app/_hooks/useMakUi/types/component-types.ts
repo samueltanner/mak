@@ -174,116 +174,95 @@ export type TypeProps = {
   makName?: string
   state?: MakUiStateKey[]
 
-  notTextBase?: boolean
-  textBase?: boolean
-  textClick?: boolean
-  textActive?: boolean
-  textAutofill?: boolean
-  textChecked?: boolean
-  textClosed?: boolean
-  textDefault?: boolean
-  textDisabled?: boolean
-  textEmpty?: boolean
-  textEnabled?: boolean
-  textFocus?: boolean
-  textFocusVisible?: boolean
-  textFocusWithin?: boolean
-  textHover?: boolean
-  textInRange?: boolean
-  textIndeterminate?: boolean
-  textInvalid?: boolean
-  textOpen?: boolean
-  textOutOfRange?: boolean
-  textPlaceholderShown?: boolean
-  textReadOnly?: boolean
-  textRequired?: boolean
-  textSelected?: boolean
-  textSelection?: boolean
-  textTarget?: boolean
-  textValid?: boolean
-  textVisited?: boolean
-  textStates?: MakUiStateKey[]
+  // textNotBase?: boolean
+  // textBase?: boolean
+  // textClick?: boolean
+  // textActive?: boolean
+  // textAutofill?: boolean
+  // textChecked?: boolean
+  // textClosed?: boolean
+  // textDefault?: boolean
+  // textDisabled?: boolean
+  // textEmpty?: boolean
+  // textEnabled?: boolean
+  // textFocus?: boolean
+  // textFocusVisible?: boolean
+  // textFocusWithin?: boolean
+  // textHover?: boolean
+  // textInRange?: boolean
+  // textIndeterminate?: boolean
+  // textInvalid?: boolean
+  // textOpen?: boolean
+  // textOutOfRange?: boolean
+  // textPlaceholderShown?: boolean
+  // textReadOnly?: boolean
+  // textRequired?: boolean
+  // textSelected?: boolean
+  // textSelection?: boolean
+  // textTarget?: boolean
+  // textValid?: boolean
+  // textVisited?: boolean
+  // textStates?: MakUiStateKey[]
 
-  textPeer?: boolean
-  textGroup?: boolean
-  textHas?: boolean
-  textGroupHas?: boolean
-  textPeerHas?: boolean
-  textModifiers?: TailwindModifier[]
+  // colorNotBase?: boolean
+  // colorBase?: boolean
+  // colorClick?: boolean
+  // colorActive?: boolean
+  // colorAutofill?: boolean
+  // colorChecked?: boolean
+  // colorClosed?: boolean
+  // colorDefault?: boolean
+  // colorDisabled?: boolean
+  // colorEmpty?: boolean
+  // colorEnabled?: boolean
+  // colorFocus?: boolean
+  // colorFocusVisible?: boolean
+  // colorFocusWithin?: boolean
+  // colorHover?: boolean
+  // colorInRange?: boolean
+  // colorIndeterminate?: boolean
+  // colorInvalid?: boolean
+  // colorOpen?: boolean
+  // colorOutOfRange?: boolean
+  // colorPlaceholderShown?: boolean
+  // colorReadOnly?: boolean
+  // colorRequired?: boolean
+  // colorSelected?: boolean
+  // colorSelection?: boolean
+  // colorTarget?: boolean
+  // colorValid?: boolean
+  // colorVisited?: boolean
+  // colorStates?: MakUiStateKey[]
 
-  notColorBase?: boolean
-  colorBase?: boolean
-  colorClick?: boolean
-  colorActive?: boolean
-  colorAutofill?: boolean
-  colorChecked?: boolean
-  colorClosed?: boolean
-  colorDefault?: boolean
-  colorDisabled?: boolean
-  colorEmpty?: boolean
-  colorEnabled?: boolean
-  colorFocus?: boolean
-  colorFocusVisible?: boolean
-  colorFocusWithin?: boolean
-  colorHover?: boolean
-  colorInRange?: boolean
-  colorIndeterminate?: boolean
-  colorInvalid?: boolean
-  colorOpen?: boolean
-  colorOutOfRange?: boolean
-  colorPlaceholderShown?: boolean
-  colorReadOnly?: boolean
-  colorRequired?: boolean
-  colorSelected?: boolean
-  colorSelection?: boolean
-  colorTarget?: boolean
-  colorValid?: boolean
-  colorVisited?: boolean
-  colorStates?: MakUiStateKey[]
-
-  colorPeer?: boolean
-  colorGroup?: boolean
-  colorHas?: boolean
-  colorGroupHas?: boolean
-  colorPeerHas?: boolean
-  colorModifiers?: TailwindModifier[]
-
-  notBorderBase?: boolean
-  borderBase?: boolean
-  borderClick?: boolean
-  borderActive?: boolean
-  borderAutofill?: boolean
-  borderChecked?: boolean
-  borderClosed?: boolean
-  borderDefault?: boolean
-  borderDisabled?: boolean
-  borderEmpty?: boolean
-  borderEnabled?: boolean
-  borderFocus?: boolean
-  borderFocusVisible?: boolean
-  borderFocusWithin?: boolean
-  borderHover?: boolean
-  borderInRange?: boolean
-  borderIndeterminate?: boolean
-  borderInvalid?: boolean
-  borderOpen?: boolean
-  borderOutOfRange?: boolean
-  borderPlaceholderShown?: boolean
-  borderReadOnly?: boolean
-  borderRequired?: boolean
-  borderSelected?: boolean
-  borderSelection?: boolean
-  borderTarget?: boolean
-  borderValid?: boolean
-  borderVisited?: boolean
-  borderStates?: MakUiStateKey[]
-
-  borderPeer?: boolean
-  borderGroup?: boolean
-  borderHas?: boolean
-  borderGroupHas?: boolean
-  borderPeerHas?: boolean
-  borderModifiers?: TailwindModifier[]
+  // borderNotBase?: boolean
+  // borderBase?: boolean
+  // borderClick?: boolean
+  // borderActive?: boolean
+  // borderAutofill?: boolean
+  // borderChecked?: boolean
+  // borderClosed?: boolean
+  // borderDefault?: boolean
+  // borderDisabled?: boolean
+  // borderEmpty?: boolean
+  // borderEnabled?: boolean
+  // borderFocus?: boolean
+  // borderFocusVisible?: boolean
+  // borderFocusWithin?: boolean
+  // borderHover?: boolean
+  // borderInRange?: boolean
+  // borderIndeterminate?: boolean
+  // borderInvalid?: boolean
+  // borderOpen?: boolean
+  // borderOutOfRange?: boolean
+  // borderPlaceholderShown?: boolean
+  // borderReadOnly?: boolean
+  // borderRequired?: boolean
+  // borderSelected?: boolean
+  // borderSelection?: boolean
+  // borderTarget?: boolean
+  // borderValid?: boolean
+  // borderVisited?: boolean
+  // borderStates?: MakUiStateKey[]
 }
 
 export type WithComponentPropsResponse = {
@@ -291,12 +270,9 @@ export type WithComponentPropsResponse = {
   color: string | undefined
   border: string | undefined
   text: string | undefined
-  colorStates: Set<MakUiStateKey | "not-base">
-  textStates: Set<MakUiStateKey | "not-base">
-  borderStates: Set<MakUiStateKey | "not-base">
-  colorModifiers: Set<TailwindModifier>
-  textModifiers: Set<TailwindModifier>
-  borderModifiers: Set<TailwindModifier>
+  // colorStates: Set<MakUiStateKey | "not-base">
+  // textStates: Set<MakUiStateKey | "not-base">
+  // borderStates: Set<MakUiStateKey | "not-base">
   themeMode: MakUiThemeKey | undefined
   borderPx: number | undefined
   className: string | undefined

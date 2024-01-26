@@ -1289,6 +1289,7 @@ export const objectToClassName = ({
     }
 
     Object.entries(allowedObject).forEach(([key, value]) => {
+      if (key === "not-base") return
       if (key === "base") {
         parsedStringArray.push(`${variant}-${value}`)
         return
@@ -1300,10 +1301,7 @@ export const objectToClassName = ({
           })
         }
       }
-
     })
-
-    console.log({ allowedObject })
 
     // Object.entries(object).forEach(([key, value]) => {
     //   if (key === "base") {
@@ -1321,7 +1319,7 @@ export const objectToClassName = ({
     //     })
     //   }
     // })
-    console.log({ parsedStringArray })
+
     return parsedStringArray.join(" ")
   }
 }

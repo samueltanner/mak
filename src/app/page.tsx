@@ -5,7 +5,8 @@ import MakUiView from "./_views/MakUiView"
 import ThemeButton from "./_components/ThemeButton"
 import { mak } from "./_hooks/useMakUi/elements/ts/mak"
 export default function Home() {
-  const { simplePalette, simpleTheme } = useMakUi()
+  const { simplePalette, simpleTheme, verbosePalette } = useMakUi()
+  console.log("simplePalette", verbosePalette)
 
   return (
     <main
@@ -17,10 +18,23 @@ export default function Home() {
         <div className="absolute bottom-4 right-4">
           <ThemeButton />
         </div>
+        <div className="group">
+          <span className="bg-red-500 group-has-[:enabled]:bg-blue-500">
+            hi there
+          </span>
+          <a href="#" className="group-has-[:button]:bg-blue-500">
+            hi there
+          </a>
+        </div>
       </div>
-      <mak.div className={`absolute bottom-4 left-4 `} textTertiary themeLight textModifiers={["group"]} textStates={["hover"]}>
+      {/* <mak.div
+        className={`absolute bottom-4 left-4 p-4`}
+        textTertiary
+        themeLight
+        primary
+      >
         hi
-      </mak.div>
+      </mak.div> */}
     </main>
   )
 }

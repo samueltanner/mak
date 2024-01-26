@@ -57,14 +57,7 @@ export const componentWrapperLogic = ({
     ...restWithComputedProps
   } = withComputedProps(props)
 
-  const {
-    colorStates,
-    borderStates,
-    textStates,
-    colorModifiers,
-    borderModifiers,
-    textModifiers,
-  } = restWithComputedProps
+  // const { colorStates, borderStates, textStates } = restWithComputedProps
 
   const activeThemeMode = themeMode
     ? themeMode
@@ -95,8 +88,7 @@ export const componentWrapperLogic = ({
     textString = objectToClassName({
       object: selectedText,
       variant: "text",
-      allowedStates: textStates,
-      allowedModifiers: textModifiers,
+      // allowedStates: textStates,
     })
   }
   if (!makUiVariantsSet.has(borderProps as MakUiVariantKey)) {
@@ -106,8 +98,7 @@ export const componentWrapperLogic = ({
     borderString = objectToClassName({
       object: selectedBorder,
       variant: "border",
-      allowedStates: borderStates,
-      allowedModifiers: borderModifiers,
+      // allowedStates: borderStates,
     })
   }
   if (!makUiVariantsSet.has(colorProps as MakUiVariantKey)) {
@@ -117,8 +108,7 @@ export const componentWrapperLogic = ({
     colorString = objectToClassName({
       object: selectedColor,
       variant: "bg",
-      allowedStates: colorStates,
-      allowedModifiers: colorModifiers,
+      // allowedStates: colorStates,
     })
   }
 
