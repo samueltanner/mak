@@ -174,11 +174,9 @@ export type TypeProps = {
   makName?: string
   state?: MakUiStateKey[]
 
-  allowedStates?: MakUiStateKey[]
-  allowedModifiers?: TailwindModifier[]
-
-  textClick?: boolean
+  notTextBase?: boolean
   textBase?: boolean
+  textClick?: boolean
   textActive?: boolean
   textAutofill?: boolean
   textChecked?: boolean
@@ -204,9 +202,18 @@ export type TypeProps = {
   textTarget?: boolean
   textValid?: boolean
   textVisited?: boolean
+  textStates?: MakUiStateKey[]
 
-  colorClick?: boolean
+  textPeer?: boolean
+  textGroup?: boolean
+  textHas?: boolean
+  textGroupHas?: boolean
+  textPeerHas?: boolean
+  textModifiers?: TailwindModifier[]
+
+  notColorBase?: boolean
   colorBase?: boolean
+  colorClick?: boolean
   colorActive?: boolean
   colorAutofill?: boolean
   colorChecked?: boolean
@@ -232,9 +239,18 @@ export type TypeProps = {
   colorTarget?: boolean
   colorValid?: boolean
   colorVisited?: boolean
+  colorStates?: MakUiStateKey[]
 
-  borderClick?: boolean
+  colorPeer?: boolean
+  colorGroup?: boolean
+  colorHas?: boolean
+  colorGroupHas?: boolean
+  colorPeerHas?: boolean
+  colorModifiers?: TailwindModifier[]
+
+  notBorderBase?: boolean
   borderBase?: boolean
+  borderClick?: boolean
   borderActive?: boolean
   borderAutofill?: boolean
   borderChecked?: boolean
@@ -260,6 +276,14 @@ export type TypeProps = {
   borderTarget?: boolean
   borderValid?: boolean
   borderVisited?: boolean
+  borderStates?: MakUiStateKey[]
+
+  borderPeer?: boolean
+  borderGroup?: boolean
+  borderHas?: boolean
+  borderGroupHas?: boolean
+  borderPeerHas?: boolean
+  borderModifiers?: TailwindModifier[]
 }
 
 export type WithComponentPropsResponse = {
@@ -267,12 +291,13 @@ export type WithComponentPropsResponse = {
   color: string | undefined
   border: string | undefined
   text: string | undefined
-  colorStates: Set<MakUiStateKey>
-  textStates: Set<MakUiStateKey>
-  borderStates: Set<MakUiStateKey>
+  colorStates: Set<MakUiStateKey | "not-base">
+  textStates: Set<MakUiStateKey | "not-base">
+  borderStates: Set<MakUiStateKey | "not-base">
+  colorModifiers: Set<TailwindModifier>
+  textModifiers: Set<TailwindModifier>
+  borderModifiers: Set<TailwindModifier>
   themeMode: MakUiThemeKey | undefined
-  allowedStates: Set<MakUiStateKey>
-  allowedModifiers: Set<TailwindModifier>
   borderPx: number | undefined
   className: string | undefined
 }
@@ -280,18 +305,9 @@ export type WithComponentPropsResponse = {
 export type ObjectToClassNameObjectProp = {
   object: GenericObject
   variant: MakUiVariantKey | string
-  modifier?: TailwindModifier
   allowedStates?: Set<string>
   allowedModifiers?: Set<string>
 }
-export type ObjectToClassNameArrayProp = [
-  GenericObject,
-  MakUiVariantKey | string,
-  TailwindModifier?
-]
-export type ObjectToClassNameProps =
-  | ObjectToClassNameArrayProp
-  | ObjectToClassNameObjectProp
 
 export type ComponentWrapperResponse = {
   textString: string | undefined
@@ -308,7 +324,5 @@ export type ComponentWrapperResponse = {
   globalTheme: MakUiVerboseTheme
   borderPx: number | undefined
   className: string | undefined
-  objectToClassName: (
-    ...args: ObjectToClassNameArrayProp | ObjectToClassNameObjectProp[]
-  ) => string
+  objectToClassName: (args: ObjectToClassNameObjectProp) => string
 }

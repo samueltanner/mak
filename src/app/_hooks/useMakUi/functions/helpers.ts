@@ -19,7 +19,6 @@ import {
   MakUiVerbosePalette,
   MakUiVerboseTheme,
   ParsedClassNameResponse,
-  TailwindModifier,
   TailwindVariantKey,
 } from "../types/ui-types"
 import colors from "tailwindcss/colors"
@@ -48,9 +47,7 @@ import {
 import {
   MakUiComponentConfigInput,
   MakUiRootComponentConfigInput,
-  ObjectToClassNameArrayProp,
   ObjectToClassNameObjectProp,
-  ObjectToClassNameProps,
 } from "../types/component-types"
 import {
   deepMerge,
@@ -60,8 +57,6 @@ import {
   mergeWithFallback,
   nearestMultiple,
 } from "@/globals/global-helper-functions"
-import { split } from "postcss/lib/list"
-import { init } from "next/dist/compiled/webpack/webpack"
 
 type DefaultColors = typeof colors
 type TailwindCustomColors = Record<string, Record<string, string>>
@@ -1263,72 +1258,70 @@ export const getTwConfigSafelist = ({
   return safeList
 }
 
-export const objectToClassName = (
-  ...args: ObjectToClassNameObjectProp[] | ObjectToClassNameArrayProp
-): string => {
-  if (
-    args.length === 1 &&
-    typeof args[0] === "object" &&
-    !Array.isArray(args[0])
-  ) {
-    const {
-      object,
-      variant,
-      modifier,
-      allowedStates,
-      allowedModifiers,
-    }: ObjectToClassNameObjectProp = args[0]
-
-    return parseProps({
-      object,
-      variant,
-      modifier,
-      allowedStates,
-      allowedModifiers,
-    })
-  } else {
-    // Handle the tuple form
-    const [object, variant, modifier] = args as ObjectToClassNameArrayProp
-
-    return parseProps({ object, variant, modifier })
-  }
+export const objectToClassName = ({
+  ...args
+}: ObjectToClassNameObjectProp): string => {
+  return parseProps({ ...args })
   function parseProps({
     object,
     variant,
-    modifier,
     allowedStates,
     allowedModifiers,
   }: ObjectToClassNameObjectProp): string {
+    console.log({
+      object,
+      variant,
+      allowedStates,
+      allowedModifiers,
+    })
     if (!isObject(object)) return ""
     let parsedStringArray: string[] = []
 
-    if (!allowedStates || !allowedStates.has("base")) {
+    if (!allowedStates || !allowedStates.has("not-base")) {
       allowedStates = new Set([...(allowedStates || []), "base"])
     }
 
-    Object.entries(object).forEach(([key, value]) => {
-      if (!allowedStates || !allowedStates.has(key)) return ""
+    let allowedObject = {} as GenericObject
+    if (allowedStates?.size) {
+      ;[...allowedStates].forEach((state) => {
+        allowedObject[state] = object[state]
+      })
+    }
+
+    Object.entries(allowedObject).forEach(([key, value]) => {
       if (key === "base") {
         parsedStringArray.push(`${variant}-${value}`)
         return
-      }
-      if (key! === "base" && modifier) {
-        parsedStringArray.push(`${modifier}-${variant}-${value}`)
-        return
-      }
-      if (key !== "base" && !modifier) {
+      } else {
         parsedStringArray.push(`${key}:${variant}-${value}`)
+        if (allowedModifiers?.size) {
+          ;[...allowedModifiers].forEach((modifier) => {
+            parsedStringArray.push(`${modifier}-${key}:${variant}-${value}`)
+          })
+        }
       }
-      if (key !== "base" && !modifier && allowedModifiers?.size) {
-        ;[...allowedModifiers].forEach((allowedModifier) => {
-          parsedStringArray.push(
-            `${allowedModifier}-${key}:${variant}-${value}`
-          )
-        })
-        return
-      }
+
     })
 
+    console.log({ allowedObject })
+
+    // Object.entries(object).forEach(([key, value]) => {
+    //   if (key === "base") {
+    //     parsedStringArray.push(`${variant}-${value}`)
+    //     return
+    //   }
+    //   if (allowedStates?.size) {
+    //     ;[...allowedStates].forEach((state) => {
+    //       parsedStringArray.push(`${state}:${variant}-${value}`)
+    //     })
+    //   }
+    //   if (allowedModifiers?.size) {
+    //     ;[...allowedModifiers].forEach((modifier) => {
+    //       parsedStringArray.push(`${modifier}:${variant}-${value}`)
+    //     })
+    //   }
+    // })
+    console.log({ parsedStringArray })
     return parsedStringArray.join(" ")
   }
 }

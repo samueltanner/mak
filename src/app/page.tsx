@@ -18,7 +18,7 @@ export default function Home() {
           <ThemeButton />
         </div>
       </div>
-      <mak.div className={`absolute bottom-4 left-4 `} textTertiary themeLight >
+      <mak.div className={`absolute bottom-4 left-4 `} textTertiary themeLight textModifiers={["group"]} textStates={["hover"]}>
         hi
       </mak.div>
     </main>

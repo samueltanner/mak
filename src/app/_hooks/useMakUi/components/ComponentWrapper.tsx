@@ -11,8 +11,6 @@ import { withComputedProps } from "./componentTypeProps"
 
 type ComponentWrapperProps = TypeProps & {
   children: ((props: any) => JSX.Element) | JSX.Element
-  allowedStates?: MakUiStateKey[]
-  allowedModifiers?: TailwindModifier[]
 }
 
 const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
@@ -54,12 +52,19 @@ export const componentWrapperLogic = ({
     color: colorProps,
     text: textProps,
     border: borderProps,
-    allowedModifiers,
-    allowedStates,
     borderPx,
     className,
     ...restWithComputedProps
   } = withComputedProps(props)
+
+  const {
+    colorStates,
+    borderStates,
+    textStates,
+    colorModifiers,
+    borderModifiers,
+    textModifiers,
+  } = restWithComputedProps
 
   const activeThemeMode = themeMode
     ? themeMode
@@ -90,8 +95,8 @@ export const componentWrapperLogic = ({
     textString = objectToClassName({
       object: selectedText,
       variant: "text",
-      allowedStates,
-      allowedModifiers,
+      allowedStates: textStates,
+      allowedModifiers: textModifiers,
     })
   }
   if (!makUiVariantsSet.has(borderProps as MakUiVariantKey)) {
@@ -101,8 +106,8 @@ export const componentWrapperLogic = ({
     borderString = objectToClassName({
       object: selectedBorder,
       variant: "border",
-      allowedStates,
-      allowedModifiers,
+      allowedStates: borderStates,
+      allowedModifiers: borderModifiers,
     })
   }
   if (!makUiVariantsSet.has(colorProps as MakUiVariantKey)) {
@@ -112,8 +117,8 @@ export const componentWrapperLogic = ({
     colorString = objectToClassName({
       object: selectedColor,
       variant: "bg",
-      allowedStates,
-      allowedModifiers,
+      allowedStates: colorStates,
+      allowedModifiers: colorModifiers,
     })
   }
 

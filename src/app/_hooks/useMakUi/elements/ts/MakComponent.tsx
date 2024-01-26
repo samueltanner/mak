@@ -21,9 +21,13 @@ const MakComponent = forwardRef<
     makUi,
   })
 
+  console.log("response", response)
+
   const allProps = { ...props, ref }
 
   const { textString, colorString, borderString } = response
+
+
 
   const updatedClassName =
     props.className + " " + textString + " " + colorString + " " + borderString

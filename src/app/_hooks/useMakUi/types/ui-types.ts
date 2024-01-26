@@ -21,6 +21,9 @@ export type TailwindModifier =
   | "group-has"
   | "peer-has"
 
+export type TailwindModifierState = `${TailwindModifier}-${MakUiInteractionStateKey}`
+export type TailwindPseudoState = TailwindModifierState | MakUiInteractionStateKey
+
 export type HtmlElementKey =
   | "button"
   | "input"
@@ -55,7 +58,6 @@ export type MakUiThemeVariantKey =
   | "custom"
   | "light"
   | "dark"
-
 
 export type MakUiVariantRootKey =
   | "primaryRoot"

@@ -56,8 +56,7 @@ export const typeProps: TypeProps = {
 
   textSize: undefined,
   borderPx: undefined,
-  allowedStates: [],
-  allowedModifiers: [],
+
   className: undefined,
   makName: undefined,
   state: [],
@@ -89,6 +88,14 @@ export const typeProps: TypeProps = {
   textTarget: false,
   textValid: false,
   textVisited: false,
+  textStates: undefined,
+
+  textPeer: false,
+  textGroup: false,
+  textHas: false,
+  textGroupHas: false,
+  textPeerHas: false,
+  textModifiers: undefined,
 
   colorBase: true,
   colorClick: false,
@@ -117,6 +124,14 @@ export const typeProps: TypeProps = {
   colorTarget: false,
   colorValid: false,
   colorVisited: false,
+  colorStates: undefined,
+
+  colorPeer: false,
+  colorGroup: false,
+  colorHas: false,
+  colorGroupHas: false,
+  colorPeerHas: false,
+  colorModifiers: undefined,
 
   borderBase: true,
   borderClick: false,
@@ -145,6 +160,14 @@ export const typeProps: TypeProps = {
   borderTarget: false,
   borderValid: false,
   borderVisited: false,
+  borderStates: undefined,
+
+  borderPeer: false,
+  borderGroup: false,
+  borderHas: false,
+  borderGroupHas: false,
+  borderPeerHas: false,
+  borderModifiers: undefined,
 }
 
 const getThemeModeValue = (props: TypeProps): MakUiThemeKey | undefined => {
@@ -211,8 +234,10 @@ const getTextValue = (props: TypeProps) => {
   return undefined
 }
 
-const getColorStates = (props: TypeProps): Set<MakUiStateKey> => {
-  const colorStates = [] as MakUiStateKey[]
+const getColorStates = (props: TypeProps): Set<MakUiStateKey | "not-base"> => {
+  const colorStates = [] as (MakUiStateKey | "not-base")[]
+  if (props.colorStates) colorStates.push(...props.colorStates)
+  if (props.notColorBase) colorStates.push("not-base")
   if (props.colorBase) colorStates.push("base")
   if (props.colorClick) colorStates.push("click")
   if (props.colorActive) colorStates.push("active")
@@ -244,8 +269,10 @@ const getColorStates = (props: TypeProps): Set<MakUiStateKey> => {
   return new Set(colorStates)
 }
 
-const getBorderStates = (props: TypeProps): Set<MakUiStateKey> => {
-  const borderStates = [] as MakUiStateKey[]
+const getBorderStates = (props: TypeProps): Set<MakUiStateKey | "not-base"> => {
+  const borderStates = [] as (MakUiStateKey | "not-base")[]
+  if (props.borderStates) borderStates.push(...props.borderStates)
+  if (props.notBorderBase) borderStates.push("not-base")
   if (props.borderBase) borderStates.push("base")
   if (props.borderClick) borderStates.push("click")
   if (props.borderActive) borderStates.push("active")
@@ -277,8 +304,10 @@ const getBorderStates = (props: TypeProps): Set<MakUiStateKey> => {
   return new Set(borderStates)
 }
 
-const getTextStates = (props: TypeProps): Set<MakUiStateKey> => {
-  const textStates = [] as MakUiStateKey[]
+const getTextStates = (props: TypeProps): Set<MakUiStateKey | "not-base"> => {
+  const textStates = [] as (MakUiStateKey | "not-base")[]
+  if (props.textStates) textStates.push(...props.textStates)
+  if (props.notTextBase) textStates.push("not-base")
   if (props.textBase) textStates.push("base")
   if (props.textClick) textStates.push("click")
   if (props.textActive) textStates.push("active")
@@ -310,16 +339,37 @@ const getTextStates = (props: TypeProps): Set<MakUiStateKey> => {
   return new Set(textStates)
 }
 
-const getAllowedStates = (props: TypeProps): Set<MakUiStateKey> => {
-  const allowedStates = ["base" as MakUiStateKey]
-  if (props.allowedStates) allowedStates.push(...props.allowedStates)
-  return new Set(allowedStates)
+const getColorModifiers = (props: TypeProps): Set<TailwindModifier> => {
+  const colorModifiers = [] as TailwindModifier[]
+  if (props.colorModifiers) colorModifiers.push(...props.colorModifiers)
+  if (props.colorPeer) colorModifiers.push("peer")
+  if (props.colorGroup) colorModifiers.push("group")
+  if (props.colorHas) colorModifiers.push("has")
+  if (props.colorGroupHas) colorModifiers.push("group-has")
+  if (props.colorPeerHas) colorModifiers.push("peer-has")
+  return new Set(colorModifiers)
 }
 
-const getAllowedModifiers = (props: TypeProps): Set<TailwindModifier> => {
-  const allowedModifiers = [] as TailwindModifier[]
-  if (props.allowedModifiers) allowedModifiers.push(...props.allowedModifiers)
-  return new Set(allowedModifiers)
+const getBorderModifiers = (props: TypeProps): Set<TailwindModifier> => {
+  const borderModifiers = [] as TailwindModifier[]
+  if (props.borderModifiers) borderModifiers.push(...props.borderModifiers)
+  if (props.borderPeer) borderModifiers.push("peer")
+  if (props.borderGroup) borderModifiers.push("group")
+  if (props.borderHas) borderModifiers.push("has")
+  if (props.borderGroupHas) borderModifiers.push("group-has")
+  if (props.borderPeerHas) borderModifiers.push("peer-has")
+  return new Set(borderModifiers)
+}
+
+const getTextModifiers = (props: TypeProps): Set<TailwindModifier> => {
+  const textModifiers = [] as TailwindModifier[]
+  if (props.textModifiers) textModifiers.push(...props.textModifiers)
+  if (props.textPeer) textModifiers.push("peer")
+  if (props.textGroup) textModifiers.push("group")
+  if (props.textHas) textModifiers.push("has")
+  if (props.textGroupHas) textModifiers.push("group-has")
+  if (props.textPeerHas) textModifiers.push("peer-has")
+  return new Set(textModifiers)
 }
 
 export const withComputedProps = (
@@ -334,9 +384,10 @@ export const withComputedProps = (
     colorStates: getColorStates(props),
     borderStates: getBorderStates(props),
     textStates: getTextStates(props),
+    colorModifiers: getColorModifiers(props),
+    borderModifiers: getBorderModifiers(props),
+    textModifiers: getTextModifiers(props),
     themeMode: getThemeModeValue(props),
-    allowedStates: getAllowedStates(props),
-    allowedModifiers: getAllowedModifiers(props),
     borderPx: props.borderPx,
     className: props.className,
   }
