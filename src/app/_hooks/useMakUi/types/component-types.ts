@@ -156,6 +156,7 @@ export type TypeProps = {
     | "light"
     | "dark"
     | string
+    | undefined
 
   themeMode?: MakUiThemeKey | undefined
   themeLight?: boolean
@@ -170,16 +171,105 @@ export type TypeProps = {
   textSize?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
   borderPx?: number
   className?: string
+  makName?: string
+  state?: MakUiStateKey[]
 
   allowedStates?: MakUiStateKey[]
   allowedModifiers?: TailwindModifier[]
+
+  textClick?: boolean
+  textBase?: boolean
+  textActive?: boolean
+  textAutofill?: boolean
+  textChecked?: boolean
+  textClosed?: boolean
+  textDefault?: boolean
+  textDisabled?: boolean
+  textEmpty?: boolean
+  textEnabled?: boolean
+  textFocus?: boolean
+  textFocusVisible?: boolean
+  textFocusWithin?: boolean
+  textHover?: boolean
+  textInRange?: boolean
+  textIndeterminate?: boolean
+  textInvalid?: boolean
+  textOpen?: boolean
+  textOutOfRange?: boolean
+  textPlaceholderShown?: boolean
+  textReadOnly?: boolean
+  textRequired?: boolean
+  textSelected?: boolean
+  textSelection?: boolean
+  textTarget?: boolean
+  textValid?: boolean
+  textVisited?: boolean
+
+  colorClick?: boolean
+  colorBase?: boolean
+  colorActive?: boolean
+  colorAutofill?: boolean
+  colorChecked?: boolean
+  colorClosed?: boolean
+  colorDefault?: boolean
+  colorDisabled?: boolean
+  colorEmpty?: boolean
+  colorEnabled?: boolean
+  colorFocus?: boolean
+  colorFocusVisible?: boolean
+  colorFocusWithin?: boolean
+  colorHover?: boolean
+  colorInRange?: boolean
+  colorIndeterminate?: boolean
+  colorInvalid?: boolean
+  colorOpen?: boolean
+  colorOutOfRange?: boolean
+  colorPlaceholderShown?: boolean
+  colorReadOnly?: boolean
+  colorRequired?: boolean
+  colorSelected?: boolean
+  colorSelection?: boolean
+  colorTarget?: boolean
+  colorValid?: boolean
+  colorVisited?: boolean
+
+  borderClick?: boolean
+  borderBase?: boolean
+  borderActive?: boolean
+  borderAutofill?: boolean
+  borderChecked?: boolean
+  borderClosed?: boolean
+  borderDefault?: boolean
+  borderDisabled?: boolean
+  borderEmpty?: boolean
+  borderEnabled?: boolean
+  borderFocus?: boolean
+  borderFocusVisible?: boolean
+  borderFocusWithin?: boolean
+  borderHover?: boolean
+  borderInRange?: boolean
+  borderIndeterminate?: boolean
+  borderInvalid?: boolean
+  borderOpen?: boolean
+  borderOutOfRange?: boolean
+  borderPlaceholderShown?: boolean
+  borderReadOnly?: boolean
+  borderRequired?: boolean
+  borderSelected?: boolean
+  borderSelection?: boolean
+  borderTarget?: boolean
+  borderValid?: boolean
+  borderVisited?: boolean
 }
 
 export type WithComponentPropsResponse = {
   theme: MakUiThemeKey | undefined
-  color: string
-  border: string
-  text: string
+  color: string | undefined
+  border: string | undefined
+  text: string | undefined
+  colorStates: Set<MakUiStateKey>
+  textStates: Set<MakUiStateKey>
+  borderStates: Set<MakUiStateKey>
   themeMode: MakUiThemeKey | undefined
   allowedStates: Set<MakUiStateKey>
   allowedModifiers: Set<TailwindModifier>
@@ -204,9 +294,9 @@ export type ObjectToClassNameProps =
   | ObjectToClassNameObjectProp
 
 export type ComponentWrapperResponse = {
-  textString: string
-  colorString: string
-  borderString: string
+  textString: string | undefined
+  colorString: string | undefined
+  borderString: string | undefined
   componentTheme: MakUiVerboseThemeVariant
   componentText: MakUiVerboseVariant
   componentColor: MakUiVerboseVariant

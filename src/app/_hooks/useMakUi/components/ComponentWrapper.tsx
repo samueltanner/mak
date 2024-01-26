@@ -16,6 +16,38 @@ type ComponentWrapperProps = TypeProps & {
 }
 
 const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
+  const makUi = useMakUi()
+  const response = componentWrapperLogic({
+    props,
+    makUi,
+  })
+
+  return (
+    <>
+      {typeof children === "function"
+        ? children({
+            computedProps: response,
+            ...props,
+          })
+        : children}
+    </>
+  )
+}
+
+export default ComponentWrapper
+
+export const componentWrapperLogic = ({
+  props,
+  makUi,
+}: {
+  props: TypeProps
+  makUi: ReturnType<typeof useMakUi>
+}) => {
+  const {
+    theme: makTheme,
+    verbosePalette: makVerbosePalette,
+    verboseTheme: makVerboseTheme,
+  } = makUi
   const {
     themeMode,
     theme: themeProps,
@@ -28,12 +60,6 @@ const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
     className,
     ...restWithComputedProps
   } = withComputedProps(props)
-
-  const {
-    theme: makTheme,
-    verbosePalette: makVerbosePalette,
-    verboseTheme: makVerboseTheme,
-  } = useMakUi()
 
   const activeThemeMode = themeMode
     ? themeMode
@@ -54,9 +80,9 @@ const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
   let selectedText
   let selectedBorder
   let selectedColor
-  let textString: string
-  let colorString: string
-  let borderString: string
+  let textString: string | undefined
+  let colorString: string | undefined
+  let borderString: string | undefined
   if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
     textString = textProps
   } else {
@@ -110,16 +136,5 @@ const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
     ...restWithComputedProps,
   }
 
-  return (
-    <>
-      {typeof children === "function"
-        ? children({
-            computedProps: response,
-            ...props,
-          })
-        : children}
-    </>
-  )
+  return response
 }
-
-export default ComponentWrapper

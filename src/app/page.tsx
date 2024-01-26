@@ -3,7 +3,7 @@ import { useMakUi } from "./_hooks/useMakUi/context/MakUiContext"
 import MakFormView from "./_views/MakFormView"
 import MakUiView from "./_views/MakUiView"
 import ThemeButton from "./_components/ThemeButton"
-
+import { mak } from "./_hooks/useMakUi/elements/ts/mak"
 export default function Home() {
   const { simplePalette, simpleTheme } = useMakUi()
 
@@ -18,6 +18,9 @@ export default function Home() {
           <ThemeButton />
         </div>
       </div>
+      <mak.div className={`absolute bottom-4 left-4 `} textTertiary themeLight >
+        hi
+      </mak.div>
     </main>
   )
 }

@@ -5,8 +5,9 @@ import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
 import { objectToClassName } from "../_hooks/useMakUi/functions/helpers"
 
 const DropdownView = () => {
-  const { simpleTheme, verboseTheme, simplePalette, verbosePalette } = useMakUi()
-  console.log({ simplePalette, verbosePalette })
+  const { simpleTheme, verboseTheme, simplePalette, verbosePalette } =
+    useMakUi()
+
   const [buttonState, setButtonState] = useState<
     "error" | "success" | "loading" | "default"
   >("default")

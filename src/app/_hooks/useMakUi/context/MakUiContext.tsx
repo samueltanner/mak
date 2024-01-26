@@ -169,8 +169,6 @@ const MakUiProviderChild = ({
       }) || {}
 
     return {
-      // sp: simple as MakUiSimplePalettesShortHand,
-      // vp: verbose as MakUiVerbosePalettesShortHand,
       simplePalette: simple as MakUiSimplePalette,
       verbosePalette: verbose as MakUiVerbosePalette,
     }

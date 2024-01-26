@@ -28,7 +28,8 @@ const palette: MakUiFlexiblePaletteInput = {
     secondary: "light:zinc-200 dark:zinc-700",
     tertiary: "light:zinc-300 dark:zinc-600",
     custom: "light:mak-teal-500 dark:mak-teal-700",
-    light: "zinc-50"
+    light: "light:white dark:zinc-50",
+    dark: "light:zinc-900 dark:zinc-950",
   },
 }
 
