@@ -20,6 +20,7 @@ import {
   MakUiVerboseShades,
   MakUiVerboseTheme,
   ParsedClassNameResponse,
+  Shade,
   TailwindVariantKey,
 } from "../types/ui-types"
 import colors from "tailwindcss/colors"
@@ -36,6 +37,7 @@ import {
   makUiDefaultThemeShades,
   makUiPalettes,
   makUiPalettesSet,
+  makUiShadesSet,
   makUiStates,
   makUiStatesSet,
   makUiThemeVariantsSet,
@@ -70,10 +72,19 @@ export const constructTailwindObject = ({
   hex: string
   step?: number
   includeNearAbsolutes?: boolean
-}): Record<number, string> => {
-  if (hex.charAt(0) !== "#") hex = `#${hex}`
-
-  const tailwindColors: Record<number, string> = {}
+}): MakUiVerboseShades => {
+  if (hex.includes("-")) {
+    hex = twColorHelper({ colorString: hex }).hex
+  }
+  if (hex === "#white" || hex === "#black") {
+    console.log("hex is white")
+    hex = hex.slice(1)
+    hex = hex === "white" ? "#FFFFFF" : "#000000"
+  }
+  if (hex.charAt(0) !== "#") {
+    hex = `#${hex}`
+  }
+  const tailwindColors = {} as MakUiVerboseShades
 
   const lightestColor = chroma.mix("white", hex, 0, "rgb")
   const darkestColor = chroma.mix("black", hex, 0, "rgb")
@@ -284,11 +295,11 @@ export const getConstructedTheme = ({
 export const getGeneratedShades = ({
   middleHex,
   providedShades,
-  steps = 100,
+  steps = 50,
 }: {
   middleHex: string
   providedShades?: Record<string, string>
-  steps: number
+  steps?: number
 }): MakUiVerboseShades => {
   const tailwindColors = constructTailwindObject({
     hex: middleHex,
@@ -512,7 +523,7 @@ export const twColorHelper = ({
       opacity: 0,
       colorString: "",
       rootString: "",
-      hex: "",
+      hex: "#000000",
     }
   }
 
@@ -541,7 +552,7 @@ export const twColorHelper = ({
       opacity: value,
       colorString: `${absoluteColor}${string}`,
       rootString: `${absoluteColor}`,
-      hex: colorString === "white" ? colors["white"] : colors["black"],
+      hex: colorString === "white" ? "#FFFFFF" : "#000000",
     }
   } else {
     if (isObject(colorString) && Object.values(colorString)[0]) {
@@ -762,38 +773,38 @@ const getNestedClassNameObjects = ({
   const classNamesArray = [] as {
     variant: string
     theme: string | undefined
-    state: string
+    shade: string
     paletteVariant: string
     className: string
   }[]
 
   let [variant, paletteVariant = "color"] = splitStringAtCapital(key)
   paletteVariant = paletteVariant.toLowerCase()
-  let states: [state: string, classNames: string][] = Object.entries(value)
-  states.forEach(([state, classNames]) => {
+  let shades: [state: string, classNames: string][] = Object.entries(value)
+  shades.forEach(([shade, classNames]) => {
     classNames.split(" ").forEach((className) => {
       const splitClassName = className.split(":")
-      let theme
-      let altStates: MakUiStateKey[] = []
+
+      let altShades: Shade[] = []
       let altThemes: MakUiThemeKey[] = []
       className = splitClassName[splitClassName.length - 1]
       if (makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)) {
-        theme = splitClassName[0] as MakUiThemeKey
+        altThemes.push(splitClassName[0] as MakUiThemeKey)
       } else {
         altThemes.push(...enabledThemeModes)
       }
       splitClassName.forEach((cn) => {
-        if (makUiStatesSet.has(cn as MakUiStateKey)) {
-          altStates.push(cn as MakUiStateKey)
+        if (makUiShadesSet.has(cn as Shade)) {
+          altShades.push(cn as Shade)
         }
       })
 
       for (const t of enabledThemeModes) {
-        for (const s of altStates) {
+        for (const s of altShades) {
           classNamesArray.push({
             variant,
             theme: t,
-            state: s,
+            shade: s,
             paletteVariant,
             className,
           })
@@ -802,7 +813,7 @@ const getNestedClassNameObjects = ({
         classNamesArray.push({
           variant,
           theme: t,
-          state,
+          shade,
           paletteVariant,
           className,
         })
@@ -840,18 +851,17 @@ const getClassNameAsObject = ({
   const classNamesArray = [] as {
     variant: string
     theme: string | undefined
-    state: string
+    shade: string
     paletteVariant: string
     className: string
   }[]
 
   const splitClassName = value.split(":")
 
-  const state =
-    splitClassName.find((el) => makUiStates.includes(el as MakUiStateKey)) ||
-    "base"
+  const shade =
+    splitClassName.find((el) => makUiShadesSet.has(el as Shade)) || "500"
   let altThemes: MakUiThemeKey[] = []
-  let altStates: MakUiStateKey[] = []
+  let altShades: Shade[] = []
   className = splitClassName[splitClassName.length - 1]
   if (makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)) {
     altThemes.push(splitClassName[0] as MakUiThemeKey)
@@ -859,17 +869,17 @@ const getClassNameAsObject = ({
     altThemes.push(...enabledThemeModes)
   }
   splitClassName.forEach((cn) => {
-    if (makUiStatesSet.has(cn as MakUiStateKey)) {
-      altStates.push(cn as MakUiStateKey)
+    if (makUiShadesSet.has(cn as Shade)) {
+      altShades.push(cn as Shade)
     }
   })
 
   for (const t of altThemes) {
-    for (const s of altStates) {
+    for (const s of altShades) {
       classNamesArray.push({
         variant,
         theme: t,
-        state: s,
+        shade: s,
         paletteVariant,
         className,
       })
@@ -878,7 +888,7 @@ const getClassNameAsObject = ({
     classNamesArray.push({
       variant,
       theme: t,
-      state,
+      shade,
       paletteVariant,
       className,
     })
@@ -945,7 +955,7 @@ export const extractInitialPalette = ({
           splitClassNames.forEach((className) => {
             const splitClassName = className.split(":")
             const color = splitClassName[splitClassName.length - 1]
-            const colorString = twColorHelper({ colorString: color }).rootString
+            const hex = twColorHelper({ colorString: color }).hex
             const altThemes: MakUiThemeKey[] = []
             makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)
               ? altThemes.push(splitClassName[0] as MakUiThemeKey)
@@ -955,7 +965,7 @@ export const extractInitialPalette = ({
               ensureNestedObject({
                 parent: themePalette,
                 keys: [t, variant],
-                value: colorString,
+                value: hex,
               })
             }
           })
@@ -971,12 +981,12 @@ export const extractInitialPalette = ({
         enabledThemeModes,
       })
       for (const obj of classNamesArray) {
-        const { variant, theme, paletteVariant, state, className } = obj
+        const { variant, theme, paletteVariant, shade, className } = obj
 
         const nestedObj = {}
         ensureNestedObject({
           parent: nestedObj,
-          keys: [theme, paletteVariant, variant, state],
+          keys: [theme, paletteVariant, variant, shade],
           value: className,
         })
 
@@ -991,12 +1001,12 @@ export const extractInitialPalette = ({
         })
 
         for (const obj of classNamesArray) {
-          const { variant, theme, paletteVariant, state, className } = obj
+          const { variant, theme, paletteVariant, shade, className } = obj
 
           const nestedObj = {}
           ensureNestedObject({
             parent: nestedObj,
-            keys: [theme, paletteVariant, variant, state],
+            keys: [theme, paletteVariant, variant, shade],
             value: className,
           })
 

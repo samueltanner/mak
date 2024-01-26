@@ -8,7 +8,21 @@ export const ColorGenerator = () => {
 
   const [generatedColors, setGeneratedColors] = useState<
     Record<number, string>
-  >({})
+  >({
+    0: "#ffffff",
+    50: "#ffffff",
+    100: "#fefefe",
+    200: "#fdfdfd",
+    300: "#fcfcfc",
+    400: "#fbfbfb",
+    500: "#fafafa",
+    600: "#c8c8c8",
+    700: "#969696",
+    800: "#646464",
+    900: "#323232",
+    950: "#191919",
+    1000: "#000000",
+  })
   useEffect(() => {
     if (selectedColor) {
       const genColors = constructTailwindObject({

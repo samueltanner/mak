@@ -149,7 +149,7 @@ export type MakUiVerboseTheme = {
 }
 
 export type MakUiVerboseVariant = {
-  [Key in MakUiVariantKey]: MakUiState
+  [Key in MakUiVariantKey]: MakUiVerboseShades
 }
 
 export type MakUiVerboseThemeVariant = {
@@ -160,7 +160,7 @@ export type MakUiState = {
   [Key in MakUiStateKey]: string
 }
 
-type Shades =
+export type Shade =
   | "0"
   | "50"
   | "100"
@@ -216,7 +216,7 @@ export type MakUiVerboseShades = MakUiSimpleShades &
   }
 
 export type MakUiShadesInput = {
-  [Key in Shades]?: string
+  [Key in Shade]?: string
 }
 // SIMPLE OUTPUT TYPES
 
@@ -237,16 +237,7 @@ export type MakUiSimpleTheme = {
 }
 
 export type MakUiSimpleVariant = {
-  [Key in MakUiVariantKey]: {
-    base: string
-    active: string
-    click: string
-    default: string
-    focus: string
-    hover: string
-    disabled: string
-    selected: string
-  }
+  [Key in MakUiVariantKey]: MakUiSimpleShades
 }
 
 export type MakUiSimpleThemeVariant = {
@@ -271,7 +262,7 @@ export type MakUiThemePaletteInput = {
 }
 
 export type MakUiVariantPaletteInput = {
-  [Key in MakUiVariantKey]?: string | MakUiStateInput
+  [Key in MakUiVariantKey]?: string | MakUiShadesInput
 }
 
 export type MakUiFlexiblePaletteInput =
@@ -289,7 +280,7 @@ export type MakUiThemeInput = {
 export type MakUiVariantInput =
   | string
   | {
-      [Key in MakUiVariantKey]?: string | MakUiStateInput
+      [Key in MakUiVariantKey]?: string | MakUiShadesInput
     }
 
 export type MakUiThemeVariantInput =

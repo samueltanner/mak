@@ -3,6 +3,7 @@ import {
   getConstructedTheme,
   getConstructedStates,
   twColorHelper,
+  getGeneratedShades,
 } from "../functions/helpers"
 import {
   MakUiFlexiblePaletteInput,
@@ -40,6 +41,8 @@ export const paletteFactory = ({
     palette: paletteInput,
     enabledThemeModes,
   })
+
+  console.log("initialVerbosePalette", initialVerbosePalette)
 
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
@@ -148,37 +151,43 @@ export const paletteFactory = ({
       }
       for (const variant of makUiVariants) {
         if (initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant]) {
-          const providedStates =
+          const providedShades =
             initialVerbosePalette[theme][paletteVariant][variant]
-
-          const constructedStates = getConstructedStates({
-            providedStates,
-            defaultShades: defaultShades.defaultStateShades,
-            theme,
+          console.log("providedShades", providedShades)
+          const constructedShades = getGeneratedShades({
+            middleHex: providedShades["500"],
+            providedShades,
           })
+
+
+          // const constructedStates = getConstructedStates({
+          //   providedShades,
+          //   defaultShades: defaultShades.defaultStateShades,
+          //   theme,
+          // })
 
           ensureNestedObject({
             parent: finalVerbosePalette,
             keys: [theme, paletteVariant, variant],
-            value: constructedStates,
+            value: constructedShades,
           })
 
-          const enabledSimpleStates = enabledInteractionStates.reduce(
-            (acc, curr) => {
-              if (constructedStates[curr]) {
-                acc[curr] = constructedStates[curr]
-              }
-              return acc
-            },
-            {} as MakUiState
-          )
+          // const enabledSimpleStates = enabledInteractionStates.reduce(
+          //   (acc, curr) => {
+          //     if (constructedStates[curr]) {
+          //       acc[curr] = constructedStates[curr]
+          //     }
+          //     return acc
+          //   },
+          //   {} as MakUiState
+          // )
 
-          enabledSimpleStates.base = constructedStates.base
+          // enabledSimpleStates.base = constructedStates.base
 
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant, variant],
-            value: enabledSimpleStates,
+            value: constructedShades,
           })
 
           if (
@@ -188,13 +197,13 @@ export const paletteFactory = ({
             ensureNestedObject({
               parent: finalVerbosePalette,
               keys: [theme, "border", variant],
-              value: constructedStates,
+              value: constructedShades,
             })
 
             ensureNestedObject({
               parent: finalSimplePalette,
               keys: [theme, "border", variant],
-              value: enabledSimpleStates,
+              value: constructedShades,
             })
           }
         } else if (
@@ -207,17 +216,24 @@ export const paletteFactory = ({
               : paletteVariant === "text" && theme === "light"
               ? 50
               : 500
-          const baseColor = twColorHelper({
-            colorString: makUiDefaultColors[variant],
-            shade: shade,
-          }).rootString
-          const constructedStates = getConstructedStates({
-            providedStates: {
-              base: baseColor,
-            } as MakUiState,
-            defaultShades: defaultShades.defaultStateShades,
-            theme,
+
+          const constructedShades = getGeneratedShades({
+            middleHex: makUiDefaultColors[variant],
           })
+
+          console.log("constructedShades", constructedShades)
+
+          // const baseColor = twColorHelper({
+          //   colorString: makUiDefaultColors[variant],
+          //   shade: shade,
+          // }).hex
+          // const constructedStates = getConstructedStates({
+          //   providedStates: {
+          //     base: baseColor,
+          //   } as MakUiState,
+          //   defaultShades: defaultShades.defaultStateShades,
+          //   theme,
+          // })
 
           ensureNestedObject({
             parent: finalVerbosePalette,

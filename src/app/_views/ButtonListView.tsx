@@ -28,7 +28,7 @@ const ButtonListView = () => {
       <div className="flex flex-shrink-0 gap-2 items-center justify-center ml-3">
         <span
           className={`size-5 rounded-md bg-${
-            color[outlined ? "custom" : "primary"].base
+            color[outlined ? "custom" : "primary"]["500"]
           }`}
         />
         <Toggle
@@ -43,7 +43,7 @@ const ButtonListView = () => {
         />
         <span
           className={`size-5 rounded-md border-4 border-${
-            color[!outlined ? "custom" : "primary"].focus
+            color[!outlined ? "custom" : "primary"]["500"]
           }`}
         />
       </div>
