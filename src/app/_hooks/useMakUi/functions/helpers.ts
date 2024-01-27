@@ -91,7 +91,9 @@ export const constructTailwindObject = ({
   }
   const tailwindColors = {} as MakUiVerboseShades
 
-  hex = hex.includes("#") ? hex : `#${hex}`
+  // Adjust the start of the second scale to earlier than hexPosition for a smoother transition
+  const scale2Start = Math.max(0, hexPosition - step * 8)
+
   const scale1 = chroma
     .scale([whiteHex, hex])
     .mode("lrgb")
@@ -99,7 +101,7 @@ export const constructTailwindObject = ({
   const scale2 = chroma
     .scale([hex, blackHex])
     .mode("lrgb")
-    .domain([hexPosition, 1000])
+    .domain([scale2Start, 960])
 
   const getColor = (i: number) => {
     return i <= hexPosition ? scale1(i).hex() : scale2(i).hex()
@@ -118,47 +120,6 @@ export const constructTailwindObject = ({
     tailwindColors[0] = whiteHex
     tailwindColors[1000] = blackHex
   }
-
-  return tailwindColors
-  // const tailwindColors = {} as MakUiVerboseShades
-
-  // const colorScale = chroma.scale([whiteHex, hex, blackHex]).mode("lrgb")
-
-  // const start = step
-  // const end = 950
-  // const totalSteps = (end - start) / step
-
-  // const scalePosition = (i: number) => {
-  //   return (i - start) / (totalSteps * step)
-  // }
-
-  // for (let i = start; i <= end; i += 50) {
-  //   if (includeNearAbsolutes) {
-  //     if (i === 50) {
-  //       tailwindColors[i] = colorScale(scalePosition(i)).hex()
-  //     }
-  //     if (i === 950) {
-  //       tailwindColors[i] = colorScale(scalePosition(i)).hex()
-  //     }
-  //   }
-  //   if (i % step !== 0) continue
-  //   if (i === hexPosition) {
-  //     tailwindColors[i] = hex
-  //   } else {
-  //     const position = scalePosition(i)
-  //     tailwindColors[i] = colorScale(position).hex()
-  //   }
-  // }
-
-  // if (includeNearAbsolutes) {
-  //   tailwindColors[50] = colorScale(scalePosition(50)).hex()
-  //   tailwindColors[950] = colorScale(scalePosition(950)).hex()
-  // }
-
-  // if (includeBlackAndWhite) {
-  //   tailwindColors[0] = whiteHex
-  //   tailwindColors[1000] = blackHex
-  // }
 
   return tailwindColors
 }
@@ -368,118 +329,142 @@ export const getConstructedShades = ({
   whiteHex?: string
 }): MakUiVerboseShades => {
   const finalShades = {} as MakUiVerboseShades
+
   if (!middleHex) {
     let fallbackPosition = Object.keys(providedShades || {})?.[0]
     const fallBackProvidedColor = Object.values(providedShades || {})?.[0]
     const fallBack =
       fallBackProvidedColor || defaultColor || makUiDefaultColors[variant]
     const resolvedFallBackObject = twColorHelper({ colorString: fallBack })
-    finalShades[fallbackPosition] = resolvedFallBackObject.rootString
-    finalShades[`${fallbackPosition}Hex`] = resolvedFallBackObject.hex
-    middleHex = resolvedFallBackObject.hex
-  }
-  const tailwindColors = constructTailwindObject({
-    hex: middleHex,
-    step: steps,
-    includeBlackAndWhite,
-    includeNearAbsolutes,
-    blackHex,
-    whiteHex,
-  })
-  for (const [shade, color] of Object.entries(tailwindColors)) {
-    if (providedShades && providedShades[shade]) {
-      const twObj = twColorHelper({ colorString: providedShades[shade] })
-      finalShades[shade] = twObj.rootString
-      finalShades[`${shade}Hex`] = twObj.hex
-    } else {
-      finalShades[`${shade}Hex`] = color
-    }
-  }
-  return finalShades
-}
 
-export const getConstructedStates = ({
-  providedStates = {} as MakUiState,
-  defaultShades,
-  theme = "light",
-}: {
-  providedStates?: MakUiState
-  defaultShades?: MakUiStateShades
-  theme?: MakUiThemeKey
-}) => {
-  let providedColor = providedStates?.base as string | undefined
-  let providedState = !!providedStates?.base ? "base" : undefined
-  let inferredBaseShade
-  let stateShade
-  const multiplier = theme === "dark" ? -1 : 1
-  if (!providedColor) {
-    for (const state of makUiStates) {
-      providedColor = providedStates?.[state]
-      if (providedColor) {
-        const providedTwObj = twColorHelper({
-          colorString: providedColor,
-        })
+    // finalShades[fallbackPosition] = `${variant}-${fallbackPosition}`
+    // finalShades[`${fallbackPosition}Hex`] = resolvedFallBackObject.hex
 
-        providedState = state
-        providedColor = providedTwObj.color
-        stateShade = providedTwObj.shade
-        let stateDiff = defaultShades![state] - defaultShades!.base
-        inferredBaseShade = providedTwObj.shade! - stateDiff * multiplier
-        break
+    const resolvedTailwindColors = constructTailwindObject({
+      hex: resolvedFallBackObject.hex,
+      step: steps,
+      includeBlackAndWhite,
+      includeNearAbsolutes,
+      blackHex,
+      whiteHex,
+      hexPosition: Number(fallbackPosition),
+    })
+    for (const [shade, color] of Object.entries(resolvedTailwindColors)) {
+      if (providedShades && providedShades[shade]) {
+        const twObj = twColorHelper({ colorString: providedShades[shade] })
+        finalShades[`${shade}Hex`] = twObj.hex
+        finalShades[shade] = `${variant}-${shade}`
+      } else {
+        finalShades[`${shade}Hex`] = color
+        finalShades[shade] = `${variant}-${shade}`
       }
     }
-  }
-
-  const twObj = twColorHelper({
-    colorString: providedColor,
-    defaults: makUiDefaultStates,
-    defaultKey: "base",
-    shade: inferredBaseShade
-      ? getNormalizedShadeNumber(inferredBaseShade)
-      : undefined,
-  })
-
-  const disabledTwObj = twColorHelper({
-    colorString: providedStates.disabled || twObj.rootString,
-    shade: providedStates.disabled
-      ? undefined
-      : getNormalizedShadeNumber(twObj.shade! - 200),
-  })
-
-  const disabledShade = disabledTwObj.autoShade
-    ? twObj.shade! - 200
-    : disabledTwObj.shade!
-
-  const disabledColor = twObj.absolute
-    ? disabledTwObj.rootString
-    : `${twObj.color}-${getNormalizedShadeNumber(disabledShade)}`
-
-  providedStates.base = twObj.rootString
-  providedStates.disabled = disabledColor
-
-  const statesObject = generateDefaultStatesObject({
-    defaultColor: twObj.color,
-    defaultShades,
-    baseShade: twObj.shade,
-    multiplier,
-  })
-
-  const resolvedProvidedStates = {} as MakUiState
-  for (const [state, color] of Object.entries(providedStates)) {
-    const twObj = twColorHelper({
-      colorString: color,
-      defaults: makUiDefaultStates,
-      defaultKey: state as keyof MakUiStateShades,
+    return finalShades
+  } else {
+    const tailwindColors = constructTailwindObject({
+      hex: middleHex,
+      step: steps,
+      includeBlackAndWhite,
+      includeNearAbsolutes,
+      blackHex,
+      whiteHex,
     })
-    resolvedProvidedStates[state as MakUiStateKey] = twObj.rootString
+    for (const [shade, color] of Object.entries(tailwindColors)) {
+      if (providedShades && providedShades[shade]) {
+        const twObj = twColorHelper({ colorString: providedShades[shade] })
+        finalShades[shade] = `${variant}-${shade}`
+        finalShades[`${shade}Hex`] = twObj.hex
+      } else {
+        finalShades[`${shade}Hex`] = color
+        finalShades[shade] = `${variant}-${shade}`
+      }
+    }
+    return finalShades
   }
-  const resolvedStatesObject = mergeWithFallback(
-    resolvedProvidedStates,
-    statesObject
-  )
-
-  return resolvedStatesObject
 }
+
+// export const getConstructedStates = ({
+//   providedStates = {} as MakUiState,
+//   defaultShades,
+//   theme = "light",
+// }: {
+//   providedStates?: MakUiState
+//   defaultShades?: MakUiStateShades
+//   theme?: MakUiThemeKey
+// }) => {
+//   let providedColor = providedStates?.base as string | undefined
+//   let providedState = !!providedStates?.base ? "base" : undefined
+//   let inferredBaseShade
+//   let stateShade
+//   const multiplier = theme === "dark" ? -1 : 1
+//   if (!providedColor) {
+//     for (const state of makUiStates) {
+//       providedColor = providedStates?.[state]
+//       if (providedColor) {
+//         const providedTwObj = twColorHelper({
+//           colorString: providedColor,
+//         })
+
+//         providedState = state
+//         providedColor = providedTwObj.color
+//         stateShade = providedTwObj.shade
+//         let stateDiff = defaultShades![state] - defaultShades!.base
+//         inferredBaseShade = providedTwObj.shade! - stateDiff * multiplier
+//         break
+//       }
+//     }
+//   }
+
+//   const twObj = twColorHelper({
+//     colorString: providedColor,
+//     defaults: makUiDefaultStates,
+//     defaultKey: "base",
+//     shade: inferredBaseShade
+//       ? getNormalizedShadeNumber(inferredBaseShade)
+//       : undefined,
+//   })
+
+//   const disabledTwObj = twColorHelper({
+//     colorString: providedStates.disabled || twObj.rootString,
+//     shade: providedStates.disabled
+//       ? undefined
+//       : getNormalizedShadeNumber(twObj.shade! - 200),
+//   })
+
+//   const disabledShade = disabledTwObj.autoShade
+//     ? twObj.shade! - 200
+//     : disabledTwObj.shade!
+
+//   const disabledColor = twObj.absolute
+//     ? disabledTwObj.rootString
+//     : `${twObj.color}-${getNormalizedShadeNumber(disabledShade)}`
+
+//   // providedStates.base = twObj.rootString
+//   // providedStates.disabled = disabledColor
+
+//   const statesObject = generateDefaultStatesObject({
+//     defaultColor: twObj.color,
+//     defaultShades,
+//     baseShade: twObj.shade,
+//     multiplier,
+//   })
+
+//   const resolvedProvidedStates = {} as MakUiState
+//   for (const [state, color] of Object.entries(providedStates)) {
+//     const twObj = twColorHelper({
+//       colorString: color,
+//       defaults: makUiDefaultStates,
+//       defaultKey: state as keyof MakUiStateShades,
+//     })
+//     resolvedProvidedStates[state as MakUiStateKey] = twObj.rootString
+//   }
+//   const resolvedStatesObject = mergeWithFallback(
+//     resolvedProvidedStates,
+//     statesObject
+//   )
+
+//   return resolvedStatesObject
+// }
 
 export const getOpacity = ({
   opacityValue,
@@ -575,6 +560,7 @@ export const twColorHelper = ({
   defaultKey?: keyof MakUiDefaultColors | keyof MakUiDefaultStateColors
 }): TWColorHelperResponse => {
   if (colorString?.includes("#")) {
+    const hex = colorString
     const resolvedColorString = getTwColor(colorString)
 
     return {
@@ -585,9 +571,9 @@ export const twColorHelper = ({
       autoShade: false,
       autoColor: false,
       opacity: 100,
-      colorString: resolvedColorString || "",
-      rootString: colorString,
-      hex: colorString,
+      colorString: resolvedColorString || undefined,
+      rootString: resolvedColorString || undefined,
+      hex: hex,
     }
   }
   let defaultValue
@@ -620,7 +606,7 @@ export const twColorHelper = ({
       opacity: 0,
       colorString: "",
       rootString: "",
-      hex: "#000000",
+      hex: "#000",
     }
   }
 
@@ -766,7 +752,7 @@ export const getTwColor = (
   }
   const twColorsObj = concatNestedKeys(colors)
 
-  const twColor = Object.entries(twColorsObj).forEach(([key, value]) => {
+  const twColor = Object.entries(twColorsObj).find(([key, value]) => {
     return value === hex
   })?.[0]
   if (twColor) {

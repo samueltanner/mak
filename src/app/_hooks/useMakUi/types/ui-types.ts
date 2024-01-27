@@ -194,15 +194,19 @@ export type MakUiAbsoluteShades = {
   "1000": string
 }
 
-export type MakUiSimpleShades = {
-  "100": string
-  "200": string
-  "300": string
-  "400": string
-  "600": string
-  "700": string
-  "800": string
-  "900": string
+export type MakUiSimpleShades = MakUiAbsoluteShades & {
+  [key: string]: string
+  "50": string
+  "150": string
+  "250": string
+  "350": string
+  "450": string
+  "500": string
+  "550": string
+  "650": string
+  "750": string
+  "850": string
+  "950": string
 }
 
 export type MakUiVerboseShades = MakUiSimpleShades &
@@ -358,8 +362,8 @@ export type TWColorHelperResponse = {
   autoShade: boolean
   autoColor: boolean
   opacity: number
-  colorString: string
-  rootString: string
+  colorString: string | undefined
+  rootString: string | undefined
   hex: string
 }
 

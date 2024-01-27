@@ -5,7 +5,7 @@ import { constructTailwindObject } from "../_hooks/useMakUi/functions/helpers"
 export const ColorGenerator = () => {
   const [selectedColor, setSelectedColor] = useState<string>("#00a7bd")
 
-  const [step, setStep] = useState<number>(100)
+  const [step, setStep] = useState<number>(50)
   const [hexPosition, setHexPosition] = useState<number>(500)
   const [blackHex, setBlackHex] = useState<string>("#000000")
   const [whiteHex, setWhiteHex] = useState<string>("#ffffff")
@@ -16,17 +16,30 @@ export const ColorGenerator = () => {
 
   const [generatedColors, setGeneratedColors] = useState<
     Record<number, string>
-  >({})
+  >({
+    "0": "#ffffff",
+    "50": "#fcf2f2",
+    "100": "#f8e5e5",
+    "150": "#f5d6d6",
+    "200": "#f2c7c7",
+    "250": "#eeb6b6",
+    "300": "#eba4a4",
+    "350": "#e78f8f",
+    "400": "#e37777",
+    "450": "#e05858",
+    "500": "#dc2626",
+    "550": "#d12424",
+    "600": "#c52222",
+    "650": "#b82020",
+    "700": "#aa1d1d",
+    "750": "#9c1b1b",
+    "800": "#8b1818",
+    "850": "#781515",
+    "900": "#621111",
+    "950": "#460c0c",
+    "1000": "#000000",
+  })
   useEffect(() => {
-    console.log({
-      selectedColor,
-      step,
-      hexPosition,
-      blackHex,
-      whiteHex,
-      includeBlackAndWhite,
-      includeNearAbsolutes,
-    })
     if (selectedColor) {
       const genColors = constructTailwindObject({
         hex: selectedColor,

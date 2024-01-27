@@ -1,21 +1,18 @@
 import {
   extractInitialPalette,
   getConstructedTheme,
-  getConstructedStates,
-  twColorHelper,
   getConstructedShades,
-} from "../functions/helpers"
+  getTwColor,
+} from "../functions/helpers";
 import {
   MakUiFlexiblePaletteInput,
   MakUiInteractionStateKey,
   MakUiSimplePalette,
-  MakUiState,
-  MakUiStateShades,
   MakUiThemeKey,
   MakUiThemeShades,
   MakUiVerbosePalette,
   ShadeStep,
-} from "../types/ui-types"
+} from "../types/ui-types";
 import {
   makUiDefaultColors,
   makUiDefaultPalette,
@@ -50,7 +47,7 @@ export const paletteFactory = ({
     enabledThemeModes,
   })
 
-  console.log("initialVerbosePalette", initialVerbosePalette)
+  console.log("red #ef4444", getTwColor("#ef4444"))
 
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette

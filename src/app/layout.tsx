@@ -22,7 +22,7 @@ const palette: MakUiFlexiblePaletteInput = {
   danger: "dark:red-600 light:red-500",
   warning: "dark:yellow-600 light:yellow-500",
   info: {
-    0: "dark:blue-50 light:blue",
+    0: "dark:#00353c light:#ef4444",
   },
   text: "light:zinc-900 dark:zinc-50",
   theme: {
