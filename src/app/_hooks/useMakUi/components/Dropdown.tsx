@@ -337,12 +337,6 @@ const Dropdown = ({
   const hiddenDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (triggerRef.current) {
-      console.log("trigger ref", triggerRef.current.getBoundingClientRect())
-    }
-  }, [])
-
-  useEffect(() => {
     if (!dropdownOpen) {
       return
     }

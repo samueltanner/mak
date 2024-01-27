@@ -20,6 +20,7 @@ import {
   MakUiThemeShades,
   MakUiVerbosePalette,
   MakUiVerboseTheme,
+  ShadeStep,
 } from "../types/ui-types"
 import {
   htmlElements,
@@ -34,11 +35,24 @@ import {
   MakUiRootComponentConfig,
   MakUiRootComponentConfigInput,
 } from "../types/component-types"
-import { isEmptyObject } from "@/globals/global-helper-functions"
+import { deepMerge, isEmptyObject } from "@/globals/global-helper-functions"
+
+type PaletteGeneratorProps = {
+  palette: MakUiFlexiblePaletteInput
+  themeShades?: MakUiThemeShades
+  enableLightMode?: boolean
+  enableDarkMode?: boolean
+  enableCustomMode?: boolean
+  shadeStep?: ShadeStep
+  includeBlackAndWhite?: boolean
+  includeNearAbsolutes?: boolean
+  blackHex?: string
+  whiteHex?: string
+}
 
 type MakUiProviderProps = {
   children: React.ReactNode
-  palette: MakUiFlexiblePaletteInput
+  palette?: MakUiFlexiblePaletteInput
   componentConfig?: MakUiComponentConfigInput
   buttonConfig?: MakUiRootComponentConfigInput
   themeShades?: MakUiThemeShades
@@ -48,6 +62,9 @@ type MakUiProviderProps = {
   enableDarkMode?: boolean
   enableCustomMode?: boolean
   enabledStates?: MakUiInteractionStateKey[]
+  shadeStep?: ShadeStep
+  includeBlackAndWhite?: boolean
+  paletteGenProps?: PaletteGeneratorProps
 }
 
 const MakUiContext = createContext<MakUiContext | undefined>(undefined)
@@ -64,26 +81,60 @@ export const MakUiProvider = (props: MakUiProviderProps) => {
   )
 }
 
+const defaultPaletteGenProps: PaletteGeneratorProps = {
+  palette: {} as MakUiFlexiblePaletteInput,
+  themeShades: makUiDefaultThemeShades,
+  enableLightMode: true,
+  enableDarkMode: true,
+  enableCustomMode: false,
+  shadeStep: 100 as ShadeStep,
+  includeBlackAndWhite: true,
+  includeNearAbsolutes: true,
+  blackHex: "#000000",
+  whiteHex: "#ffffff",
+}
+
 const MakUiProviderChild = ({
   children,
-  palette: paletteInput = {},
   componentConfig: componentConfigInput,
+  palette: paletteInput,
   enableSystem = true,
   defaultTheme = "light",
-  enableDarkMode = true,
-  enableCustomMode = false,
-  themeShades = makUiDefaultThemeShades,
-  stateShades = makUiDefaultStateShades,
-  enabledStates = ["hover", "focus", "disabled"],
+  paletteGenProps = defaultPaletteGenProps,
 }: MakUiProviderProps) => {
   let { theme: themeMode, setTheme: setThemeMode } = useTheme()
+  const mergedPaletteGenProps = deepMerge(
+    defaultPaletteGenProps,
+    paletteGenProps
+  ) as PaletteGeneratorProps
 
+  const {
+    palette: paletteGenInput,
+    themeShades,
+    enableLightMode,
+    enableDarkMode,
+    enableCustomMode,
+    shadeStep,
+    includeBlackAndWhite,
+    includeNearAbsolutes,
+    blackHex,
+    whiteHex,
+  } = mergedPaletteGenProps
+
+  paletteInput = !isEmptyObject(paletteGenInput)
+    ? paletteGenInput
+    : paletteInput
+    ? paletteInput
+    : {}
   const stringifiedPalette = JSON.stringify(paletteInput)
 
   const darkModeInPalette = stringifiedPalette.includes("dark:")
   const customModeInPalette = stringifiedPalette.includes("custom:")
+  const lightModeInPalette =
+    stringifiedPalette.includes("light:") ||
+    Object.values(paletteInput).some((val) => !val.includes(":"))
   const enabledThemeModes = [
-    "light",
+    enableLightMode || lightModeInPalette ? "light" : null,
     enableDarkMode || darkModeInPalette ? "dark" : null,
     enableCustomMode || customModeInPalette ? "custom" : null,
   ].filter((mode) => mode !== null) as MakUiThemeKey[]
@@ -159,13 +210,15 @@ const MakUiProviderChild = ({
   const palettesMemo = useMemo(() => {
     const { verbose, simple } =
       paletteFactory({
-        paletteInput,
+        paletteInput: paletteInput as MakUiFlexiblePaletteInput,
         enabledThemeModes,
         enabledInteractionStates,
-        defaultShades: {
-          defaultStateShades: stateShades,
-          defaultThemeShades: themeShades,
-        },
+        defaultShades: themeShades!,
+        shadeStep: shadeStep!,
+        includeBlackAndWhite: includeBlackAndWhite!,
+        includeNearAbsolutes: includeNearAbsolutes!,
+        blackHex: blackHex!,
+        whiteHex: whiteHex!,
       }) || {}
 
     return {
@@ -214,7 +267,7 @@ const MakUiProviderChild = ({
     const configKey: keyof MakUiComponentConfigInput = type
       ? `${type}Config`
       : "buttonConfig"
-    enabledStates = states || componentConfig[configKey]?.enabledStates || []
+
     const defaultConfig = componentConfig?.[configKey]
     const defaultTheme: MakUiThemeKey | undefined =
       theme || (themeMode as MakUiThemeKey | undefined)
@@ -222,7 +275,6 @@ const MakUiProviderChild = ({
     return makClassNameHelper({
       string,
       verbosePalette,
-      enabledStates,
       defaultConfig: type ? defaultConfig : undefined,
       themeMode: defaultTheme,
       makClassName,

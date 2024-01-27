@@ -114,6 +114,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        "mak-black": "#0f0f0f",
         mak: {
           teal: {
             50: "#e6f3f4",

@@ -21,7 +21,9 @@ const palette: MakUiFlexiblePaletteInput = {
   error: "dark:red-600 light:red-500",
   danger: "dark:red-600 light:red-500",
   warning: "dark:yellow-600 light:yellow-500",
-  info: "dark:blue-600 light:blue-500",
+  info: {
+    0: "dark:blue-50 light:blue",
+  },
   text: "light:zinc-900 dark:zinc-50",
   theme: {
     primary: "light:zinc-50 dark:zinc-800",
@@ -49,7 +51,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <MakUiProvider
-          palette={palette}
+          paletteGenProps={{
+            palette,
+            enableDarkMode: true,
+            shadeStep: 50,
+          }}
           componentConfig={componentConfig}
           enableSystem
         >

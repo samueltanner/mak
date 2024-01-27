@@ -1,6 +1,10 @@
 // Generic Types
 
+import colors from "tailwindcss/colors"
+
 export type GenericObject = Record<string, any>
+export type DefaultColors = typeof colors
+export type TailwindCustomColors = NestedObject | GenericObject | undefined
 
 // KEYS
 
@@ -160,6 +164,8 @@ export type MakUiState = {
   [Key in MakUiStateKey]: string
 }
 
+export type ShadeStep = 50 | 100
+
 export type Shade =
   | "0"
   | "50"
@@ -184,8 +190,8 @@ export type Shade =
   | "1000"
 
 export type MakUiAbsoluteShades = {
-  "0": "#000000"
-  "1000": "#ffffff"
+  "0": string
+  "1000": string
 }
 
 export type MakUiSimpleShades = {

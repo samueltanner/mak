@@ -1,5 +1,6 @@
 import chroma from "chroma-js"
 import {
+  DefaultColors,
   GenericObject,
   MakUiDefaultColors,
   MakUiDefaultStateColors,
@@ -21,6 +22,7 @@ import {
   MakUiVerboseTheme,
   ParsedClassNameResponse,
   Shade,
+  TailwindCustomColors,
   TailwindVariantKey,
 } from "../types/ui-types"
 import colors from "tailwindcss/colors"
@@ -61,57 +63,102 @@ import {
   nearestMultiple,
 } from "@/globals/global-helper-functions"
 
-type DefaultColors = typeof colors
-type TailwindCustomColors = Record<string, Record<string, string>>
-
 export const constructTailwindObject = ({
   hex,
   step = 100,
   includeNearAbsolutes = true,
+  hexPosition = 500,
+  includeBlackAndWhite = true,
+  blackHex = "#000000",
+  whiteHex = "#FFFFFF",
 }: {
   hex: string
   step?: number
   includeNearAbsolutes?: boolean
+  hexPosition?: number
+  includeBlackAndWhite?: boolean
+  blackHex?: string
+  whiteHex?: string
 }): MakUiVerboseShades => {
-  if (hex.includes("-")) {
+  if (hex.includes("-") || hex.charAt(0) !== "#") {
     hex = twColorHelper({ colorString: hex }).hex
   }
-  if (hex === "#white" || hex === "#black") {
-    console.log("hex is white")
-    hex = hex.slice(1)
-    hex = hex === "white" ? "#FFFFFF" : "#000000"
+  if (hex.includes("#white") || hex === "white") {
+    hex = "#ffffff"
   }
-  if (hex.charAt(0) !== "#") {
-    hex = `#${hex}`
+  if (hex.includes("#black") || hex === "black") {
+    hex = "#000000"
   }
   const tailwindColors = {} as MakUiVerboseShades
 
-  const lightestColor = chroma.mix("white", hex, 0, "rgb")
-  const darkestColor = chroma.mix("black", hex, 0, "rgb")
+  hex = hex.includes("#") ? hex : `#${hex}`
+  const scale1 = chroma
+    .scale([whiteHex, hex])
+    .mode("lrgb")
+    .domain([0, hexPosition])
+  const scale2 = chroma
+    .scale([hex, blackHex])
+    .mode("lrgb")
+    .domain([hexPosition, 1000])
 
-  const colorScale = chroma.scale([lightestColor, hex, darkestColor])
-
-  const start = 0
-  const end = 1000
-  const totalSteps = (end - start) / step
-
-  const scalePosition = (i: number) => {
-    return (i - start) / (totalSteps * step)
+  const getColor = (i: number) => {
+    return i <= hexPosition ? scale1(i).hex() : scale2(i).hex()
   }
 
-  for (let i = start; i <= end; i += step) {
-    if (i === 500) {
-      tailwindColors[i] = hex
-    } else {
-      const position = scalePosition(i)
-      tailwindColors[i] = colorScale(position).hex()
-    }
+  for (let i = 0; i <= 1000; i += step) {
+    tailwindColors[i] = getColor(i)
   }
 
   if (includeNearAbsolutes) {
-    tailwindColors[50] = colorScale(scalePosition(50)).hex()
-    tailwindColors[950] = colorScale(scalePosition(950)).hex()
+    tailwindColors[50] = getColor(50)
+    tailwindColors[950] = getColor(950)
   }
+
+  if (includeBlackAndWhite) {
+    tailwindColors[0] = whiteHex
+    tailwindColors[1000] = blackHex
+  }
+
+  return tailwindColors
+  // const tailwindColors = {} as MakUiVerboseShades
+
+  // const colorScale = chroma.scale([whiteHex, hex, blackHex]).mode("lrgb")
+
+  // const start = step
+  // const end = 950
+  // const totalSteps = (end - start) / step
+
+  // const scalePosition = (i: number) => {
+  //   return (i - start) / (totalSteps * step)
+  // }
+
+  // for (let i = start; i <= end; i += 50) {
+  //   if (includeNearAbsolutes) {
+  //     if (i === 50) {
+  //       tailwindColors[i] = colorScale(scalePosition(i)).hex()
+  //     }
+  //     if (i === 950) {
+  //       tailwindColors[i] = colorScale(scalePosition(i)).hex()
+  //     }
+  //   }
+  //   if (i % step !== 0) continue
+  //   if (i === hexPosition) {
+  //     tailwindColors[i] = hex
+  //   } else {
+  //     const position = scalePosition(i)
+  //     tailwindColors[i] = colorScale(position).hex()
+  //   }
+  // }
+
+  // if (includeNearAbsolutes) {
+  //   tailwindColors[50] = colorScale(scalePosition(50)).hex()
+  //   tailwindColors[950] = colorScale(scalePosition(950)).hex()
+  // }
+
+  // if (includeBlackAndWhite) {
+  //   tailwindColors[0] = whiteHex
+  //   tailwindColors[1000] = blackHex
+  // }
 
   return tailwindColors
 }
@@ -211,6 +258,7 @@ export const getConstructedTheme = ({
     colorString: dark || "black",
     useDefaults: false,
   })
+
   const defaultShadesObj = makUiDefaultThemeShades[theme]
   const shadeDiffs = Object.entries(defaultShadesObj).reduce(
     (acc, [variant, shade]) => {
@@ -282,36 +330,69 @@ export const getConstructedTheme = ({
 
   const themeResponse = {
     primary: resolvedThemeObject.primary.rootString,
+    primaryHex: resolvedThemeObject.primary.hex,
     secondary: resolvedThemeObject.secondary.rootString,
+    secondaryHex: resolvedThemeObject.secondary.hex,
     tertiary: resolvedThemeObject.tertiary.rootString,
+    tertiaryHex: resolvedThemeObject.tertiary.hex,
     custom: resolvedThemeObject.custom.rootString,
+    customHex: resolvedThemeObject.custom.hex,
     light: resolvedThemeObject.light.rootString,
+    lightHex: resolvedThemeObject.light.hex,
     dark: resolvedThemeObject.dark.rootString,
+    darkHex: resolvedThemeObject.dark.hex,
   }
 
   return themeResponse
 }
 
-export const getGeneratedShades = ({
+export const getConstructedShades = ({
+  defaultColor,
   middleHex,
   providedShades,
   steps = 50,
+  variant,
+  includeBlackAndWhite = true,
+  includeNearAbsolutes = true,
+  blackHex = "#000000",
+  whiteHex = "#FFFFFF",
 }: {
-  middleHex: string
+  defaultColor?: string
+  middleHex?: string
   providedShades?: Record<string, string>
   steps?: number
+  variant: MakUiVariantKey
+  includeBlackAndWhite?: boolean
+  includeNearAbsolutes?: boolean
+  blackHex?: string
+  whiteHex?: string
 }): MakUiVerboseShades => {
+  const finalShades = {} as MakUiVerboseShades
+  if (!middleHex) {
+    let fallbackPosition = Object.keys(providedShades || {})?.[0]
+    const fallBackProvidedColor = Object.values(providedShades || {})?.[0]
+    const fallBack =
+      fallBackProvidedColor || defaultColor || makUiDefaultColors[variant]
+    const resolvedFallBackObject = twColorHelper({ colorString: fallBack })
+    finalShades[fallbackPosition] = resolvedFallBackObject.rootString
+    finalShades[`${fallbackPosition}Hex`] = resolvedFallBackObject.hex
+    middleHex = resolvedFallBackObject.hex
+  }
   const tailwindColors = constructTailwindObject({
     hex: middleHex,
     step: steps,
+    includeBlackAndWhite,
+    includeNearAbsolutes,
+    blackHex,
+    whiteHex,
   })
-  const finalShades = {} as MakUiVerboseShades
   for (const [shade, color] of Object.entries(tailwindColors)) {
     if (providedShades && providedShades[shade]) {
-      const hex = twColorHelper({ colorString: providedShades[shade] }).hex
-      finalShades[shade] = hex
+      const twObj = twColorHelper({ colorString: providedShades[shade] })
+      finalShades[shade] = twObj.rootString
+      finalShades[`${shade}Hex`] = twObj.hex
     } else {
-      finalShades[shade] = color
+      finalShades[`${shade}Hex`] = color
     }
   }
   return finalShades
@@ -493,6 +574,22 @@ export const twColorHelper = ({
   defaults?: MakUiDefaultColors | MakUiDefaultStateColors
   defaultKey?: keyof MakUiDefaultColors | keyof MakUiDefaultStateColors
 }): TWColorHelperResponse => {
+  if (colorString?.includes("#")) {
+    const resolvedColorString = getTwColor(colorString)
+
+    return {
+      absolute: true,
+      isTwColor: false,
+      color: undefined,
+      shade: undefined,
+      autoShade: false,
+      autoColor: false,
+      opacity: 100,
+      colorString: resolvedColorString || "",
+      rootString: colorString,
+      hex: colorString,
+    }
+  }
   let defaultValue
   if (makUiVariants.includes(defaultKey as MakUiVariantKey)) {
     defaults as MakUiDefaultColors
@@ -619,6 +716,64 @@ export const twColorHelper = ({
   }
 }
 
+export const concatNestedKeys = (
+  obj: NestedObject,
+  prefix: string = ""
+): NestedObject => {
+  let result: NestedObject = {}
+
+  Object.keys(obj).forEach((key) => {
+    // Construct the new key using the prefix
+    const newKey = prefix ? `${prefix}-${key}` : key
+
+    if (
+      typeof obj[key] === "object" &&
+      obj[key] !== null &&
+      !Array.isArray(obj[key])
+    ) {
+      // If the value is a nested object, call the function recursively
+      Object.assign(result, concatNestedKeys(obj[key], newKey))
+    } else {
+      // Otherwise, add the key-value pair to the result
+      result[newKey] = obj[key]
+    }
+  })
+
+  return result
+}
+
+export const getTwColor = (
+  hex: string,
+  objectToCheck?: NestedObject | GenericObject
+) => {
+  if (objectToCheck) {
+    const concatObject = concatNestedKeys(objectToCheck)
+    const customColor = Object.entries(concatObject).find(([key, value]) => {
+      return value === hex
+    })?.[0]
+    if (customColor) {
+      return customColor
+    }
+  }
+  const twConfigColors = twConfig?.theme?.extend?.colors as TailwindCustomColors
+
+  const customColorsObj = concatNestedKeys(twConfigColors || {})
+  const customColor = Object.entries(customColorsObj).find(([key, value]) => {
+    return value === hex
+  })?.[0]
+  if (customColor) {
+    return customColor
+  }
+  const twColorsObj = concatNestedKeys(colors)
+
+  const twColor = Object.entries(twColorsObj).forEach(([key, value]) => {
+    return value === hex
+  })?.[0]
+  if (twColor) {
+    return twColor
+  }
+}
+
 export const getTwHex = ({
   colorString,
   color,
@@ -662,7 +817,7 @@ export const getTwHex = ({
       if (defaultHex) return defaultHex
       return black
     } else {
-      const tailwindCustomColors = twConfig?.theme
+      const tailwindCustomColors = twConfig?.theme?.extend
         ?.colors as TailwindCustomColors
 
       const [colorGroup, colorSubGroup] = rootColor.split("-")
@@ -951,11 +1106,11 @@ export const extractInitialPalette = ({
       themes.forEach(([variant, classNames]) => {
         if (typeof classNames === "string") {
           const splitClassNames = classNames.split(" ")
-
           splitClassNames.forEach((className) => {
             const splitClassName = className.split(":")
             const color = splitClassName[splitClassName.length - 1]
             const hex = twColorHelper({ colorString: color }).hex
+
             const altThemes: MakUiThemeKey[] = []
             makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)
               ? altThemes.push(splitClassName[0] as MakUiThemeKey)
@@ -1043,7 +1198,6 @@ export const extractInitialPalette = ({
 export const makClassNameHelper = ({
   string,
   verbosePalette,
-  enabledStates,
   defaultConfig,
   themeMode,
   makClassName,
@@ -1051,7 +1205,6 @@ export const makClassNameHelper = ({
 }: {
   string?: string
   verbosePalette: MakUiVerbosePalette
-  enabledStates: MakUiInteractionStateKey[]
   defaultConfig?: MakUiRootComponentConfigInput
   themeMode?: MakUiThemeKey
   makClassName?: string
@@ -1113,12 +1266,12 @@ export const makClassNameHelper = ({
         const baseClassName =
           `${twVariant}-${target[themeVariant]}` + opacityString
         finalClassName.push(baseClassName)
-        for (const state of enabledStates) {
-          const constructedClassName =
-            `${state}:${twVariant}-${target[themeVariant]}` + opacityString
+        // for (const state of enabledStates) {
+        //   const constructedClassName =
+        //     `${state}:${twVariant}-${target[themeVariant]}` + opacityString
 
-          finalClassName.push(constructedClassName)
-        }
+        //   finalClassName.push(constructedClassName)
+        // }
       }
     } else {
       target = verbosePalette[theme!][palette][variant]
@@ -1126,12 +1279,12 @@ export const makClassNameHelper = ({
       if (!state) {
         const baseClassName = `${twVariant}-${target.base}` + opacityString
         finalClassName.push(baseClassName)
-        for (const state of enabledStates) {
-          const constructedClassName =
-            `${state}:${twVariant}-${target[state]}` + opacityString
+        // for (const state of enabledStates) {
+        //   const constructedClassName =
+        //     `${state}:${twVariant}-${target[state]}` + opacityString
 
-          finalClassName.push(constructedClassName)
-        }
+        //   finalClassName.push(constructedClassName)
+        // }
       } else {
         let constructedClassName
         if (twVariant) {
@@ -1314,12 +1467,6 @@ export const objectToClassName = ({
     allowedStates,
     allowedModifiers,
   }: ObjectToClassNameObjectProp): string {
-    console.log({
-      object,
-      variant,
-      allowedStates,
-      allowedModifiers,
-    })
     if (!isObject(object)) return ""
     let parsedStringArray: string[] = []
 
