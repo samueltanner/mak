@@ -89,7 +89,7 @@ export const componentWrapperLogic = ({
   let borderString: string | undefined
 
   const styleObject = {
-    backgroundColor: undefined as string | undefined,
+    "background-color": undefined as string | undefined,
     borderColor: undefined as string | undefined,
     color: undefined as string | undefined,
   }
@@ -99,8 +99,8 @@ export const componentWrapperLogic = ({
   } else {
     console.log("themeProps", themeProps)
     selectedTheme = themePalette[themeProps as MakUiThemeVariantKey]
-    themeString = `bg-${selectedTheme}`
-    styleObject.backgroundColor = selectedTheme
+    themeString = selectedTheme
+    styleObject["background-color"] = selectedTheme
   }
   if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
     textString = textProps
