@@ -8,7 +8,7 @@ export type TailwindCustomColors = NestedObject | GenericObject | undefined
 
 // KEYS
 
-export type TailwindVariantKey =
+export type TailwindUtilityClass =
   | "bg"
   | "text"
   | "border"
@@ -17,11 +17,18 @@ export type TailwindVariantKey =
   | "ring-offset"
   | "fill"
   | "stroke"
+  | "divide"
+  | "placeholder"
+  | "decoration"
+  | "accent"
+  | "caret"
+  | "shadow"
 
 export type TailwindModifier =
   | "peer"
   | "group"
   | "has"
+  | "*"
   | "group-has"
   | "peer-has"
 
@@ -56,7 +63,7 @@ export type MakUiVariantKeySH =
 
 export type MakUiThemeKey = "dark" | "light" | "custom"
 
-export type MakUiPaletteKey = "color" | "text" | "border" | "theme"
+export type MakUiPaletteKey = "color" | "text" | "border" | "theme" | "bg"
 
 export type MakUiThemeVariantKey =
   | "primary"
@@ -149,6 +156,7 @@ export type MakUiVerbosePalette = {
 
 export type MakUiVerboseTheme = {
   color: MakUiVerboseVariant
+  bg: MakUiVerboseVariant
   text: MakUiVerboseVariant
   border: MakUiVerboseVariant
   theme: MakUiVerboseThemeVariant
@@ -377,7 +385,16 @@ export type ParsedClassNameResponse = {
   variant: MakUiVariantKey
   themeVariant: MakUiThemeVariantKey
   state: MakUiStateKey | undefined
-  twVariant: TailwindVariantKey
+  twVariant: TailwindUtilityClass
   opacity: string | undefined
   string: string
+}
+
+export type MakClassNameObject = {
+  utility: TailwindUtilityClass | undefined
+  modifier: TailwindModifier | undefined
+  paletteVariant: MakUiPaletteKey
+  variant: MakUiVariantKey
+  shade: Shade
+  opacity: number | string | undefined
 }

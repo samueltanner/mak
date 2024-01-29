@@ -222,12 +222,11 @@ export type ComponentWrapperResponse = {
   componentText: MakUiVerboseVariant
   componentColor: MakUiVerboseVariant
   componentBorder: MakUiVerboseVariant
-  componentPalette: MakUiVerboseTheme
+  fullComponentTheme: MakUiVerboseTheme
   componentThemeMode: MakUiThemeKey | undefined
   globalThemeMode: MakUiThemeKey
   globalPalette: MakUiVerbosePalette
   globalTheme: MakUiVerboseTheme
-  borderPx: number | undefined
   className: string | undefined
-  objectToClassName: (args: ObjectToClassNameObjectProp) => string
+  makClassName: string | undefined
 }

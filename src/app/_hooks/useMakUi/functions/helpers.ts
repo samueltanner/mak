@@ -2,6 +2,7 @@ import chroma from "chroma-js"
 import {
   DefaultColors,
   GenericObject,
+  MakClassNameObject,
   MakUiDefaultColors,
   MakUiDefaultStateColors,
   MakUiFlexiblePaletteInput,
@@ -23,7 +24,8 @@ import {
   ParsedClassNameResponse,
   Shade,
   TailwindCustomColors,
-  TailwindVariantKey,
+  TailwindModifier,
+  TailwindUtilityClass,
 } from "../types/ui-types"
 import colors from "tailwindcss/colors"
 import twConfig from "../../../../../tailwind.config"
@@ -58,6 +60,7 @@ import {
   isObject,
   nearestMultiple,
 } from "@/globals/global-helper-functions"
+import { act } from "react-dom/test-utils"
 
 export const constructTailwindObject = ({
   hex,
@@ -1126,9 +1129,9 @@ const parseMakClassName = (string: string) => {
       makClassNameObj.state = str as MakUiStateKey
     }
 
-    if (tailwindVariantsSet.has(str as TailwindVariantKey)) {
+    if (tailwindVariantsSet.has(str as TailwindUtilityClass)) {
       if (makClassNameObj.twVariant !== "ring-offset") {
-        makClassNameObj.twVariant = str as TailwindVariantKey
+        makClassNameObj.twVariant = str as TailwindUtilityClass
       }
     } else if (str === "color") {
       makClassNameObj.twVariant = "bg"
@@ -1279,4 +1282,121 @@ export const objectToClassName = ({
 
     return parsedStringArray.join(" ")
   }
+}
+
+export const parseClassNameToStyleObject = ({
+  className = "",
+  makClassName = undefined,
+  activeTheme,
+}: {
+  className?: string
+  makClassName?: string
+  activeTheme: MakUiVerboseTheme
+}) => {
+  let styleObject = {} as GenericObject
+  const makRegex = /mak\((.*?)\)/
+
+  const matches = className.match(makRegex)
+
+  if (matches) {
+    const insideMak = matches[1]
+    const outsideMak = className.replace(matches[0], "").trim()
+    console.log({ insideMak, outsideMak })
+    className = outsideMak
+    makClassName =
+      makClassName || "" + !!insideMak.length ? ` ${insideMak}` : ""
+  }
+
+  styleObject = parseMakClassNames({
+    makClassName,
+    activeTheme,
+  })
+
+  return { styleObject, twClassNames: className }
+}
+
+const parseMakClassNames = ({
+  makClassName,
+  activeTheme,
+}: {
+  makClassName?: string
+  activeTheme: MakUiVerboseTheme
+}) => {
+  const makClassNamesArray = makClassName?.split(" ") || []
+  const makClassNamesObjectArray: MakClassNameObject[] = []
+  const parsedMakClassNamesArray: string[] = []
+  const styleObj = {} as GenericObject
+  const styleMap = new Map<string, string | GenericObject>()
+
+  const { color, text, border, theme } = activeTheme
+
+  makClassNamesArray.length > 0 &&
+    makClassNamesArray.forEach((makClassName) => {
+      let key: string = "backgroundColor"
+      let modifierKey: string | undefined = undefined
+      let paletteVariant: MakUiPaletteKey = "bg"
+      let modifierClass: string | undefined = undefined
+      let modifier: string | undefined = undefined
+      let variant: MakUiVariantKey = "primary"
+      let shade: Shade | undefined = undefined
+      let mcn: string | undefined
+      let opacity = undefined
+      let color
+
+      const keyMap = {
+        bg: "backgroundColor",
+        text: "color",
+        border: "borderColor",
+        theme: "backgroundColor",
+        color: "backgroundColor",
+      }
+
+      modifier = makClassName.includes(":")
+        ? makClassName!.split(":")[0]
+        : undefined
+      mcn = makClassName!.split(":")[1] || makClassName
+      opacity = mcn?.split("/")[1]
+      mcn = mcn?.split("/")[0]
+      paletteVariant =
+        (mcn?.split("-")[0] as MakUiPaletteKey) || ("bg" as MakUiPaletteKey)
+      variant =
+        (mcn?.split("-")[1] as MakUiVariantKey) ||
+        ("primary" as MakUiVariantKey)
+      shade = (Number(mcn?.split("-")[2]) as Shade) || (500 as Shade)
+
+      if (paletteVariant !== "theme") {
+        color = activeTheme[paletteVariant][variant][shade]
+      } else {
+        color = activeTheme.theme?.[variant as keyof MakUiVerboseThemeVariant]
+        console.log({ color }, activeTheme)
+      }
+
+      if (opacity && color) {
+        color = chroma(color)
+          .alpha(Number(opacity) / 100)
+          .css()
+      }
+
+      if (modifier) {
+        const splitModifier = modifier.split("-")
+        if (splitModifier.length > 1) {
+          modifierClass = splitModifier[0]
+          modifier = splitModifier[1]
+          modifierKey = `.${modifierClass}:${modifier} &`
+        } else {
+          modifier = splitModifier[0]
+          modifierKey = `&:${modifier}`
+        }
+        key = keyMap[paletteVariant]
+        styleMap.set(modifierKey, {
+          [key]: color,
+        })
+      } else {
+        key = keyMap[paletteVariant]
+        styleMap.set(key, color)
+      }
+    })
+
+  Object.keys(styleObj).length && console.log("makClassNamesStyleMap", styleMap)
+  return Object.fromEntries(styleMap)
 }

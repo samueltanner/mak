@@ -17,10 +17,10 @@ import {
   MakUiThemeVariantKey,
   MakUiVariantKey,
   Shade,
-  TailwindVariantKey,
+  TailwindUtilityClass,
 } from "../types/ui-types"
 
-export const tailwindVariants: TailwindVariantKey[] = [
+export const tailwindVariants: TailwindUtilityClass[] = [
   "bg",
   "text",
   "border",
@@ -29,6 +29,12 @@ export const tailwindVariants: TailwindVariantKey[] = [
   "ring-offset",
   "fill",
   "stroke",
+  "divide",
+  "placeholder",
+  "decoration",
+  "accent",
+  "caret",
+  "shadow",
 ]
 
 export const htmlElements: HtmlElementKey[] = [
@@ -41,7 +47,7 @@ export const htmlElements: HtmlElementKey[] = [
   "textarea",
 ]
 
-export const tailwindVariantsSet: Set<TailwindVariantKey> = new Set(
+export const tailwindVariantsSet: Set<TailwindUtilityClass> = new Set(
   tailwindVariants
 )
 

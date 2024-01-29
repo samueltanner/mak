@@ -4,7 +4,10 @@ import {
   makUiVariantsSet,
 } from "../constants/ui-constants"
 import { useMakUi } from "../context/MakUiContext"
-import { objectToClassName } from "../functions/helpers"
+import {
+  objectToClassName,
+  parseClassNameToStyleObject,
+} from "../functions/helpers"
 import { TypeProps, ComponentWrapperResponse } from "../types/component-types"
 import {
   MakUiStateKey,
@@ -51,14 +54,14 @@ export const componentWrapperLogic = ({
     verbosePalette: makVerbosePalette,
     verboseTheme: makVerboseTheme,
   } = makUi
-  const {
+  let {
     mode: themeMode,
     theme: themeProps,
     color: colorProps,
     text: textProps,
     border: borderProps,
-    borderPx,
     className,
+    makClassName,
     ...restWithComputedProps
   } = withComputedProps(props)
 
@@ -68,7 +71,7 @@ export const componentWrapperLogic = ({
     ? makTheme
     : undefined
 
-  const activePalette = activeThemeMode
+  const activeTheme = activeThemeMode
     ? makVerbosePalette[activeThemeMode]
     : makVerboseTheme
 
@@ -77,7 +80,7 @@ export const componentWrapperLogic = ({
     color: colorPalette,
     border: borderPalette,
     theme: themePalette,
-  } = activePalette
+  } = activeTheme
 
   let selectedTheme
   let selectedText
@@ -88,50 +91,76 @@ export const componentWrapperLogic = ({
   let colorString: string | undefined
   let borderString: string | undefined
 
-  const styleObject = {
-    "background-color": undefined as string | undefined,
-    borderColor: undefined as string | undefined,
-    color: undefined as string | undefined,
+  if (themeProps) {
+    const themeClassName = `theme-${themeProps}`
+    makClassName = makClassName
+      ? `${makClassName} ${themeClassName}`
+      : themeClassName
   }
 
-  if (!makUiThemeVariantsSet.has(themeProps as MakUiThemeVariantKey)) {
-    themeString = themeProps
-  } else {
-    console.log("themeProps", themeProps)
-    selectedTheme = themePalette[themeProps as MakUiThemeVariantKey]
-    themeString = selectedTheme
-    styleObject["background-color"] = selectedTheme
+  if (colorProps) {
+    const colorClassName = `bg-${colorProps}`
+    makClassName = makClassName
+      ? `${makClassName} ${colorClassName}`
+      : colorClassName
   }
-  if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
-    textString = textProps
-  } else {
-    selectedText = textPalette[textProps as MakUiVariantKey]
-    textString = objectToClassName({
-      object: selectedText,
-      variant: "text",
-      // allowedStates: textStates,
-    })
+
+  if (textProps) {
+    const textClassName = `text-${textProps}`
+    makClassName = makClassName
+      ? `${makClassName} ${textClassName}`
+      : textClassName
   }
-  if (!makUiVariantsSet.has(borderProps as MakUiVariantKey)) {
-    borderString = borderProps
-  } else {
-    selectedBorder = borderPalette[borderProps as MakUiVariantKey]
-    borderString = objectToClassName({
-      object: selectedBorder,
-      variant: "border",
-      // allowedStates: borderStates,
-    })
+
+  if (borderProps) {
+    const borderClassName = `border-${borderProps}`
+    makClassName = makClassName
+      ? `${makClassName} ${borderClassName}`
+      : borderClassName
   }
-  if (!makUiVariantsSet.has(colorProps as MakUiVariantKey)) {
-    colorString = colorProps
-  } else {
-    selectedColor = colorPalette[colorProps as MakUiVariantKey]
-    colorString = objectToClassName({
-      object: selectedColor,
-      variant: "bg",
-      // allowedStates: colorStates,
-    })
-  }
+
+  const { styleObject, twClassNames } = parseClassNameToStyleObject({
+    className: className,
+    makClassName,
+    activeTheme,
+  })
+
+  // if (!makUiThemeVariantsSet.has(themeProps as MakUiThemeVariantKey)) {
+  //   themeString = themeProps
+  // } else {
+  //   selectedTheme = themePalette[themeProps as MakUiThemeVariantKey]
+  //   themeString = selectedTheme
+  // }
+  // if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
+  //   textString = textProps
+  // } else {
+  //   selectedText = textPalette[textProps as MakUiVariantKey]
+  //   textString = objectToClassName({
+  //     object: selectedText,
+  //     variant: "text",
+  //     // allowedStates: textStates,
+  //   })
+  // }
+  // if (!makUiVariantsSet.has(borderProps as MakUiVariantKey)) {
+  //   borderString = borderProps
+  // } else {
+  //   selectedBorder = borderPalette[borderProps as MakUiVariantKey]
+  //   borderString = objectToClassName({
+  //     object: selectedBorder,
+  //     variant: "border",
+  //     // allowedStates: borderStates,
+  //   })
+  // }
+  // if (!makUiVariantsSet.has(colorProps as MakUiVariantKey)) {
+  //   colorString = colorProps
+  // } else {
+  //   selectedColor = colorPalette[colorProps as MakUiVariantKey]
+  //   colorString = objectToClassName({
+  //     object: selectedColor,
+  //     variant: "bg",
+  //     // allowedStates: colorStates,
+  //   })
+  // }
 
   const response: ComponentWrapperResponse = {
     styleObject,
@@ -143,14 +172,13 @@ export const componentWrapperLogic = ({
     componentText: textPalette,
     componentColor: colorPalette,
     componentBorder: borderPalette,
-    componentPalette: activePalette,
+    fullComponentTheme: activeTheme,
     componentThemeMode: activeThemeMode,
     globalThemeMode: makTheme,
     globalTheme: makVerboseTheme,
     globalPalette: makVerbosePalette,
-    objectToClassName,
-    borderPx,
-    className,
+    className: twClassNames,
+    makClassName,
     ...restWithComputedProps,
   }
 

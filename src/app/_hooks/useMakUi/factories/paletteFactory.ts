@@ -213,6 +213,30 @@ export const paletteFactory = ({
     }
   }
 
+  Object.defineProperties(finalVerbosePalette.dark, {
+    bg: {
+      get() {
+        return finalVerbosePalette.dark.color
+      },
+    },
+    // ring: {
+    //   get() {
+    //     return finalVerbosePalette.dark.border
+    //   },
+    // },
+    // outline: {
+    //   get() {
+    //     return finalVerbosePalette.dark.border
+    //   },
+    // },
+    // "ring-offset": {
+    //   get() {
+    //     return finalVerbosePalette.dark.border
+    //   },
+    // },
+
+  })
+
   return {
     verbose: finalVerbosePalette as MakUiVerbosePalette,
     simple: finalSimplePalette as MakUiSimplePalette,
