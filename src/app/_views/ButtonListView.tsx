@@ -8,7 +8,6 @@ const ButtonListView = () => {
   const { simpleTheme } = useMakUi()
   const { theme, color, text, border } = simpleTheme
   const [outlined, setOutlined] = useState(false)
-  console.log("color", color[outlined ? "custom" : "primary"]["500Hex"])
 
   return (
     <div className="flex gap-2 items-center">
@@ -28,25 +27,25 @@ const ButtonListView = () => {
       })}
       <div className="flex flex-shrink-0 gap-2 items-center justify-center ml-3">
         <span
-          className={`size-5 rounded-md `}
+          className={`size-5 rounded-md fade-in-out`}
           style={{
-            backgroundColor: color[outlined ? "custom" : "primary"]["500Hex"],
+            backgroundColor: color[outlined ? "custom" : "primary"]["500"],
           }}
         />
         <Toggle
-          allowedStates={["disabled", "checked"]}
-          allowedModifiers={["peer"]}
+          // allowedStates={["disabled", "checked"]}
+          // allowedModifiers={["peer"]}
           checked={outlined}
           onChange={() => setOutlined(!outlined)}
           borderPx={4}
-          borderSecondary
-          light
+          // borderSecondary
+
           custom
         />
         <span
-          className={`size-5 rounded-md border-4`}
+          className={`size-5 rounded-md border-4 fade-in-out`}
           style={{
-            borderColor: color[!outlined ? "custom" : "primary"]["500Hex"],
+            borderColor: color[!outlined ? "custom" : "primary"]["500"],
           }}
         />
       </div>

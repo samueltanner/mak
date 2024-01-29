@@ -85,7 +85,7 @@ export const ensureNestedObject = <T>({
   value,
 }: {
   parent: T
-  keys?: (keyof T | string | undefined)[]
+  keys?: (keyof T | string | number | undefined)[]
   value?: any
 }) => {
   keys = keys ? keys.filter((k) => k) : []

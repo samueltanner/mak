@@ -24,7 +24,7 @@ const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
     <>
       {typeof children === "function"
         ? children({
-            computedProps: response,
+            ...response,
             ...props,
           })
         : children}
@@ -47,7 +47,7 @@ export const componentWrapperLogic = ({
     verboseTheme: makVerboseTheme,
   } = makUi
   const {
-    themeMode,
+    mode: themeMode,
     theme: themeProps,
     color: colorProps,
     text: textProps,
@@ -56,8 +56,6 @@ export const componentWrapperLogic = ({
     className,
     ...restWithComputedProps
   } = withComputedProps(props)
-
-  // const { colorStates, borderStates, textStates } = restWithComputedProps
 
   const activeThemeMode = themeMode
     ? themeMode

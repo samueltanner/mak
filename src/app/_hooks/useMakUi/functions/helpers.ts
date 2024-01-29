@@ -89,19 +89,19 @@ export const constructTailwindObject = ({
   if (hex.includes("#black") || hex === "black") {
     hex = "#000000"
   }
+
   const tailwindColors = {} as MakUiVerboseShades
 
-  // Adjust the start of the second scale to earlier than hexPosition for a smoother transition
-  const scale2Start = Math.max(0, hexPosition - step * 8)
+  const scale2Start = Math.max(0, hexPosition)
 
   const scale1 = chroma
     .scale([whiteHex, hex])
-    .mode("lrgb")
+    .mode("rgb")
     .domain([0, hexPosition])
   const scale2 = chroma
     .scale([hex, blackHex])
-    .mode("lrgb")
-    .domain([scale2Start, 960])
+    .mode("rgb")
+    .domain([scale2Start, 1000])
 
   const getColor = (i: number) => {
     return i <= hexPosition ? scale1(i).hex() : scale2(i).hex()
@@ -111,10 +111,10 @@ export const constructTailwindObject = ({
     tailwindColors[i] = getColor(i)
   }
 
-  if (includeNearAbsolutes) {
-    tailwindColors[50] = getColor(50)
-    tailwindColors[950] = getColor(950)
-  }
+  // if (includeNearAbsolutes) {
+  //   tailwindColors[50] = getColor(50)
+  //   tailwindColors[950] = getColor(950)
+  // }
 
   if (includeBlackAndWhite) {
     tailwindColors[0] = whiteHex
@@ -186,10 +186,14 @@ export const getConstructedTheme = ({
   providedVariants,
   theme,
   defaultShades,
+  blackHex,
+  whiteHex,
 }: {
   providedVariants: MakUiVerboseThemeVariant
   theme: MakUiThemeKey
   defaultShades: MakUiThemeShades
+  blackHex: string
+  whiteHex: string
 }) => {
   const { primary, secondary, tertiary, custom, light, dark } = providedVariants
 
@@ -287,21 +291,19 @@ export const getConstructedTheme = ({
       colorString: darkColor,
       shade: resolvedShadesObject.dark,
     }),
+    blackHex,
+    whiteHex,
   }
 
   const themeResponse = {
-    primary: resolvedThemeObject.primary.rootString,
-    primaryHex: resolvedThemeObject.primary.hex,
-    secondary: resolvedThemeObject.secondary.rootString,
-    secondaryHex: resolvedThemeObject.secondary.hex,
-    tertiary: resolvedThemeObject.tertiary.rootString,
-    tertiaryHex: resolvedThemeObject.tertiary.hex,
-    custom: resolvedThemeObject.custom.rootString,
-    customHex: resolvedThemeObject.custom.hex,
-    light: resolvedThemeObject.light.rootString,
-    lightHex: resolvedThemeObject.light.hex,
-    dark: resolvedThemeObject.dark.rootString,
-    darkHex: resolvedThemeObject.dark.hex,
+    primary: resolvedThemeObject.primary.hex,
+    secondary: resolvedThemeObject.secondary.hex,
+    tertiary: resolvedThemeObject.tertiary.hex,
+    custom: resolvedThemeObject.custom.hex,
+    light: resolvedThemeObject.light.hex,
+    dark: resolvedThemeObject.dark.hex,
+    black: resolvedThemeObject.blackHex,
+    white: resolvedThemeObject.whiteHex,
   }
 
   return themeResponse
@@ -329,6 +331,7 @@ export const getConstructedShades = ({
   whiteHex?: string
 }): MakUiVerboseShades => {
   const finalShades = {} as MakUiVerboseShades
+  let shadeHex: string
 
   if (!middleHex) {
     let fallbackPosition = Object.keys(providedShades || {})?.[0]
@@ -336,9 +339,6 @@ export const getConstructedShades = ({
     const fallBack =
       fallBackProvidedColor || defaultColor || makUiDefaultColors[variant]
     const resolvedFallBackObject = twColorHelper({ colorString: fallBack })
-
-    // finalShades[fallbackPosition] = `${variant}-${fallbackPosition}`
-    // finalShades[`${fallbackPosition}Hex`] = resolvedFallBackObject.hex
 
     const resolvedTailwindColors = constructTailwindObject({
       hex: resolvedFallBackObject.hex,
@@ -349,15 +349,16 @@ export const getConstructedShades = ({
       whiteHex,
       hexPosition: Number(fallbackPosition),
     })
+
     for (const [shade, color] of Object.entries(resolvedTailwindColors)) {
       if (providedShades && providedShades[shade]) {
         const twObj = twColorHelper({ colorString: providedShades[shade] })
-        finalShades[`${shade}Hex`] = twObj.hex
-        finalShades[shade] = `${variant}-${shade}`
+        shadeHex = twObj.hex
       } else {
-        finalShades[`${shade}Hex`] = color
-        finalShades[shade] = `${variant}-${shade}`
+        shadeHex = color
       }
+      const shadeNumber = Number(shade)
+      finalShades[shadeNumber] = shadeHex
     }
     return finalShades
   } else {
@@ -372,12 +373,12 @@ export const getConstructedShades = ({
     for (const [shade, color] of Object.entries(tailwindColors)) {
       if (providedShades && providedShades[shade]) {
         const twObj = twColorHelper({ colorString: providedShades[shade] })
-        finalShades[shade] = `${variant}-${shade}`
-        finalShades[`${shade}Hex`] = twObj.hex
+        shadeHex = twObj.hex
       } else {
-        finalShades[`${shade}Hex`] = color
-        finalShades[shade] = `${variant}-${shade}`
+        shadeHex = color
       }
+      const shadeNumber = Number(shade)
+      finalShades[shadeNumber] = shadeHex
     }
     return finalShades
   }
@@ -561,7 +562,6 @@ export const twColorHelper = ({
 }): TWColorHelperResponse => {
   if (colorString?.includes("#")) {
     const hex = colorString
-    const resolvedColorString = getTwColor(colorString)
 
     return {
       absolute: true,
@@ -571,8 +571,8 @@ export const twColorHelper = ({
       autoShade: false,
       autoColor: false,
       opacity: 100,
-      colorString: resolvedColorString || undefined,
-      rootString: resolvedColorString || undefined,
+      colorString: undefined,
+      rootString: undefined,
       hex: hex,
     }
   }
@@ -914,19 +914,21 @@ const getNestedClassNameObjects = ({
   const classNamesArray = [] as {
     variant: string
     theme: string | undefined
-    shade: string
+    shade: Shade | undefined
     paletteVariant: string
     className: string
   }[]
 
   let [variant, paletteVariant = "color"] = splitStringAtCapital(key)
+
   paletteVariant = paletteVariant.toLowerCase()
   let shades: [state: string, classNames: string][] = Object.entries(value)
+
   shades.forEach(([shade, classNames]) => {
+    const shadeNumber = Number(shade) as Shade
     classNames.split(" ").forEach((className) => {
       const splitClassName = className.split(":")
 
-      let altShades: Shade[] = []
       let altThemes: MakUiThemeKey[] = []
       className = splitClassName[splitClassName.length - 1]
       if (makUiThemesSet.has(splitClassName[0] as MakUiThemeKey)) {
@@ -934,27 +936,12 @@ const getNestedClassNameObjects = ({
       } else {
         altThemes.push(...enabledThemeModes)
       }
-      splitClassName.forEach((cn) => {
-        if (makUiShadesSet.has(cn as Shade)) {
-          altShades.push(cn as Shade)
-        }
-      })
 
-      for (const t of enabledThemeModes) {
-        for (const s of altShades) {
-          classNamesArray.push({
-            variant,
-            theme: t,
-            shade: s,
-            paletteVariant,
-            className,
-          })
-        }
-
+      for (const t of altThemes) {
         classNamesArray.push({
           variant,
           theme: t,
-          shade,
+          shade: shadeNumber,
           paletteVariant,
           className,
         })
@@ -992,15 +979,22 @@ const getClassNameAsObject = ({
   const classNamesArray = [] as {
     variant: string
     theme: string | undefined
-    shade: string
+    shade: Shade
     paletteVariant: string
     className: string
   }[]
 
   const splitClassName = value.split(":")
 
-  const shade =
-    splitClassName.find((el) => makUiShadesSet.has(el as Shade)) || "500"
+  const shade: Shade = (() => {
+    for (let el of splitClassName) {
+      let num = Number(el)
+      if (makUiShadesSet.has(num as Shade)) {
+        return num as Shade
+      }
+    }
+    return 500 as Shade
+  })()
   let altThemes: MakUiThemeKey[] = []
   let altShades: Shade[] = []
   className = splitClassName[splitClassName.length - 1]
@@ -1010,8 +1004,8 @@ const getClassNameAsObject = ({
     altThemes.push(...enabledThemeModes)
   }
   splitClassName.forEach((cn) => {
-    if (makUiShadesSet.has(cn as Shade)) {
-      altShades.push(cn as Shade)
+    if (makUiShadesSet.has(Number(cn) as Shade)) {
+      altShades.push(Number(cn) as Shade)
     }
   })
 
@@ -1121,13 +1115,14 @@ export const extractInitialPalette = ({
         value,
         enabledThemeModes,
       })
+
       for (const obj of classNamesArray) {
         const { variant, theme, paletteVariant, shade, className } = obj
 
         const nestedObj = {}
         ensureNestedObject({
           parent: nestedObj,
-          keys: [theme, paletteVariant, variant, shade],
+          keys: [theme, paletteVariant, variant, shade?.toString()],
           value: className,
         })
 
@@ -1143,11 +1138,11 @@ export const extractInitialPalette = ({
 
         for (const obj of classNamesArray) {
           const { variant, theme, paletteVariant, shade, className } = obj
-
+          const shadeNumber = Number(shade)
           const nestedObj = {}
           ensureNestedObject({
             parent: nestedObj,
-            keys: [theme, paletteVariant, variant, shade],
+            keys: [theme, paletteVariant, variant, shadeNumber.toString()],
             value: className,
           })
 
@@ -1481,23 +1476,6 @@ export const objectToClassName = ({
         }
       }
     })
-
-    // Object.entries(object).forEach(([key, value]) => {
-    //   if (key === "base") {
-    //     parsedStringArray.push(`${variant}-${value}`)
-    //     return
-    //   }
-    //   if (allowedStates?.size) {
-    //     ;[...allowedStates].forEach((state) => {
-    //       parsedStringArray.push(`${state}:${variant}-${value}`)
-    //     })
-    //   }
-    //   if (allowedModifiers?.size) {
-    //     ;[...allowedModifiers].forEach((modifier) => {
-    //       parsedStringArray.push(`${modifier}:${variant}-${value}`)
-    //     })
-    //   }
-    // })
 
     return parsedStringArray.join(" ")
   }

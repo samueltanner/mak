@@ -9,7 +9,6 @@ type ToggleProps = TypeProps & {
   checkedColor?: string
   bgColor?: string
   bgCheckedColor?: string
-  computedProps: ComponentWrapperResponse
 }
 
 const ToggleComponent = ({
@@ -20,8 +19,8 @@ const ToggleComponent = ({
   checkedColor,
   bgColor,
   bgCheckedColor,
-  computedProps,
-}: ToggleProps) => {
+  ...computedProps
+}: ToggleProps & ComponentWrapperResponse) => {
   const computedBorder = `border-[${computedProps.borderPx}px] ${computedProps.borderString}`
   const computedToggle = () => {
     if (!color) return `after:bg-${computedProps.componentTheme.primary}`
@@ -63,7 +62,7 @@ const ToggleComponent = ({
   )
 }
 
-const Toggle = (props: any) => {
+const Toggle = (props: ToggleProps & TypeProps) => {
   return (
     <ComponentWrapper {...props}>
       {(computedProps) => <ToggleComponent {...computedProps} />}

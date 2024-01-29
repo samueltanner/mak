@@ -6,11 +6,13 @@ import ThemeButton from "./_components/ThemeButton"
 import { mak } from "./_hooks/useMakUi/elements/ts/mak"
 export default function Home() {
   const { simplePalette, simpleTheme, verbosePalette } = useMakUi()
-  console.log("simplePalette", verbosePalette)
 
   return (
     <main
-      className={`relative h-screen w-screen p-4 bg-${simpleTheme.theme.primary}`}
+      className={`relative h-screen w-screen p-4`}
+      style={{
+        backgroundColor: simpleTheme.theme.primary,
+      }}
     >
       <div className="flex w-full h-full justify-between">
         <MakUiView />
@@ -18,16 +20,7 @@ export default function Home() {
         <div className="absolute bottom-4 right-4">
           <ThemeButton />
         </div>
-        
       </div>
-      {/* <mak.div
-        className={`absolute bottom-4 left-4 p-4`}
-        textTertiary
-        themeLight
-        primary
-      >
-        hi
-      </mak.div> */}
     </main>
   )
 }

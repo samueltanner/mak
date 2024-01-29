@@ -65,6 +65,8 @@ export type MakUiThemeVariantKey =
   | "custom"
   | "light"
   | "dark"
+  | "white"
+  | "black"
 
 export type MakUiVariantRootKey =
   | "primaryRoot"
@@ -167,62 +169,62 @@ export type MakUiState = {
 export type ShadeStep = 50 | 100
 
 export type Shade =
-  | "0"
-  | "50"
-  | "100"
-  | "150"
-  | "200"
-  | "250"
-  | "300"
-  | "350"
-  | "400"
-  | "450"
-  | "500"
-  | "550"
-  | "600"
-  | "650"
-  | "700"
-  | "750"
-  | "800"
-  | "850"
-  | "900"
-  | "950"
-  | "1000"
+  | 0
+  | 50
+  | 100
+  | 150
+  | 200
+  | 250
+  | 300
+  | 350
+  | 400
+  | 450
+  | 500
+  | 550
+  | 600
+  | 650
+  | 700
+  | 750
+  | 800
+  | 850
+  | 900
+  | 950
+  | 1000
 
 export type MakUiAbsoluteShades = {
-  "0": string
-  "1000": string
+  0: string
+  1000: string
 }
 
 export type MakUiSimpleShades = MakUiAbsoluteShades & {
-  [key: string]: string
-  "50": string
-  "150": string
-  "250": string
-  "350": string
-  "450": string
-  "500": string
-  "550": string
-  "650": string
-  "750": string
-  "850": string
-  "950": string
+  [key: number]: string
+  50: string
+  150: string
+  250: string
+  350: string
+  450: string
+  500: string
+  550: string
+  650: string
+  750: string
+  850: string
+  950: string
 }
 
 export type MakUiVerboseShades = MakUiSimpleShades &
   MakUiAbsoluteShades & {
-    [key: string]: string
-    "50": string
-    "150": string
-    "250": string
-    "350": string
-    "450": string
-    "500": string
-    "550": string
-    "650": string
-    "750": string
-    "850": string
-    "950": string
+    [key: number]: string
+    50: string
+    150: string
+    250: string
+    350: string
+    450: string
+    500: string
+    550: string
+    650: string
+    750: string
+    850: string
+    950: string
   }
 
 export type MakUiShadesInput = {
@@ -348,7 +350,9 @@ export type MakUiDefaultPalette = {
       tertiary: string
       custom: string
       light: string
+      white: string
       dark: string
+      black: string
     }
   }
 }

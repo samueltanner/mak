@@ -63,8 +63,6 @@ export const makUiThemeVariants: MakUiThemeVariantKey[] = [
   "secondary",
   "tertiary",
   "custom",
-  "light",
-  "dark",
 ]
 
 export const makUiThemeVariantsSet: Set<MakUiThemeVariantKey> = new Set(
@@ -121,27 +119,8 @@ export const makUiStates: MakUiStateKey[] = [
 ]
 
 export const makUiShades = [
-  "0",
-  "50",
-  "100",
-  "150",
-  "200",
-  "250",
-  "300",
-  "350",
-  "400",
-  "450",
-  "500",
-  "550",
-  "600",
-  "650",
-  "700",
-  "750",
-  "800",
-  "850",
-  "900",
-  "950",
-  "1000",
+  0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750,
+  800, 850, 900, 950, 1000,
 ] as Shade[]
 
 export const makUiShadesSet: Set<Shade> = new Set(makUiShades)
@@ -160,6 +139,8 @@ export const makUiDefaultColors: MakUiDefaultColors = {
   custom: "zinc",
   light: "white",
   dark: "black",
+  white: "white",
+  black: "black",
 }
 
 export const makUiDefaultPalette: MakUiDefaultPalette = {
@@ -173,7 +154,9 @@ export const makUiDefaultPalette: MakUiDefaultPalette = {
       tertiary: "zinc-200",
       custom: "zinc-950",
       light: "white",
+      white: "white",
       dark: "black",
+      black: "black",
     },
   },
   dark: {
@@ -187,6 +170,8 @@ export const makUiDefaultPalette: MakUiDefaultPalette = {
       custom: "zinc-700",
       light: "white",
       dark: "black",
+      white: "white",
+      black: "black",
     },
   },
   custom: {
@@ -200,6 +185,8 @@ export const makUiDefaultPalette: MakUiDefaultPalette = {
       custom: "zinc-950",
       light: "white",
       dark: "black",
+      white: "white",
+      black: "black",
     },
   },
 }
@@ -212,6 +199,8 @@ export const makUiDefaultThemeShades: MakUiThemeShades = {
     custom: 950,
     light: 50,
     dark: 950,
+    white: 0,
+    black: 1000,
   },
   dark: {
     primary: 950,
@@ -220,6 +209,8 @@ export const makUiDefaultThemeShades: MakUiThemeShades = {
     custom: 700,
     light: 50,
     dark: 950,
+    white: 0,
+    black: 1000,
   },
   custom: {
     primary: 50,
@@ -228,6 +219,8 @@ export const makUiDefaultThemeShades: MakUiThemeShades = {
     custom: 950,
     light: 50,
     dark: 950,
+    white: 0,
+    black: 1000,
   },
 }
 

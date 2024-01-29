@@ -2,8 +2,7 @@ import {
   extractInitialPalette,
   getConstructedTheme,
   getConstructedShades,
-  getTwColor,
-} from "../functions/helpers";
+} from "../functions/helpers"
 import {
   MakUiFlexiblePaletteInput,
   MakUiInteractionStateKey,
@@ -12,7 +11,7 @@ import {
   MakUiThemeShades,
   MakUiVerbosePalette,
   ShadeStep,
-} from "../types/ui-types";
+} from "../types/ui-types"
 import {
   makUiDefaultColors,
   makUiDefaultPalette,
@@ -26,7 +25,6 @@ export const paletteFactory = ({
   enabledThemeModes,
   defaultShades,
   shadeStep,
-  enabledInteractionStates,
   includeBlackAndWhite,
   includeNearAbsolutes,
   blackHex,
@@ -47,8 +45,6 @@ export const paletteFactory = ({
     enabledThemeModes,
   })
 
-  console.log("red #ef4444", getTwColor("#ef4444"))
-
   let finalVerbosePalette = {} as MakUiVerbosePalette
   let finalSimplePalette = {} as MakUiSimplePalette
   for (const theme of enabledThemeModes) {
@@ -61,6 +57,8 @@ export const paletteFactory = ({
             providedVariants,
             theme,
             defaultShades: defaultShades,
+            blackHex,
+            whiteHex,
           })
 
           ensureNestedObject({
@@ -69,20 +67,10 @@ export const paletteFactory = ({
             value: constructedTheme,
           })
 
-          const { primary, secondary, tertiary, custom, light, dark } =
-            constructedTheme
-
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant],
-            value: {
-              primary,
-              secondary,
-              tertiary,
-              custom,
-              light,
-              dark,
-            },
+            value: constructedTheme,
           })
         } else {
           const defaultVariant = makUiDefaultPalette[theme]!.theme
@@ -90,6 +78,8 @@ export const paletteFactory = ({
             providedVariants: defaultVariant,
             theme,
             defaultShades: defaultShades,
+            blackHex,
+            whiteHex,
           })
 
           ensureNestedObject({
@@ -98,60 +88,12 @@ export const paletteFactory = ({
             value: constructedTheme,
           })
 
-          const { primary, secondary, tertiary, custom } = constructedTheme
-
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant],
-            value: {
-              primary,
-              secondary,
-              tertiary,
-              custom,
-            },
+            value: constructedTheme,
           })
         }
-        // const shorthand = paletteShorthand[paletteVariant]
-        // Object.defineProperty(finalVerbosePalette[theme], shorthand, {
-        //   get: function () {
-        //     return finalVerbosePalette[theme][paletteVariant]
-        //   },
-        // })
-
-        // Object.defineProperty(finalSimplePalette[theme], shorthand, {
-        //   get: function () {
-        //     return finalSimplePalette[theme][paletteVariant]
-        //   },
-        // })
-
-        // for (const colorVariant of uiThemeColorVariantsAndRoots) {
-        //   const shorthand = paletteShorthand[colorVariant]
-        //   // Object.defineProperty(
-        //   //   finalVerbosePalette[theme][paletteVariant],
-        //   //   shorthand,
-        //   //   {
-        //   //     get: function () {
-        //   //       return finalVerbosePalette[theme][paletteVariant][colorVariant]
-        //   //     },
-        //   //   }
-        //   // )
-        //   if (
-        //     colorVariant !== "customRoot" &&
-        //     colorVariant !== "primaryRoot" &&
-        //     colorVariant !== "secondaryRoot" &&
-        //     colorVariant !== "tertiaryRoot"
-        //   ) {
-        //     // Object.defineProperty(
-        //     //   finalSimplePalette[theme][paletteVariant],
-        //     //   shorthand,
-        //     //   {
-        //     //     get: function () {
-        //     //       return finalSimplePalette[theme][paletteVariant][colorVariant]
-        //     //     },
-        //     //   }
-        //     // )
-        //   }
-        // }
         continue
       }
       for (const variant of makUiVariants) {
@@ -171,34 +113,30 @@ export const paletteFactory = ({
             whiteHex,
           })
 
-          // const constructedStates = getConstructedStates({
-          //   providedShades,
-          //   defaultShades: defaultShades.defaultStateShades,
-          //   theme,
-          // })
-
           ensureNestedObject({
             parent: finalVerbosePalette,
             keys: [theme, paletteVariant, variant],
             value: constructedShades,
           })
 
-          // const enabledSimpleStates = enabledInteractionStates.reduce(
-          //   (acc, curr) => {
-          //     if (constructedStates[curr]) {
-          //       acc[curr] = constructedStates[curr]
-          //     }
-          //     return acc
-          //   },
-          //   {} as MakUiState
-          // )
-
-          // enabledSimpleStates.base = constructedStates.base
-
           ensureNestedObject({
             parent: finalSimplePalette,
             keys: [theme, paletteVariant, variant],
-            value: constructedShades,
+            value: {
+              "0": constructedShades["0"],
+              "50": constructedShades["50"],
+              "100": constructedShades["100"],
+              "200": constructedShades["200"],
+              "300": constructedShades["300"],
+              "400": constructedShades["400"],
+              "500": constructedShades["500"],
+              "600": constructedShades["600"],
+              "700": constructedShades["700"],
+              "800": constructedShades["800"],
+              "900": constructedShades["900"],
+              "950": constructedShades["950"],
+              "1000": constructedShades["1000"],
+            },
           })
 
           if (
@@ -214,20 +152,27 @@ export const paletteFactory = ({
             ensureNestedObject({
               parent: finalSimplePalette,
               keys: [theme, "border", variant],
-              value: constructedShades,
+              value: {
+                "0": constructedShades["0"],
+                "50": constructedShades["50"],
+                "100": constructedShades["100"],
+                "200": constructedShades["200"],
+                "300": constructedShades["300"],
+                "400": constructedShades["400"],
+                "500": constructedShades["500"],
+                "600": constructedShades["600"],
+                "700": constructedShades["700"],
+                "800": constructedShades["800"],
+                "900": constructedShades["900"],
+                "950": constructedShades["950"],
+                "1000": constructedShades["1000"],
+              },
             })
           }
         } else if (
           !initialVerbosePalette?.[theme]?.[paletteVariant]?.[variant] &&
           !finalVerbosePalette?.[theme]?.[paletteVariant]?.[variant]
         ) {
-          const shade =
-            paletteVariant === "text" && theme === "dark"
-              ? 950
-              : paletteVariant === "text" && theme === "light"
-              ? 50
-              : 500
-
           const constructedShades = getConstructedShades({
             middleHex: makUiDefaultColors?.[variant],
             variant: variant,
@@ -238,65 +183,34 @@ export const paletteFactory = ({
             whiteHex,
           })
 
-          // const baseColor = twColorHelper({
-          //   colorString: makUiDefaultColors[variant],
-          //   shade: shade,
-          // }).hex
-          // const constructedStates = getConstructedStates({
-          //   providedStates: {
-          //     base: baseColor,
-          //   } as MakUiState,
-          //   defaultShades: defaultShades.defaultStateShades,
-          //   theme,
-          // })
-
           ensureNestedObject({
             parent: finalVerbosePalette,
             keys: [theme, paletteVariant, variant],
             value: constructedShades,
           })
 
-          // const enabledSimpleStates = enabledInteractionStates.reduce(
-          //   (acc, curr) => {
-          //     if (constructedStates[curr]) {
-          //       acc[curr] = constructedStates[curr]
-          //     }
-          //     return acc
-          //   },
-          //   {} as MakUiState
-          // )
-          // enabledSimpleStates.base = constructedStates.base
-
-          // ensureNestedObject({
-          //   parent: finalSimplePalette,
-          //   keys: [theme, paletteVariant, variant],
-          //   value: enabledSimpleStates,
-          // })
+          ensureNestedObject({
+            parent: finalSimplePalette,
+            keys: [theme, paletteVariant, variant],
+            value: {
+              "0": constructedShades["0"],
+              "50": constructedShades["50"],
+              "100": constructedShades["100"],
+              "200": constructedShades["200"],
+              "300": constructedShades["300"],
+              "400": constructedShades["400"],
+              "500": constructedShades["500"],
+              "600": constructedShades["600"],
+              "700": constructedShades["700"],
+              "800": constructedShades["800"],
+              "900": constructedShades["900"],
+              "950": constructedShades["950"],
+              "1000": constructedShades["1000"],
+            },
+          })
         }
       }
-      // const shorthand = paletteShorthand[paletteVariant]
-      // Object.defineProperty(finalVerbosePalette[theme], shorthand, {
-      //   get: function () {
-      //     return finalVerbosePalette[theme][paletteVariant]
-      //   },
-      // })
-      // Object.defineProperty(finalSimplePalette[theme], shorthand, {
-      //   get: function () {
-      //     return finalSimplePalette[theme][paletteVariant]
-      //   },
-      // })
     }
-    // const shorthand = paletteShorthand[theme]
-    // Object.defineProperty(finalVerbosePalette, shorthand, {
-    //   get: function () {
-    //     return finalVerbosePalette[theme]
-    //   },
-    // })
-    // Object.defineProperty(finalSimplePalette, shorthand, {
-    //   get: function () {
-    //     return finalSimplePalette[theme]
-    //   },
-    // })
   }
 
   return {

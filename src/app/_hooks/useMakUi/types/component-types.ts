@@ -2,11 +2,13 @@ import {
   MakUiInteractionStateKey,
   MakUiStateKey,
   MakUiThemeKey,
+  MakUiThemeVariantKey,
   MakUiVariantKey,
   MakUiVerbosePalette,
   MakUiVerboseTheme,
   MakUiVerboseThemeVariant,
   MakUiVerboseVariant,
+  Shade,
   TailwindModifier,
 } from "./ui-types"
 
@@ -79,6 +81,25 @@ export type ButtonSubStates = {
 }
 
 export type TypeProps = {
+  //theme
+  darkMode?: boolean
+  lightMode?: boolean
+  customMode?: boolean
+  themeMode?: MakUiThemeKey | undefined
+
+  //theme variant
+  themeWhite?: boolean
+  themeBlack?: boolean
+  themeLight?: boolean
+  themeDark?: boolean
+  themeCustom?: boolean
+  themePrimary?: boolean
+  themeSecondary?: boolean
+  themeTertiary?: boolean
+  themeVariant?: MakUiThemeVariantKey | undefined
+  themeOpacity?: number | undefined
+
+  //variant
   primary?: boolean
   secondary?: boolean
   tertiary?: boolean
@@ -88,10 +109,7 @@ export type TypeProps = {
   danger?: boolean
   info?: boolean
   custom?: boolean
-  light?: boolean
-  dark?: boolean
-  colorType?: MakUiVariantKey | undefined
-  color?:
+  variant?:
     | "primary"
     | "secondary"
     | "tertiary"
@@ -101,10 +119,12 @@ export type TypeProps = {
     | "warning"
     | "danger"
     | "info"
-    | "light"
-    | "dark"
     | string
+    | undefined
+  variantShade?: Shade | undefined
+  variantOpacity?: number | undefined
 
+  //text
   textPrimary?: boolean
   textSecondary?: boolean
   textTertiary?: boolean
@@ -116,7 +136,6 @@ export type TypeProps = {
   textCustom?: boolean
   textLight?: boolean
   textDark?: boolean
-  textType?: MakUiVariantKey | undefined
   text?:
     | "primary"
     | "secondary"
@@ -127,10 +146,12 @@ export type TypeProps = {
     | "warning"
     | "danger"
     | "info"
-    | "light"
-    | "dark"
     | string
+    | undefined
+  textShade?: Shade | undefined
+  textOpacity?: number | undefined
 
+  //border
   borderPrimary?: boolean
   borderSecondary?: boolean
   borderTertiary?: boolean
@@ -140,9 +161,6 @@ export type TypeProps = {
   borderDanger?: boolean
   borderInfo?: boolean
   borderCustom?: boolean
-  borderLight?: boolean
-  borderDark?: boolean
-  borderType?: MakUiVariantKey | undefined
   border?:
     | "primary"
     | "secondary"
@@ -153,129 +171,38 @@ export type TypeProps = {
     | "warning"
     | "danger"
     | "info"
-    | "light"
-    | "dark"
     | string
     | undefined
-
-  themeMode?: MakUiThemeKey | undefined
-  themeLight?: boolean
-  themeDark?: boolean
-  themePrimary?: boolean
-  themeSecondary?: boolean
-  themeTertiary?: boolean
-  themeCustom?: boolean
-  themeType?: MakUiThemeKey | undefined
-  theme?: "primary" | "secondary" | "tertiary" | "custom"
+  borderShade?: Shade | undefined
+  borderOpacity?: number | undefined
 
   textSize?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
   borderPx?: number
   className?: string
-  makName?: string
+  makClassName?: string
   state?: MakUiStateKey[]
-
-  // textNotBase?: boolean
-  // textBase?: boolean
-  // textClick?: boolean
-  // textActive?: boolean
-  // textAutofill?: boolean
-  // textChecked?: boolean
-  // textClosed?: boolean
-  // textDefault?: boolean
-  // textDisabled?: boolean
-  // textEmpty?: boolean
-  // textEnabled?: boolean
-  // textFocus?: boolean
-  // textFocusVisible?: boolean
-  // textFocusWithin?: boolean
-  // textHover?: boolean
-  // textInRange?: boolean
-  // textIndeterminate?: boolean
-  // textInvalid?: boolean
-  // textOpen?: boolean
-  // textOutOfRange?: boolean
-  // textPlaceholderShown?: boolean
-  // textReadOnly?: boolean
-  // textRequired?: boolean
-  // textSelected?: boolean
-  // textSelection?: boolean
-  // textTarget?: boolean
-  // textValid?: boolean
-  // textVisited?: boolean
-  // textStates?: MakUiStateKey[]
-
-  // colorNotBase?: boolean
-  // colorBase?: boolean
-  // colorClick?: boolean
-  // colorActive?: boolean
-  // colorAutofill?: boolean
-  // colorChecked?: boolean
-  // colorClosed?: boolean
-  // colorDefault?: boolean
-  // colorDisabled?: boolean
-  // colorEmpty?: boolean
-  // colorEnabled?: boolean
-  // colorFocus?: boolean
-  // colorFocusVisible?: boolean
-  // colorFocusWithin?: boolean
-  // colorHover?: boolean
-  // colorInRange?: boolean
-  // colorIndeterminate?: boolean
-  // colorInvalid?: boolean
-  // colorOpen?: boolean
-  // colorOutOfRange?: boolean
-  // colorPlaceholderShown?: boolean
-  // colorReadOnly?: boolean
-  // colorRequired?: boolean
-  // colorSelected?: boolean
-  // colorSelection?: boolean
-  // colorTarget?: boolean
-  // colorValid?: boolean
-  // colorVisited?: boolean
-  // colorStates?: MakUiStateKey[]
-
-  // borderNotBase?: boolean
-  // borderBase?: boolean
-  // borderClick?: boolean
-  // borderActive?: boolean
-  // borderAutofill?: boolean
-  // borderChecked?: boolean
-  // borderClosed?: boolean
-  // borderDefault?: boolean
-  // borderDisabled?: boolean
-  // borderEmpty?: boolean
-  // borderEnabled?: boolean
-  // borderFocus?: boolean
-  // borderFocusVisible?: boolean
-  // borderFocusWithin?: boolean
-  // borderHover?: boolean
-  // borderInRange?: boolean
-  // borderIndeterminate?: boolean
-  // borderInvalid?: boolean
-  // borderOpen?: boolean
-  // borderOutOfRange?: boolean
-  // borderPlaceholderShown?: boolean
-  // borderReadOnly?: boolean
-  // borderRequired?: boolean
-  // borderSelected?: boolean
-  // borderSelection?: boolean
-  // borderTarget?: boolean
-  // borderValid?: boolean
-  // borderVisited?: boolean
-  // borderStates?: MakUiStateKey[]
 }
 
 export type WithComponentPropsResponse = {
-  theme: MakUiThemeKey | undefined
+  mode: MakUiThemeKey | undefined
+  theme: MakUiThemeVariantKey | undefined
   color: string | undefined
   border: string | undefined
   text: string | undefined
-  // colorStates: Set<MakUiStateKey | "not-base">
-  // textStates: Set<MakUiStateKey | "not-base">
-  // borderStates: Set<MakUiStateKey | "not-base">
-  themeMode: MakUiThemeKey | undefined
+
+  textOpacity: number | undefined
+  variantOpacity: number | undefined
+  borderOpacity: number | undefined
+
+  textShade: Shade | undefined
+  variantShade: Shade | undefined
+  borderShade: Shade | undefined
+
+  state: MakUiStateKey[] | undefined
+
   borderPx: number | undefined
   className: string | undefined
+  makClassName: string | undefined
 }
 
 export type ObjectToClassNameObjectProp = {
