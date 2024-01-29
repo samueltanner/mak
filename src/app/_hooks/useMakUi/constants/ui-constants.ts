@@ -63,6 +63,10 @@ export const makUiThemeVariants: MakUiThemeVariantKey[] = [
   "secondary",
   "tertiary",
   "custom",
+  "light",
+  "dark",
+  "white",
+  "black",
 ]
 
 export const makUiThemeVariantsSet: Set<MakUiThemeVariantKey> = new Set(
@@ -70,12 +74,17 @@ export const makUiThemeVariantsSet: Set<MakUiThemeVariantKey> = new Set(
 )
 
 export const makUiVariants: MakUiVariantKey[] = [
-  ...makUiThemeVariants,
+  "primary",
+  "secondary",
+  "tertiary",
+  "custom",
   "success",
   "error",
   "danger",
   "warning",
   "info",
+  "light",
+  "dark",
 ]
 
 export const makUiVariantsSet: Set<MakUiVariantKey> = new Set(makUiVariants)

@@ -33,13 +33,10 @@ const ButtonListView = () => {
           }}
         />
         <Toggle
-          // allowedStates={["disabled", "checked"]}
-          // allowedModifiers={["peer"]}
           checked={outlined}
           onChange={() => setOutlined(!outlined)}
           borderPx={4}
-          // borderSecondary
-
+          darkMode
           custom
         />
         <span

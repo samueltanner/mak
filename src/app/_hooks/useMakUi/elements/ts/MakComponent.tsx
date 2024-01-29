@@ -2,8 +2,8 @@
 import { forwardRef, ReactNode, createElement } from "react"
 import { useMakUi } from "../../context/MakUiContext"
 import { MakUiElementProps } from "./mak-custom-types"
-import { withComputedProps } from "../../components/componentTypeProps"
 import { componentWrapperLogic } from "../../components/ComponentWrapper"
+import styled from "styled-components"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -21,14 +21,21 @@ const MakComponent = forwardRef<
     makUi,
   })
 
+  console.log("response", response.themeString)
+
   const allProps = { ...props, ref }
 
   const { textString, colorString, borderString } = response
 
-  const updatedClassName =
-    props.className + " " + textString + " " + colorString + " " + borderString
+  const updatedClassNameArray = [
+    allProps.className,
+    textString,
+    colorString,
+    borderString,
+  ]
 
-  allProps.className = updatedClassName
+  allProps.className = updatedClassNameArray.filter(Boolean).join(" ")
+  console.log({ updatedClassNameArray, allProps, className: props.className })
 
   return createElement(component, allProps)
 })

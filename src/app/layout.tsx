@@ -5,6 +5,7 @@ import { Inter } from "next/font/google"
 import { MakUiProvider } from "./_hooks/useMakUi/context/MakUiContext"
 import { MakUiFlexiblePaletteInput } from "./_hooks/useMakUi/types/ui-types"
 import { MakUiComponentConfigInput } from "./_hooks/useMakUi/types/component-types"
+import ThemeWrapper from "./_views/ThemeWrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -52,14 +53,13 @@ export default function RootLayout({
           paletteGenProps={{
             palette,
             enableDarkMode: true,
-            shadeStep: 50,
             blackHex: "#242424",
             whiteHex: "#e6e6e6",
           }}
           componentConfig={componentConfig}
           enableSystem
         >
-          {children}
+          <ThemeWrapper>{children}</ThemeWrapper>
         </MakUiProvider>
       </body>
     </html>

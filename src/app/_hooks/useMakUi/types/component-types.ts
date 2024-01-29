@@ -189,7 +189,7 @@ export type WithComponentPropsResponse = {
   color: string | undefined
   border: string | undefined
   text: string | undefined
-
+  themeOpacity: number | undefined
   textOpacity: number | undefined
   variantOpacity: number | undefined
   borderOpacity: number | undefined
@@ -213,6 +213,8 @@ export type ObjectToClassNameObjectProp = {
 }
 
 export type ComponentWrapperResponse = {
+  styleObject: GenericObject
+  themeString: string | undefined
   textString: string | undefined
   colorString: string | undefined
   borderString: string | undefined

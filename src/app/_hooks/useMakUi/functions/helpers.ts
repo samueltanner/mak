@@ -35,12 +35,10 @@ import {
 import {
   makUiDefaultColors,
   makUiDefaultStateShades,
-  makUiDefaultStates,
   makUiDefaultThemeShades,
   makUiPalettes,
   makUiPalettesSet,
   makUiShadesSet,
-  makUiStates,
   makUiStatesSet,
   makUiThemeVariantsSet,
   makUiThemesSet,
@@ -51,7 +49,6 @@ import {
 } from "../constants/ui-constants"
 import {
   MakUiComponentConfigInput,
-  MakUiRootComponentConfigInput,
   ObjectToClassNameObjectProp,
 } from "../types/component-types"
 import {
@@ -59,7 +56,6 @@ import {
   ensureNestedObject,
   isEmptyObject,
   isObject,
-  mergeWithFallback,
   nearestMultiple,
 } from "@/globals/global-helper-functions"
 
@@ -110,11 +106,6 @@ export const constructTailwindObject = ({
   for (let i = 0; i <= 1000; i += step) {
     tailwindColors[i] = getColor(i)
   }
-
-  // if (includeNearAbsolutes) {
-  //   tailwindColors[50] = getColor(50)
-  //   tailwindColors[950] = getColor(950)
-  // }
 
   if (includeBlackAndWhite) {
     tailwindColors[0] = whiteHex
@@ -383,89 +374,6 @@ export const getConstructedShades = ({
     return finalShades
   }
 }
-
-// export const getConstructedStates = ({
-//   providedStates = {} as MakUiState,
-//   defaultShades,
-//   theme = "light",
-// }: {
-//   providedStates?: MakUiState
-//   defaultShades?: MakUiStateShades
-//   theme?: MakUiThemeKey
-// }) => {
-//   let providedColor = providedStates?.base as string | undefined
-//   let providedState = !!providedStates?.base ? "base" : undefined
-//   let inferredBaseShade
-//   let stateShade
-//   const multiplier = theme === "dark" ? -1 : 1
-//   if (!providedColor) {
-//     for (const state of makUiStates) {
-//       providedColor = providedStates?.[state]
-//       if (providedColor) {
-//         const providedTwObj = twColorHelper({
-//           colorString: providedColor,
-//         })
-
-//         providedState = state
-//         providedColor = providedTwObj.color
-//         stateShade = providedTwObj.shade
-//         let stateDiff = defaultShades![state] - defaultShades!.base
-//         inferredBaseShade = providedTwObj.shade! - stateDiff * multiplier
-//         break
-//       }
-//     }
-//   }
-
-//   const twObj = twColorHelper({
-//     colorString: providedColor,
-//     defaults: makUiDefaultStates,
-//     defaultKey: "base",
-//     shade: inferredBaseShade
-//       ? getNormalizedShadeNumber(inferredBaseShade)
-//       : undefined,
-//   })
-
-//   const disabledTwObj = twColorHelper({
-//     colorString: providedStates.disabled || twObj.rootString,
-//     shade: providedStates.disabled
-//       ? undefined
-//       : getNormalizedShadeNumber(twObj.shade! - 200),
-//   })
-
-//   const disabledShade = disabledTwObj.autoShade
-//     ? twObj.shade! - 200
-//     : disabledTwObj.shade!
-
-//   const disabledColor = twObj.absolute
-//     ? disabledTwObj.rootString
-//     : `${twObj.color}-${getNormalizedShadeNumber(disabledShade)}`
-
-//   // providedStates.base = twObj.rootString
-//   // providedStates.disabled = disabledColor
-
-//   const statesObject = generateDefaultStatesObject({
-//     defaultColor: twObj.color,
-//     defaultShades,
-//     baseShade: twObj.shade,
-//     multiplier,
-//   })
-
-//   const resolvedProvidedStates = {} as MakUiState
-//   for (const [state, color] of Object.entries(providedStates)) {
-//     const twObj = twColorHelper({
-//       colorString: color,
-//       defaults: makUiDefaultStates,
-//       defaultKey: state as keyof MakUiStateShades,
-//     })
-//     resolvedProvidedStates[state as MakUiStateKey] = twObj.rootString
-//   }
-//   const resolvedStatesObject = mergeWithFallback(
-//     resolvedProvidedStates,
-//     statesObject
-//   )
-
-//   return resolvedStatesObject
-// }
 
 export const getOpacity = ({
   opacityValue,
@@ -1174,114 +1082,6 @@ export const extractInitialPalette = ({
   }
 
   return paletteObject as MakUiVerbosePalette
-}
-
-export const makClassNameHelper = ({
-  string,
-  verbosePalette,
-  defaultConfig,
-  themeMode,
-  makClassName,
-  className,
-}: {
-  string?: string
-  verbosePalette: MakUiVerbosePalette
-  defaultConfig?: MakUiRootComponentConfigInput
-  themeMode?: MakUiThemeKey
-  makClassName?: string
-  className?: string
-}) => {
-  if (!string && !makClassName && !className) return
-  if (!string && makClassName) {
-    string = `mak(${makClassName}) ${className}`
-  }
-  if (string && !string?.includes("mak(")) {
-    string = `mak(${string})`
-  }
-  const splitClassNames = string?.split(")") || []
-  let initialMakClassNames = splitClassNames.find((cn) => cn.includes("mak("))
-  const initialRootClassNames = splitClassNames.find(
-    (cn) => !cn.includes("mak(")
-  )
-
-  let rootClassNames =
-    initialRootClassNames && defaultConfig?.className
-      ? ` ${initialRootClassNames} ${defaultConfig?.className}`
-      : initialRootClassNames || defaultConfig?.className || ""
-  if (initialMakClassNames) {
-    initialMakClassNames = initialMakClassNames.replace("mak(", "")
-  } else {
-    return rootClassNames
-  }
-
-  initialMakClassNames = makClassName
-    ? `${initialMakClassNames} ${makClassName}`
-    : initialMakClassNames
-  rootClassNames = className ? `${rootClassNames} ${className}` : rootClassNames
-
-  let finalClassName = []
-  for (const makCn of initialMakClassNames.split(" ")) {
-    let {
-      theme,
-      themeVariant,
-      palette,
-      variant,
-      state,
-      twVariant,
-      opacity,
-      string,
-    } = parseMakClassName(makCn)
-
-    const opacityString = opacity ? `/${opacity}` : ""
-    if (!theme) theme = themeMode
-    let target
-    if (palette === "theme") {
-      const themePalette = verbosePalette[theme!][palette]
-      target = themePalette
-
-      if (state) {
-        const constructedClassName =
-          `${state}:${twVariant}-${target[themeVariant]}` + opacityString
-        finalClassName.push(constructedClassName)
-      } else {
-        const baseClassName =
-          `${twVariant}-${target[themeVariant]}` + opacityString
-        finalClassName.push(baseClassName)
-        // for (const state of enabledStates) {
-        //   const constructedClassName =
-        //     `${state}:${twVariant}-${target[themeVariant]}` + opacityString
-
-        //   finalClassName.push(constructedClassName)
-        // }
-      }
-    } else {
-      target = verbosePalette[theme!][palette][variant]
-
-      if (!state) {
-        const baseClassName = `${twVariant}-${target.base}` + opacityString
-        finalClassName.push(baseClassName)
-        // for (const state of enabledStates) {
-        //   const constructedClassName =
-        //     `${state}:${twVariant}-${target[state]}` + opacityString
-
-        //   finalClassName.push(constructedClassName)
-        // }
-      } else {
-        let constructedClassName
-        if (twVariant) {
-          constructedClassName =
-            `${twVariant}:${palette}-${target[state]}` + opacityString
-        } else {
-          constructedClassName = `${state}:${target[state]}` + opacityString
-        }
-        finalClassName.push(constructedClassName)
-      }
-    }
-  }
-
-  const finalClassNamesString = finalClassName.join(" ") + ` ${rootClassNames}`
-
-  return finalClassNamesString
 }
 
 const parseMakClassName = (string: string) => {

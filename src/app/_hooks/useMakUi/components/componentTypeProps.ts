@@ -1,8 +1,12 @@
-import { deepMerge } from "@/globals/global-helper-functions"
+import {
+  allowFalsyFallback,
+  deepMerge,
+} from "@/globals/global-helper-functions"
 import { TypeProps, WithComponentPropsResponse } from "../types/component-types"
 import {
   MakUiStateKey,
   MakUiThemeKey,
+  MakUiThemeVariantKey,
   TailwindModifier,
 } from "../types/ui-types"
 
@@ -76,18 +80,21 @@ const getThemeModeValue = (props: TypeProps): MakUiThemeKey | undefined => {
   if (props.lightMode) return "light" as MakUiThemeKey
   if (props.darkMode) return "dark" as MakUiThemeKey
   if (props.customMode) return "custom" as MakUiThemeKey
-  return "light" as MakUiThemeKey
+  return undefined
 }
 
-const getThemeVariantValue = (props: TypeProps): MakUiThemeKey | undefined => {
-  if (props.themeVariant) return props.themeVariant as MakUiThemeKey
-
-  if (props.themePrimary) return "primary" as MakUiThemeKey
-  if (props.themeSecondary) return "secondary" as MakUiThemeKey
-  if (props.themeTertiary) return "tertiary" as MakUiThemeKey
-  if (props.themeCustom) return "custom" as MakUiThemeKey
-  if (props.themeLight) return "light" as MakUiThemeKey
-  if (props.themeDark) return "dark" as MakUiThemeKey
+const getThemeVariantValue = (
+  props: TypeProps
+): MakUiThemeVariantKey | undefined => {
+  if (props.themeVariant) return props.themeVariant as MakUiThemeVariantKey
+  if (props.themePrimary) return "primary" as MakUiThemeVariantKey
+  if (props.themeSecondary) return "secondary" as MakUiThemeVariantKey
+  if (props.themeTertiary) return "tertiary" as MakUiThemeVariantKey
+  if (props.themeCustom) return "custom" as MakUiThemeVariantKey
+  if (props.themeLight) return "light" as MakUiThemeVariantKey
+  if (props.themeDark) return "dark" as MakUiThemeVariantKey
+  if (props.themeWhite) return "white" as MakUiThemeVariantKey
+  if (props.themeBlack) return "black" as MakUiThemeVariantKey
   return undefined
 }
 
@@ -144,16 +151,29 @@ export const withComputedProps = (
     color: getColorValue(props),
     border: getBorderValue(props),
     text: getTextValue(props),
+    themeOpacity: allowFalsyFallback(
+      props.themeOpacity,
+      typeProps.themeOpacity
+    ),
 
-    textOpacity: props.textOpacity,
-    variantOpacity: props.variantOpacity,
-    borderOpacity: props.borderOpacity,
+    textOpacity: allowFalsyFallback(props.textOpacity, typeProps.textOpacity),
+    variantOpacity: allowFalsyFallback(
+      props.variantOpacity,
+      typeProps.variantOpacity
+    ),
+    borderOpacity: allowFalsyFallback(
+      props.borderOpacity,
+      typeProps.borderOpacity
+    ),
 
-    textShade: props.textShade,
-    variantShade: props.variantShade,
-    borderShade: props.borderShade,
-    state: props.state,
-    borderPx: props.borderPx,
+    textShade: allowFalsyFallback(props.textShade, typeProps.textShade),
+    variantShade: allowFalsyFallback(
+      props.variantShade,
+      typeProps.variantShade
+    ),
+    borderShade: allowFalsyFallback(props.borderShade, typeProps.borderShade),
+    state: allowFalsyFallback(props.state, typeProps.state),
+    borderPx: allowFalsyFallback(props.borderPx, typeProps.borderPx),
     className: props.className,
     makClassName: props.makClassName,
   }

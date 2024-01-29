@@ -1,9 +1,14 @@
-import { makUiVariantsSet } from "../constants/ui-constants"
+import {
+  makUiThemeVariants,
+  makUiThemeVariantsSet,
+  makUiVariantsSet,
+} from "../constants/ui-constants"
 import { useMakUi } from "../context/MakUiContext"
 import { objectToClassName } from "../functions/helpers"
 import { TypeProps, ComponentWrapperResponse } from "../types/component-types"
 import {
   MakUiStateKey,
+  MakUiThemeVariantKey,
   MakUiVariantKey,
   TailwindModifier,
 } from "../types/ui-types"
@@ -73,12 +78,30 @@ export const componentWrapperLogic = ({
     border: borderPalette,
     theme: themePalette,
   } = activePalette
+
+  let selectedTheme
   let selectedText
   let selectedBorder
   let selectedColor
+  let themeString: string | undefined
   let textString: string | undefined
   let colorString: string | undefined
   let borderString: string | undefined
+
+  const styleObject = {
+    backgroundColor: undefined as string | undefined,
+    borderColor: undefined as string | undefined,
+    color: undefined as string | undefined,
+  }
+
+  if (!makUiThemeVariantsSet.has(themeProps as MakUiThemeVariantKey)) {
+    themeString = themeProps
+  } else {
+    console.log("themeProps", themeProps)
+    selectedTheme = themePalette[themeProps as MakUiThemeVariantKey]
+    themeString = `bg-${selectedTheme}`
+    styleObject.backgroundColor = selectedTheme
+  }
   if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
     textString = textProps
   } else {
@@ -111,6 +134,8 @@ export const componentWrapperLogic = ({
   }
 
   const response: ComponentWrapperResponse = {
+    styleObject,
+    themeString,
     textString,
     colorString,
     borderString,

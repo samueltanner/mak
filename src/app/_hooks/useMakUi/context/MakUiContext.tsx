@@ -5,12 +5,9 @@ import { ThemeProvider, useTheme } from "next-themes"
 import {
   constructTailwindObject,
   getActiveTwVariants,
-  getTwConfigSafelist,
-  makClassNameHelper,
 } from "../functions/helpers"
 
 import {
-  HtmlElementKey,
   MakUiFlexiblePaletteInput,
   MakUiInteractionStateKey,
   MakUiSimplePalette,
@@ -23,8 +20,6 @@ import {
   ShadeStep,
 } from "../types/ui-types"
 import {
-  htmlElements,
-  makUiDefaultStateShades,
   makUiDefaultThemeShades,
   makUiThemes,
   defaultComponentConfig,
@@ -259,29 +254,6 @@ const MakUiProviderChild = ({
 
   const { simplePalette, verbosePalette } = palettesMemo
 
-  const makClassName = (
-    string: MakUiClassNameHelperClassNames | undefined,
-    options?: MakUiClassNameHelperOptions
-  ) => {
-    const { type, states, theme, makClassName, className } = options || {}
-    const configKey: keyof MakUiComponentConfigInput = type
-      ? `${type}Config`
-      : "buttonConfig"
-
-    const defaultConfig = componentConfig?.[configKey]
-    const defaultTheme: MakUiThemeKey | undefined =
-      theme || (themeMode as MakUiThemeKey | undefined)
-
-    return makClassNameHelper({
-      string,
-      verbosePalette,
-      defaultConfig: type ? defaultConfig : undefined,
-      themeMode: defaultTheme,
-      makClassName,
-      className,
-    })
-  }
-
   // useEffect(() => {
   //   const safeList = getTwConfigSafelist({
   //     simplePalette,
@@ -325,8 +297,6 @@ const MakUiProviderChild = ({
     isLight: theme === "light",
     isCustom: theme === "custom",
     enabledThemeModes,
-    makClassName,
-    mcn: makClassName,
     // getSafeList,
     constructTailwindColorScale: constructTailwindObject,
   }
@@ -337,20 +307,6 @@ const MakUiProviderChild = ({
     </MakUiContext.Provider>
   )
 }
-
-type MakUiClassNameHelperClassNames = string
-type MakUiClassNameHelperOptions = {
-  type?: HtmlElementKey
-  states?: MakUiInteractionStateKey[]
-  theme?: MakUiThemeKey
-  useConfig?: boolean
-  makClassName?: string
-  className?: string
-}
-export type MakUiClassNameHelper = (
-  className: string,
-  options?: MakUiClassNameHelperOptions | undefined
-) => string | undefined
 
 interface MakUiContext {
   componentConfig: MakUiComponentConfig
@@ -368,8 +324,6 @@ interface MakUiContext {
   simpleTheme: MakUiSimpleTheme
   verboseTheme: MakUiVerboseTheme
 
-  mcn: MakUiClassNameHelper
-  makClassName: (className?: string) => string | undefined
   // getSafeList: () => void
   constructTailwindColorScale: ({
     hex,
