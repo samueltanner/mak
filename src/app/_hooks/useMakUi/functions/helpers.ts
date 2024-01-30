@@ -1322,7 +1322,6 @@ export const parseClassNameToStyleObject = ({
   activeTheme: MakUiVerboseTheme
 }) => {
   const makRegex = /mak\((.*?)\)/
-
   const matches = className.match(makRegex)
 
   if (matches) {
@@ -1394,16 +1393,14 @@ const parseMakClassNames = ({
       if (paletteVariant !== "theme") {
         color = activeTheme?.[paletteVariant]?.[variant]?.[shade]
         if (!color) {
-          console.log("makClassName", makClassName)
           let twKey = makClassName.includes(":")
             ? makClassName.split(":")[1]
             : makClassName
-          console.log("twKey1", twKey)
+
           twKey = twKey.split("-").slice(1).join("-")
           if (twKey.charAt(0) === "#") {
             color = twKey
           } else {
-            console.log("twKey2", twKey)
             const twColor = twColors[twKey]
             color = twColor
           }
@@ -1419,7 +1416,6 @@ const parseMakClassNames = ({
       }
 
       if (modifier) {
-        console.log("modifier", modifier)
         const splitModifier = modifier.split("-")
         if (splitModifier.length > 1) {
           modifierClass = splitModifier[0]

@@ -46,12 +46,12 @@ const DummyPage = () => {
       <div className="group bg-zinc-500 w-fit p-4">
         <span>we are a group</span>
         <mak.div
-          className="text-primary w-fit"
+          className="text-primary w-fit fade-in-out"
           makClassName={`${toggle ? "bg-purple-500" : "bg-orange-500"} ${
             toggle ? "hover:bg-blue-400" : "hover:bg-yellow-400"
           } group-hover:bg-green-500`}
         >
-          <div className="text-white">Mak Div</div>
+          Mak Div
         </mak.div>
       </div>
       {/* <StyledComponent {...styleObject}>Styled Element</StyledComponent> */}

@@ -1,7 +1,7 @@
 // MakComponent.tsx
 /** @jsxImportSource @emotion/react */
 
-import { createElement, forwardRef, ReactNode, useMemo, memo } from "react"
+import { forwardRef, ReactNode, useMemo, memo } from "react"
 import { useMakUi } from "../../context/MakUiContext"
 import { MakUiElementProps } from "./mak-custom-types"
 import { componentWrapperLogic } from "../../components/ComponentWrapper"
@@ -51,9 +51,7 @@ const MakComponent = memo(
       }
 
       return (
-        <StyledComponent styleProps={inlineStyles} {...props}>
-          mak div styled
-        </StyledComponent>
+        <StyledComponent styleObject={inlineStyles} as={component} {...props} />
       )
     }
   )

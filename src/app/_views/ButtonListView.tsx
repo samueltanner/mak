@@ -4,7 +4,6 @@ import Toggle from "../_hooks/useMakUi/components/Toggle"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
 import { MakUiVariantKey } from "../_hooks/useMakUi/types/ui-types"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
-import styled from "@emotion/styled"
 
 const ButtonListView = () => {
   const { simpleTheme, verboseTheme } = useMakUi()
@@ -37,21 +36,17 @@ const ButtonListView = () => {
           onClick={() => setOutlined(!outlined)}
         />
 
-        {/* <Toggle
+        <Toggle
           checked={outlined}
           onChange={() => setOutlined(!outlined)}
           borderPx={4}
           darkMode
           custom
           className="peer"
-          bgColor="#854d0e"
-          bgCheckedColor="blue-500"
-        /> */}
-        <input
-          type="checkbox"
-          checked={outlined}
-          onChange={() => setOutlined(!outlined)}
+          // bgColor="#854d0e"
+          // bgCheckedColor="blue-500"
         />
+
         <mak.span
           className={`size-5 rounded-md border-4 fade-in-out mak(${
             outlined ? "border-primary" : "border-custom"
