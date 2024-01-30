@@ -53,8 +53,8 @@ export default function RootLayout({
           paletteGenProps={{
             palette,
             enableDarkMode: true,
-            blackHex: "#242424",
-            whiteHex: "#e6e6e6",
+            altBlack: "#242424",
+            altWhite: "#e6e6e6",
           }}
           componentConfig={componentConfig}
           enableSystem

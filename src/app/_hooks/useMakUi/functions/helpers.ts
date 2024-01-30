@@ -180,40 +180,65 @@ export const getConstructedTheme = ({
   providedVariants,
   theme,
   defaultShades,
-  blackHex,
-  whiteHex,
+  altBlack,
+  altWhite,
 }: {
   providedVariants: MakUiVerboseThemeVariant
   theme: MakUiThemeKey
   defaultShades: MakUiThemeShades
-  blackHex: string
-  whiteHex: string
+  altBlack: string
+  altWhite: string
 }) => {
   const { primary, secondary, tertiary, custom, light, dark } = providedVariants
-
-  const { shade: primaryShade, color: primaryColor } = twColorHelper({
+  const blackHex = twColorHelper({ colorString: altBlack }).hex
+  const whiteHex = twColorHelper({ colorString: altWhite }).hex
+  const {
+    shade: primaryShade,
+    color: primaryColor,
+    hex: primaryHex,
+  } = twColorHelper({
     colorString: primary || makUiDefaultColors.primary,
     shade: includesShade(primary) ? undefined : defaultShades[theme].primary,
     useDefaults: false,
   })
-  const { shade: secondaryShade, color: secondaryColor } = twColorHelper({
+  const {
+    shade: secondaryShade,
+    color: secondaryColor,
+    hex: secondaryHex,
+  } = twColorHelper({
     colorString: secondary,
     useDefaults: false,
   })
-  const { shade: tertiaryShade, color: tertiaryColor } = twColorHelper({
+  const {
+    shade: tertiaryShade,
+    color: tertiaryColor,
+    hex: tertiaryHex,
+  } = twColorHelper({
     colorString: tertiary,
     useDefaults: false,
   })
-  const { shade: customShade, color: customColor } = twColorHelper({
+  const {
+    shade: customShade,
+    color: customColor,
+    hex: customHex,
+  } = twColorHelper({
     colorString: custom,
     useDefaults: false,
   })
 
-  const { shade: lightShade, color: lightColor } = twColorHelper({
+  const {
+    shade: lightShade,
+    color: lightColor,
+    hex: lightHex,
+  } = twColorHelper({
     colorString: light || "white",
     useDefaults: false,
   })
-  const { shade: darkShade, color: darkColor } = twColorHelper({
+  const {
+    shade: darkShade,
+    color: darkColor,
+    hex: darkHex,
+  } = twColorHelper({
     colorString: dark || "black",
     useDefaults: false,
   })
@@ -290,12 +315,12 @@ export const getConstructedTheme = ({
   }
 
   const themeResponse = {
-    primary: resolvedThemeObject.primary.hex,
-    secondary: resolvedThemeObject.secondary.hex,
-    tertiary: resolvedThemeObject.tertiary.hex,
-    custom: resolvedThemeObject.custom.hex,
-    light: resolvedThemeObject.light.hex,
-    dark: resolvedThemeObject.dark.hex,
+    primary: primaryHex || resolvedThemeObject.primary.hex,
+    secondary: secondaryHex || resolvedThemeObject.secondary.hex,
+    tertiary: tertiaryHex || resolvedThemeObject.tertiary.hex,
+    custom: customHex || resolvedThemeObject.custom.hex,
+    light: lightHex || resolvedThemeObject.light.hex,
+    dark: darkHex || resolvedThemeObject.dark.hex,
     black: resolvedThemeObject.blackHex,
     white: resolvedThemeObject.whiteHex,
   }
@@ -311,8 +336,8 @@ export const getConstructedShades = ({
   variant,
   includeBlackAndWhite = true,
   includeNearAbsolutes = true,
-  blackHex = "#000000",
-  whiteHex = "#FFFFFF",
+  altBlack = "#000000",
+  altWhite = "#FFFFFF",
 }: {
   defaultColor?: string
   middleHex?: string
@@ -321,11 +346,13 @@ export const getConstructedShades = ({
   variant: MakUiVariantKey
   includeBlackAndWhite?: boolean
   includeNearAbsolutes?: boolean
-  blackHex?: string
-  whiteHex?: string
+  altBlack?: string
+  altWhite?: string
 }): MakUiVerboseShades => {
   const finalShades = {} as MakUiVerboseShades
   let shadeHex: string
+  const blackHex = twColorHelper({ colorString: altBlack }).hex
+  const whiteHex = twColorHelper({ colorString: altWhite }).hex
 
   if (!middleHex) {
     let fallbackPosition = Object.keys(providedShades || {})?.[0]

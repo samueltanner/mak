@@ -27,8 +27,8 @@ export const paletteFactory = ({
   shadeStep,
   includeBlackAndWhite,
   includeNearAbsolutes,
-  blackHex,
-  whiteHex,
+  altBlack,
+  altWhite,
 }: {
   paletteInput: MakUiFlexiblePaletteInput
   enabledThemeModes: MakUiThemeKey[]
@@ -37,8 +37,8 @@ export const paletteFactory = ({
   shadeStep: ShadeStep
   includeBlackAndWhite: boolean
   includeNearAbsolutes: boolean
-  blackHex: string
-  whiteHex: string
+  altBlack: string
+  altWhite: string
 }) => {
   const initialVerbosePalette = extractInitialPalette({
     palette: paletteInput,
@@ -57,9 +57,11 @@ export const paletteFactory = ({
             providedVariants,
             theme,
             defaultShades: defaultShades,
-            blackHex,
-            whiteHex,
+            altBlack,
+            altWhite,
           })
+
+          console.log("theme", theme, { constructedTheme })
 
           ensureNestedObject({
             parent: finalVerbosePalette,
@@ -78,8 +80,8 @@ export const paletteFactory = ({
             providedVariants: defaultVariant,
             theme,
             defaultShades: defaultShades,
-            blackHex,
-            whiteHex,
+            altBlack,
+            altWhite,
           })
 
           ensureNestedObject({
@@ -109,8 +111,8 @@ export const paletteFactory = ({
             steps: shadeStep,
             includeBlackAndWhite,
             includeNearAbsolutes,
-            blackHex,
-            whiteHex,
+            altBlack,
+            altWhite,
           })
 
           ensureNestedObject({
@@ -179,8 +181,8 @@ export const paletteFactory = ({
             steps: shadeStep,
             includeBlackAndWhite,
             includeNearAbsolutes,
-            blackHex,
-            whiteHex,
+            altBlack,
+            altWhite,
           })
 
           ensureNestedObject({
@@ -234,7 +236,6 @@ export const paletteFactory = ({
     //     return finalVerbosePalette.dark.border
     //   },
     // },
-
   })
 
   return {

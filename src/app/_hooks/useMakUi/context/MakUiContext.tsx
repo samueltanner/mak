@@ -41,8 +41,8 @@ type PaletteGeneratorProps = {
   shadeStep?: ShadeStep
   includeBlackAndWhite?: boolean
   includeNearAbsolutes?: boolean
-  blackHex?: string
-  whiteHex?: string
+  altBlack?: string
+  altWhite?: string
 }
 
 type MakUiProviderProps = {
@@ -85,8 +85,8 @@ const defaultPaletteGenProps: PaletteGeneratorProps = {
   shadeStep: 100 as ShadeStep,
   includeBlackAndWhite: true,
   includeNearAbsolutes: true,
-  blackHex: "#000000",
-  whiteHex: "#ffffff",
+  altBlack: "#000000",
+  altWhite: "#ffffff",
 }
 
 const MakUiProviderChild = ({
@@ -112,8 +112,8 @@ const MakUiProviderChild = ({
     shadeStep,
     includeBlackAndWhite,
     includeNearAbsolutes,
-    blackHex,
-    whiteHex,
+    altBlack,
+    altWhite,
   } = mergedPaletteGenProps
 
   paletteInput = !isEmptyObject(paletteGenInput)
@@ -212,8 +212,8 @@ const MakUiProviderChild = ({
         shadeStep: shadeStep!,
         includeBlackAndWhite: includeBlackAndWhite!,
         includeNearAbsolutes: includeNearAbsolutes!,
-        blackHex: blackHex!,
-        whiteHex: whiteHex!,
+        altBlack: altBlack!,
+        altWhite: altWhite!,
       }) || {}
 
     return {
