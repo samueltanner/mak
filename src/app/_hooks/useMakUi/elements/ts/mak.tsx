@@ -10,9 +10,16 @@ type Mak = {
   [K in keyof JSX.IntrinsicElements]: ExtendedHTMLElement<K>
 }
 
+const componentCache = {}
+
 const handler: ProxyHandler<{}> = {
   get(_: any, tag: keyof JSX.IntrinsicElements) {
-    return (props: any) => <MakComponent component={tag} {...props} />
+    if (!componentCache[tag]) {
+      componentCache[tag] = (props: any) => (
+        <MakComponent component={tag} {...props} />
+      )
+    }
+    return componentCache[tag]
   },
 }
 

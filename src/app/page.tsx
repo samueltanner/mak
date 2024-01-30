@@ -23,15 +23,6 @@ export default function Home() {
         <div className="absolute bottom-4 right-4">
           <ThemeButton />
         </div>
-        {/* <mak.div className="group bg-blue-500 flex h-fit flex-col p-6">
-          I am the parent
-          <mak.div
-            className="border-2 rounded-md cursor-pointer fade-in-out"
-            makClassName="bg-danger-500/100 border-secondary-300 hover:bg-info-200 group-hover:text-secondary-300"
-          >
-            I am the child
-          </mak.div>
-        </mak.div> */}
       </div>
     </div>
   )

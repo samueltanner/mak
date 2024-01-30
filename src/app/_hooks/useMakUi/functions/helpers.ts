@@ -1339,7 +1339,7 @@ export const parseClassNameToStyleObject = ({
     activeTheme,
   })
 
-  return { styleObject, twClassNames: className, makClassNames: makClassName}
+  return { styleObject, twClassNames: className, makClassNames: makClassName }
 }
 
 const parseMakClassNames = ({
@@ -1349,6 +1349,8 @@ const parseMakClassNames = ({
   makClassName?: string
   activeTheme: MakUiVerboseTheme
 }) => {
+  if (!makClassName) return {}
+  makClassName = makClassName.trim()
   const makClassNamesArray = makClassName?.split(" ") || []
   const styleObj = {} as GenericObject
   const styleMap = new Map<string, string | GenericObject>()
