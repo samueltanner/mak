@@ -4,6 +4,7 @@ const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <mak.main
       themePrimary
+      textPrimary
       className="flex flex-col w-screen h-screen"
     >
       {children}

@@ -1,12 +1,11 @@
 // MakComponent.tsx
 /** @jsxImportSource @emotion/react */
 
-import { forwardRef, ReactNode } from "react"
+import { forwardRef, ReactNode, useMemo } from "react"
 import { useMakUi } from "../../context/MakUiContext"
 import { MakUiElementProps } from "./mak-custom-types"
 import { componentWrapperLogic } from "../../components/ComponentWrapper"
 import styled from "@emotion/styled"
-import { group } from "console"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -19,23 +18,19 @@ const MakComponent = forwardRef<
   HTMLMakComponentProps<keyof JSX.IntrinsicElements>
 >(({ component, ...props }, ref) => {
   const makUi = useMakUi()
-  const response = componentWrapperLogic({
-    props,
-    makUi,
-  })
+  const response = useMemo(() => {
+    return componentWrapperLogic({
+      props,
+      makUi,
+    })
+  }, [props, makUi])
 
   const allProps = { ...props, ref }
 
-  const {
-    textString,
-    colorString,
-    borderString,
-    themeString,
-    styleObject,
-    className,
-  } = response
+  const { themeString, styleObject, className, makClassName } = response
 
   allProps.className = className
+  allProps.makClassName = makClassName
 
   const StyledElement = styled(({ as: T = "div", ...props }) => (
     <T {...props} />

@@ -1328,7 +1328,7 @@ export const parseClassNameToStyleObject = ({
   if (matches) {
     const insideMak = matches[1]
     const outsideMak = className.replace(matches[0], "").trim()
-    console.log({ insideMak, outsideMak })
+
     className = outsideMak
     makClassName =
       makClassName || "" + !!insideMak.length ? ` ${insideMak}` : ""
@@ -1339,7 +1339,7 @@ export const parseClassNameToStyleObject = ({
     activeTheme,
   })
 
-  return { styleObject, twClassNames: className }
+  return { styleObject, twClassNames: className, makClassNames: makClassName}
 }
 
 const parseMakClassNames = ({
@@ -1350,12 +1350,8 @@ const parseMakClassNames = ({
   activeTheme: MakUiVerboseTheme
 }) => {
   const makClassNamesArray = makClassName?.split(" ") || []
-  const makClassNamesObjectArray: MakClassNameObject[] = []
-  const parsedMakClassNamesArray: string[] = []
   const styleObj = {} as GenericObject
   const styleMap = new Map<string, string | GenericObject>()
-
-  const { color, text, border, theme } = activeTheme
 
   makClassNamesArray.length > 0 &&
     makClassNamesArray.forEach((makClassName) => {
@@ -1395,7 +1391,6 @@ const parseMakClassNames = ({
         color = activeTheme[paletteVariant][variant][shade]
       } else {
         color = activeTheme.theme?.[variant as keyof MakUiVerboseThemeVariant]
-        console.log({ color }, activeTheme)
       }
 
       if (opacity && color) {

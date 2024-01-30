@@ -61,8 +61,6 @@ export const paletteFactory = ({
             altWhite,
           })
 
-          console.log("theme", theme, { constructedTheme })
-
           ensureNestedObject({
             parent: finalVerbosePalette,
             keys: [theme, paletteVariant],

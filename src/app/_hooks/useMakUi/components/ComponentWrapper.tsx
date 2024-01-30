@@ -82,15 +82,6 @@ export const componentWrapperLogic = ({
     theme: themePalette,
   } = activeTheme
 
-  let selectedTheme
-  let selectedText
-  let selectedBorder
-  let selectedColor
-  let themeString: string | undefined
-  let textString: string | undefined
-  let colorString: string | undefined
-  let borderString: string | undefined
-
   if (themeProps) {
     const themeClassName = `theme-${themeProps}`
     makClassName = makClassName
@@ -125,49 +116,8 @@ export const componentWrapperLogic = ({
     activeTheme,
   })
 
-  // if (!makUiThemeVariantsSet.has(themeProps as MakUiThemeVariantKey)) {
-  //   themeString = themeProps
-  // } else {
-  //   selectedTheme = themePalette[themeProps as MakUiThemeVariantKey]
-  //   themeString = selectedTheme
-  // }
-  // if (!makUiVariantsSet.has(textProps as MakUiVariantKey)) {
-  //   textString = textProps
-  // } else {
-  //   selectedText = textPalette[textProps as MakUiVariantKey]
-  //   textString = objectToClassName({
-  //     object: selectedText,
-  //     variant: "text",
-  //     // allowedStates: textStates,
-  //   })
-  // }
-  // if (!makUiVariantsSet.has(borderProps as MakUiVariantKey)) {
-  //   borderString = borderProps
-  // } else {
-  //   selectedBorder = borderPalette[borderProps as MakUiVariantKey]
-  //   borderString = objectToClassName({
-  //     object: selectedBorder,
-  //     variant: "border",
-  //     // allowedStates: borderStates,
-  //   })
-  // }
-  // if (!makUiVariantsSet.has(colorProps as MakUiVariantKey)) {
-  //   colorString = colorProps
-  // } else {
-  //   selectedColor = colorPalette[colorProps as MakUiVariantKey]
-  //   colorString = objectToClassName({
-  //     object: selectedColor,
-  //     variant: "bg",
-  //     // allowedStates: colorStates,
-  //   })
-  // }
-
   const response: ComponentWrapperResponse = {
     styleObject,
-    themeString,
-    textString,
-    colorString,
-    borderString,
     componentTheme: themePalette,
     componentText: textPalette,
     componentColor: colorPalette,

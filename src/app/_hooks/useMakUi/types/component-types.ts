@@ -214,10 +214,6 @@ export type ObjectToClassNameObjectProp = {
 
 export type ComponentWrapperResponse = {
   styleObject: GenericObject
-  themeString: string | undefined
-  textString: string | undefined
-  colorString: string | undefined
-  borderString: string | undefined
   componentTheme: MakUiVerboseThemeVariant
   componentText: MakUiVerboseVariant
   componentColor: MakUiVerboseVariant
