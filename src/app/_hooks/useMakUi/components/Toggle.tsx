@@ -22,24 +22,18 @@ const ToggleComponent = ({
   bgCheckedColor,
   ...computedProps
 }: ToggleProps & ComponentWrapperResponse) => {
-  const computedBorder = `border-[${computedProps.borderPx}px] ${computedProps.borderString}`
-  const computedToggle = () => {
-    if (!color) return `after:bg-${computedProps.componentTheme.primary}`
-
-    if (!checkedColor) {
-      return `after:${color}`
-    } else {
-      return `after:${color} after:peer-checked:${checkedColor}`
+  const computedBgColor = () => {
+    let bgColorArray = []
+    if (bgColor) {
+      const bgString = bgColor.split("bg-")[1] || bgColor.split("bg-")[0]
+      bgColorArray.push(`bg-${bgString}`)
     }
-  }
-  const computedBackground = () => {
-    if (!bgColor) return computedProps.colorString as string
-
-    if (!bgCheckedColor) {
-      return `${bgColor}`
-    } else {
-      return `${bgColor} peer-checked:${bgCheckedColor}`
+    if (bgCheckedColor) {
+      const bgString =
+        bgCheckedColor.split("bg-")[1] || bgCheckedColor.split("bg-")[0]
+      bgColorArray.push(`checked:bg-${bgString}`)
     }
+    return bgColorArray.join(" ")
   }
 
   return (
@@ -55,9 +49,16 @@ const ToggleComponent = ({
           }}
         />
 
-        <span
-          className={`w-12 h-[26px] ${computedBackground()} ${computedBorder} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[3px] after:start-1 after:peer-checked:start-[4px] ${computedToggle()} after:rounded-full after:h-5 after:w-5 after:transition-all`}
-        />
+        <mak.span
+          className="w-12 h-6 rounded-full items-center flex"
+          makClassName={"checked:bg-light-100"}
+        >
+          <mak.span
+            className={`size-[20px] bg-red-500 flex rounded-full mx-0.5 transition duration-100 ease-in-out ${
+              checkedProp ? "translate-x-6" : "translate-x-0"
+            }`}
+          />
+        </mak.span>
       </label>
     </span>
   )

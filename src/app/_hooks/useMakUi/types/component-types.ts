@@ -213,7 +213,19 @@ export type ObjectToClassNameObjectProp = {
 }
 
 export type ComponentWrapperResponse = {
-  styleObject: GenericObject
+  styleObject:
+    | {
+        pseudoObject?: undefined
+        styleObject?: undefined
+      }
+    | {
+        pseudoObject: {
+          [k: string]: string | GenericObject
+        }
+        styleObject: {
+          [k: string]: string | GenericObject
+        }
+      }
   componentTheme: MakUiVerboseThemeVariant
   componentText: MakUiVerboseVariant
   componentColor: MakUiVerboseVariant

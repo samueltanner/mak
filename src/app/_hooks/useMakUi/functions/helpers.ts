@@ -2,7 +2,6 @@ import chroma from "chroma-js"
 import {
   DefaultColors,
   GenericObject,
-  MakClassNameObject,
   MakUiDefaultColors,
   MakUiDefaultStateColors,
   MakUiFlexiblePaletteInput,
@@ -24,10 +23,10 @@ import {
   ParsedClassNameResponse,
   Shade,
   TailwindCustomColors,
-  TailwindModifier,
   TailwindUtilityClass,
 } from "../types/ui-types"
 import colors from "tailwindcss/colors"
+import { twColors } from "../constants/tailwind-colors"
 import twConfig from "../../../../../tailwind.config"
 import {
   MakUiThemeKey,
@@ -60,7 +59,6 @@ import {
   isObject,
   nearestMultiple,
 } from "@/globals/global-helper-functions"
-import { act } from "react-dom/test-utils"
 
 export const constructTailwindObject = ({
   hex,
@@ -338,6 +336,7 @@ export const getConstructedShades = ({
   includeNearAbsolutes = true,
   altBlack = "#000000",
   altWhite = "#FFFFFF",
+  hexPosition,
 }: {
   defaultColor?: string
   middleHex?: string
@@ -348,6 +347,7 @@ export const getConstructedShades = ({
   includeNearAbsolutes?: boolean
   altBlack?: string
   altWhite?: string
+  hexPosition?: number
 }): MakUiVerboseShades => {
   const finalShades = {} as MakUiVerboseShades
   let shadeHex: string
@@ -390,6 +390,7 @@ export const getConstructedShades = ({
       includeNearAbsolutes,
       blackHex,
       whiteHex,
+      hexPosition,
     })
     for (const [shade, color] of Object.entries(tailwindColors)) {
       if (providedShades && providedShades[shade]) {
@@ -666,37 +667,37 @@ export const concatNestedKeys = (
   return result
 }
 
-export const getTwColor = (
-  hex: string,
-  objectToCheck?: NestedObject | GenericObject
-) => {
-  if (objectToCheck) {
-    const concatObject = concatNestedKeys(objectToCheck)
-    const customColor = Object.entries(concatObject).find(([key, value]) => {
-      return value === hex
-    })?.[0]
-    if (customColor) {
-      return customColor
-    }
-  }
-  const twConfigColors = twConfig?.theme?.extend?.colors as TailwindCustomColors
+// export const getTwColor = (
+//   hex: string,
+//   objectToCheck?: NestedObject | GenericObject
+// ) => {
+//   if (objectToCheck) {
+//     const concatObject = concatNestedKeys(objectToCheck)
+//     const customColor = Object.entries(concatObject).find(([key, value]) => {
+//       return value === hex
+//     })?.[0]
+//     if (customColor) {
+//       return customColor
+//     }
+//   }
+//   const twConfigColors = twConfig?.theme?.extend?.colors as TailwindCustomColors
 
-  const customColorsObj = concatNestedKeys(twConfigColors || {})
-  const customColor = Object.entries(customColorsObj).find(([key, value]) => {
-    return value === hex
-  })?.[0]
-  if (customColor) {
-    return customColor
-  }
-  const twColorsObj = concatNestedKeys(colors)
+//   const customColorsObj = concatNestedKeys(twConfigColors || {})
+//   const customColor = Object.entries(customColorsObj).find(([key, value]) => {
+//     return value === hex
+//   })?.[0]
+//   if (customColor) {
+//     return customColor
+//   }
+//   const twColorsObj = concatNestedKeys(colors)
 
-  const twColor = Object.entries(twColorsObj).find(([key, value]) => {
-    return value === hex
-  })?.[0]
-  if (twColor) {
-    return twColor
-  }
-}
+//   const twColor = Object.entries(twColorsObj).find(([key, value]) => {
+//     return value === hex
+//   })?.[0]
+//   if (twColor) {
+//     return twColor
+//   }
+// }
 
 export const getTwHex = ({
   colorString,
@@ -1320,7 +1321,6 @@ export const parseClassNameToStyleObject = ({
   makClassName?: string
   activeTheme: MakUiVerboseTheme
 }) => {
-  let styleObject = {} as GenericObject
   const makRegex = /mak\((.*?)\)/
 
   const matches = className.match(makRegex)
@@ -1334,7 +1334,7 @@ export const parseClassNameToStyleObject = ({
       makClassName || "" + !!insideMak.length ? ` ${insideMak}` : ""
   }
 
-  styleObject = parseMakClassNames({
+  const styleObject = parseMakClassNames({
     makClassName,
     activeTheme,
   })
@@ -1349,11 +1349,12 @@ const parseMakClassNames = ({
   makClassName?: string
   activeTheme: MakUiVerboseTheme
 }) => {
-  if (!makClassName) return {}
-  makClassName = makClassName.trim()
+  makClassName = makClassName?.trim()
+  if (!makClassName || makClassName === "") return {}
+
   const makClassNamesArray = makClassName?.split(" ") || []
-  const styleObj = {} as GenericObject
   const styleMap = new Map<string, string | GenericObject>()
+  const modifierMap = new Map<string, string | GenericObject>()
 
   makClassNamesArray.length > 0 &&
     makClassNamesArray.forEach((makClassName) => {
@@ -1387,10 +1388,26 @@ const parseMakClassNames = ({
       variant =
         (mcn?.split("-")[1] as MakUiVariantKey) ||
         ("primary" as MakUiVariantKey)
-      shade = (Number(mcn?.split("-")[2]) as Shade) || (500 as Shade)
+      const shadeString = mcn?.split("-")[2] || "500"
+      shade = Number(shadeString) as Shade
 
       if (paletteVariant !== "theme") {
-        color = activeTheme[paletteVariant][variant][shade]
+        color = activeTheme?.[paletteVariant]?.[variant]?.[shade]
+        if (!color) {
+          console.log("makClassName", makClassName)
+          let twKey = makClassName.includes(":")
+            ? makClassName.split(":")[1]
+            : makClassName
+          console.log("twKey1", twKey)
+          twKey = twKey.split("-").slice(1).join("-")
+          if (twKey.charAt(0) === "#") {
+            color = twKey
+          } else {
+            console.log("twKey2", twKey)
+            const twColor = twColors[twKey]
+            color = twColor
+          }
+        }
       } else {
         color = activeTheme.theme?.[variant as keyof MakUiVerboseThemeVariant]
       }
@@ -1402,6 +1419,7 @@ const parseMakClassNames = ({
       }
 
       if (modifier) {
+        console.log("modifier", modifier)
         const splitModifier = modifier.split("-")
         if (splitModifier.length > 1) {
           modifierClass = splitModifier[0]
@@ -1412,7 +1430,7 @@ const parseMakClassNames = ({
           modifierKey = `&:${modifier}`
         }
         key = keyMap[paletteVariant]
-        styleMap.set(modifierKey, {
+        modifierMap.set(modifierKey, {
           [key]: color,
         })
       } else {
@@ -1421,6 +1439,10 @@ const parseMakClassNames = ({
       }
     })
 
-  Object.keys(styleObj).length && console.log("makClassNamesStyleMap", styleMap)
-  return Object.fromEntries(styleMap)
+  const pseudoObject = Object.fromEntries(modifierMap)
+  const styleObject = Object.fromEntries(styleMap)
+  return {
+    pseudoObject,
+    styleObject,
+  }
 }

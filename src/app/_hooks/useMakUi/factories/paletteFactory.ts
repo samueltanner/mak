@@ -181,6 +181,8 @@ export const paletteFactory = ({
             includeNearAbsolutes,
             altBlack,
             altWhite,
+            hexPosition:
+              variant === "dark" ? 1000 : variant === "light" ? 0 : 500,
           })
 
           ensureNestedObject({
@@ -217,6 +219,29 @@ export const paletteFactory = ({
     bg: {
       get() {
         return finalVerbosePalette.dark.color
+      },
+    },
+    // ring: {
+    //   get() {
+    //     return finalVerbosePalette.dark.border
+    //   },
+    // },
+    // outline: {
+    //   get() {
+    //     return finalVerbosePalette.dark.border
+    //   },
+    // },
+    // "ring-offset": {
+    //   get() {
+    //     return finalVerbosePalette.dark.border
+    //   },
+    // },
+  })
+
+  Object.defineProperties(finalVerbosePalette.light, {
+    bg: {
+      get() {
+        return finalVerbosePalette.light.color
       },
     },
     // ring: {

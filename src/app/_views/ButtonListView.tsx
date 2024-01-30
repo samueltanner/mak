@@ -33,17 +33,24 @@ const ButtonListView = () => {
         <mak.span
           className={`size-5 rounded-md fade-in-out cursor-pointer mak(${
             !outlined ? "bg-primary" : "bg-custom"
-          })`}
+          } hover:bg-red-500)`}
           onClick={() => setOutlined(!outlined)}
         />
 
-        <Toggle
+        {/* <Toggle
           checked={outlined}
           onChange={() => setOutlined(!outlined)}
           borderPx={4}
           darkMode
           custom
           className="peer"
+          bgColor="#854d0e"
+          bgCheckedColor="blue-500"
+        /> */}
+        <input
+          type="checkbox"
+          checked={outlined}
+          onChange={() => setOutlined(!outlined)}
         />
         <mak.span
           className={`size-5 rounded-md border-4 fade-in-out mak(${
