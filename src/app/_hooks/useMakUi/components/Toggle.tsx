@@ -1,5 +1,6 @@
 import { ComponentWrapperResponse, TypeProps } from "../types/component-types"
 import ComponentWrapper from "./ComponentWrapper"
+import { mak } from "../elements/ts/mak"
 
 type ToggleProps = TypeProps & {
   checked?: boolean

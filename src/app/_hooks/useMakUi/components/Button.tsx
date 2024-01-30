@@ -1,7 +1,7 @@
 "use client"
 import { forwardRef, useEffect, useMemo, useState } from "react"
 import { InLineLoader } from "./InLineLoader"
-import { MakUiClassNameHelper, useMakUi } from "../context/MakUiContext"
+import { useMakUi } from "../context/MakUiContext"
 import {
   MakUiSimpleTheme,
   MakUiStateKey,
