@@ -5,11 +5,42 @@ import { useState } from "react"
 import styled from "@emotion/styled"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 import StyledComponent from "../_hooks/useMakUi/elements/ts/StyledComponent"
+import Toggle from "../_hooks/useMakUi/components/Toggle"
 
 interface StyledElementProps {
   color: string
   backgroundColor: string
 }
+
+const StyledSpan = styled.span({
+  height: "8rem",
+  width: "fit-content",
+  backgroundColor: "red",
+
+  'input[type="checkbox"].peer:checked ~ &': {
+    backgroundColor: "blue",
+
+    "*": {
+      backgroundColor: "yellow",
+      "&:hover": {
+        backgroundColor: "green",
+      },
+    },
+
+    'input[type="checkbox"].peer:checked ~ & *': {
+      backgroundColor: "yellow",
+    },
+  },
+  "*": {
+    backgroundColor: "purple",
+  },
+})
+
+const ConditionalStyledComponent = styled.div({
+  'input[type="checkbox"]:checked ~ & *': {
+    color: "red",
+  },
+})
 
 const DummyPage = () => {
   const [toggle, setToggle] = useState<boolean>(false)
@@ -24,37 +55,15 @@ const DummyPage = () => {
   return (
     <div>
       <h1>Test Page</h1>
-      <span className="flex gap-2">
-        <label>Toggle</label>
-        <input
-          type="checkbox"
-          checked={toggle}
-          onChange={() => {
-            setToggle(!toggle)
-            setStyleObject({
-              ...styleObject,
-              backgroundColor: toggle ? "blue" : "red",
-              color: toggle ? "red" : "blue",
-              "&:hover": {
-                backgroundColor: "green",
-                color: "yellow",
-              },
-            })
-          }}
-        />
-      </span>
-      <div className="group bg-zinc-500 w-fit p-4">
-        <span>we are a group</span>
-        <mak.div
-          className="text-primary w-fit fade-in-out"
-          makClassName={`${toggle ? "bg-purple-500" : "bg-orange-500"} ${
-            toggle ? "hover:bg-blue-400" : "hover:bg-yellow-400"
-          } group-hover:bg-green-500`}
-        >
-          Mak Div
-        </mak.div>
-      </div>
-      {/* <StyledComponent {...styleObject}>Styled Element</StyledComponent> */}
+      <Toggle
+        checked={toggle}
+        onChange={() => setToggle(!toggle)}
+        darkMode
+        custom
+        // border="primary-500"
+        // bgColor="#854d0e"
+        // bgCheckedColor="blue-500"
+      />
     </div>
   )
 }

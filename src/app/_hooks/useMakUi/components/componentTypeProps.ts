@@ -55,6 +55,21 @@ export const typeProps: TypeProps = {
   textShade: 500,
   textOpacity: 100,
 
+  bgPrimary: false,
+  bgSecondary: false,
+  bgTertiary: false,
+  bgSuccess: false,
+  bgError: false,
+  bgWarning: false,
+  bgDanger: false,
+  bgInfo: false,
+  bgCustom: false,
+  bgLight: false,
+  bgDark: false,
+  bg: undefined,
+  bgShade: undefined,
+  bgOpacity: undefined,
+
   borderPrimary: false,
   borderSecondary: false,
   borderTertiary: false,
@@ -140,10 +155,25 @@ const getTextValue = (props: TypeProps) => {
   return undefined
 }
 
+const getBgValue = (props: TypeProps) => {
+  if (props.bg) return props.bg
+  if (props.bgPrimary) return "primary"
+  if (props.bgSecondary) return "secondary"
+  if (props.bgTertiary) return "tertiary"
+  if (props.bgSuccess) return "success"
+  if (props.bgError) return "error"
+  if (props.bgWarning) return "warning"
+  if (props.bgDanger) return "danger"
+  if (props.bgInfo) return "info"
+  if (props.bgCustom) return "custom"
+  if (props.bgLight) return "light"
+  if (props.bgDark) return "dark"
+  return undefined
+}
+
 export const withComputedProps = (
   props: TypeProps
 ): WithComponentPropsResponse => {
-  // props = deepMerge(props, typeProps)
   return {
     ...props,
     mode: getThemeModeValue(props),
@@ -151,12 +181,14 @@ export const withComputedProps = (
     color: getColorValue(props),
     border: getBorderValue(props),
     text: getTextValue(props),
+    bg: getBgValue(props),
     themeOpacity: allowFalsyFallback(
       props.themeOpacity,
       typeProps.themeOpacity
     ),
 
     textOpacity: allowFalsyFallback(props.textOpacity, typeProps.textOpacity),
+    bgOpacity: allowFalsyFallback(props.bgOpacity, typeProps.bgOpacity),
     variantOpacity: allowFalsyFallback(
       props.variantOpacity,
       typeProps.variantOpacity
@@ -167,6 +199,7 @@ export const withComputedProps = (
     ),
 
     textShade: allowFalsyFallback(props.textShade, typeProps.textShade),
+    bgShade: allowFalsyFallback(props.bgShade, typeProps.bgShade),
     variantShade: allowFalsyFallback(
       props.variantShade,
       typeProps.variantShade

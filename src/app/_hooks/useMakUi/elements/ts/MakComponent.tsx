@@ -42,16 +42,31 @@ const MakComponent = memo(
           makUi,
         })
       }, [props, makUi])
+      const { styleObject, twClassName, makClassName, ...responseRest } =
+        response
 
-      const { styleObject = {}, pseudoObject = {} } = response.styleObject
+      const { baseClassObject = {}, pseudoClassObject = {} } = styleObject
+
+      const allProps = {
+        className: twClassName,
+        makClassName,
+        component,
+        ref,
+        ...responseRest,
+      }
 
       const inlineStyles = {
-        ...styleObject,
-        ...pseudoObject,
+        ...baseClassObject,
+        ...pseudoClassObject,
       }
 
       return (
-        <StyledComponent styleObject={inlineStyles} as={component} {...props} />
+        <StyledComponent
+          styleObject={inlineStyles}
+          as={component}
+          className={twClassName}
+          {...allProps}
+        />
       )
     }
   )

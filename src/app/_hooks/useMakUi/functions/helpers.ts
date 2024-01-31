@@ -49,6 +49,7 @@ import {
   tailwindVariantsSet,
 } from "../constants/ui-constants"
 import {
+  ClassObject,
   MakUiComponentConfigInput,
   ObjectToClassNameObjectProp,
 } from "../types/component-types"
@@ -1321,24 +1322,76 @@ export const parseClassNameToStyleObject = ({
   makClassName?: string
   activeTheme: MakUiVerboseTheme
 }) => {
-  const makRegex = /mak\((.*?)\)/
-  const matches = className.match(makRegex)
+  const makRegex = /mak\((.*?)\)/g
+  const whiteSpaceRegex = /[ \t\r\n]+/
+  const makClassNamesArray = []
+  const twClassNamesArray = []
 
-  if (matches) {
-    const insideMak = matches[1]
-    const outsideMak = className.replace(matches[0], "").trim()
+  if (makClassName) {
+    makClassNamesArray.push(...makClassName.split(" "))
+  }
+  if (className && className.includes("mak(")) {
+    className = className.replace(/mak\(\)/g, "")
+    let match
+    while ((match = makRegex.exec(className)) !== null) {
+      makClassNamesArray.push(...match[1].split(" "))
+    }
 
-    className = outsideMak
-    makClassName =
-      makClassName || "" + !!insideMak.length ? ` ${insideMak}` : ""
+    const outside = className
+      .replace(makRegex, "")
+      .replace(whiteSpaceRegex, " ")
+      .trim()
+      .split(" ")
+    if (outside.length) {
+      twClassNamesArray.push(...outside)
+    }
+  } else if (className && !className.includes("mak(")) {
+    twClassNamesArray.push(...className.split(" "))
   }
 
-  const styleObject = parseMakClassNames({
-    makClassName,
-    activeTheme,
-  })
+  makClassName = makClassNamesArray.join(" ")
+  let twClassName = twClassNamesArray.length
+    ? twClassNamesArray.join(" ")
+    : undefined
 
-  return { styleObject, twClassNames: className, makClassNames: makClassName }
+  const { baseClassObject, pseudoClassObject, unresolved } = parseMakClassNames(
+    {
+      makClassName,
+      activeTheme,
+    }
+  )
+
+  const styleObject: {
+    baseClassObject: ClassObject
+    pseudoClassObject: ClassObject
+  } = { baseClassObject, pseudoClassObject }
+
+  return { styleObject, twClassName, makClassName }
+}
+
+const separateTwModifiers = (className: string) => {
+  if (!className || typeof className !== "string")
+    return {
+      className,
+      modifiersArray: [],
+      modifiers: "",
+    }
+  const regex = /^(.*):([^:]+)$/
+  const match = className.match(regex)
+
+  if (match) {
+    return {
+      modifiers: match[1],
+      modifiersArray: match[1].split(":"),
+      className: match[2],
+    }
+  } else {
+    return {
+      modifiers: "",
+      modifiersArray: [],
+      className: className,
+    }
+  }
 }
 
 const parseMakClassNames = ({
@@ -1348,15 +1401,19 @@ const parseMakClassNames = ({
   makClassName?: string
   activeTheme: MakUiVerboseTheme
 }) => {
-  makClassName = makClassName?.trim()
+  makClassName = makClassName?.replace(/\s+/g, " ").trim()
   if (!makClassName || makClassName === "") return {}
 
   const makClassNamesArray = makClassName?.split(" ") || []
   const styleMap = new Map<string, string | GenericObject>()
   const modifierMap = new Map<string, string | GenericObject>()
+  const unresolvedClasses: string[] = []
 
-  makClassNamesArray.length > 0 &&
-    makClassNamesArray.forEach((makClassName) => {
+  if (makClassNamesArray.length > 0) {
+    for (const makClassName of makClassNamesArray) {
+      const { className, modifiers, modifiersArray } =
+        separateTwModifiers(makClassName)
+
       let key: string = "backgroundColor"
       let modifierKey: string | undefined = undefined
       let paletteVariant: MakUiPaletteKey = "bg"
@@ -1376,10 +1433,8 @@ const parseMakClassNames = ({
         color: "backgroundColor",
       }
 
-      modifier = makClassName.includes(":")
-        ? makClassName!.split(":")[0]
-        : undefined
-      mcn = makClassName!.split(":")[1] || makClassName
+      modifier = modifiers
+      mcn = className
       opacity = mcn?.split("/")[1]
       mcn = mcn?.split("/")[0]
       paletteVariant =
@@ -1392,11 +1447,9 @@ const parseMakClassNames = ({
 
       if (paletteVariant !== "theme") {
         color = activeTheme?.[paletteVariant]?.[variant]?.[shade]
-        if (!color) {
-          let twKey = makClassName.includes(":")
-            ? makClassName.split(":")[1]
-            : makClassName
 
+        if (!color) {
+          let twKey = mcn
           twKey = twKey.split("-").slice(1).join("-")
           if (twKey.charAt(0) === "#") {
             color = twKey
@@ -1416,6 +1469,14 @@ const parseMakClassNames = ({
       }
 
       if (modifier) {
+        if (modifier === "peer-checked") {
+          modifierKey = 'input[type="checkbox"].peer:checked ~ &'
+          key = keyMap[paletteVariant]
+          modifierMap.set(modifierKey, {
+            [key]: color,
+          })
+          continue
+        }
         const splitModifier = modifier.split("-")
         if (splitModifier.length > 1) {
           modifierClass = splitModifier[0]
@@ -1429,16 +1490,38 @@ const parseMakClassNames = ({
         modifierMap.set(modifierKey, {
           [key]: color,
         })
-      } else {
+      } else if (paletteVariant && color) {
         key = keyMap[paletteVariant]
         styleMap.set(key, color)
+      } else {
+        unresolvedClasses.push(makClassName)
       }
-    })
-
-  const pseudoObject = Object.fromEntries(modifierMap)
-  const styleObject = Object.fromEntries(styleMap)
-  return {
-    pseudoObject,
-    styleObject,
+    }
   }
+
+  const pseudoClassObject = Object.fromEntries(modifierMap)
+  const baseClassObject = Object.fromEntries(styleMap)
+  const unresolved = unresolvedClasses.length
+    ? unresolvedClasses.join(" ")
+    : undefined
+  return {
+    pseudoClassObject,
+    baseClassObject,
+    unresolved,
+  }
+}
+
+export const ensureUtilityClass = (utility: string, className: string) => {
+  if (!utility) {
+    className = utility
+    utility = "bg-"
+  }
+  if (!utility.includes("-")) utility = `${utility}-`
+  if (!className.includes(utility)) {
+    return `${utility}${className}`
+  } else {
+    className = className.split(utility)[1] || className.split(utility)[0]
+    className = `${utility}${className}`
+  }
+  return className
 }

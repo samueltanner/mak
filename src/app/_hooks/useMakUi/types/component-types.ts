@@ -109,18 +109,7 @@ export type TypeProps = {
   danger?: boolean
   info?: boolean
   custom?: boolean
-  variant?:
-    | "primary"
-    | "secondary"
-    | "tertiary"
-    | "custom"
-    | "success"
-    | "error"
-    | "warning"
-    | "danger"
-    | "info"
-    | string
-    | undefined
+  variant?: MakUiVariantKey | string | undefined
   variantShade?: Shade | undefined
   variantOpacity?: number | undefined
 
@@ -136,20 +125,24 @@ export type TypeProps = {
   textCustom?: boolean
   textLight?: boolean
   textDark?: boolean
-  text?:
-    | "primary"
-    | "secondary"
-    | "tertiary"
-    | "custom"
-    | "success"
-    | "error"
-    | "warning"
-    | "danger"
-    | "info"
-    | string
-    | undefined
+  text?: MakUiVariantKey | string | undefined
   textShade?: Shade | undefined
   textOpacity?: number | undefined
+
+  bgPrimary?: boolean
+  bgSecondary?: boolean
+  bgTertiary?: boolean
+  bgSuccess?: boolean
+  bgError?: boolean
+  bgWarning?: boolean
+  bgDanger?: boolean
+  bgInfo?: boolean
+  bgCustom?: boolean
+  bgLight?: boolean
+  bgDark?: boolean
+  bg?: MakUiVariantKey | string | undefined
+  bgShade?: Shade | undefined
+  bgOpacity?: number | undefined
 
   //border
   borderPrimary?: boolean
@@ -161,18 +154,7 @@ export type TypeProps = {
   borderDanger?: boolean
   borderInfo?: boolean
   borderCustom?: boolean
-  border?:
-    | "primary"
-    | "secondary"
-    | "tertiary"
-    | "custom"
-    | "success"
-    | "error"
-    | "warning"
-    | "danger"
-    | "info"
-    | string
-    | undefined
+  border?: MakUiVariantKey | string | undefined
   borderShade?: Shade | undefined
   borderOpacity?: number | undefined
 
@@ -189,12 +171,15 @@ export type WithComponentPropsResponse = {
   color: string | undefined
   border: string | undefined
   text: string | undefined
+  bg: string | undefined
   themeOpacity: number | undefined
   textOpacity: number | undefined
+  bgOpacity: number | undefined
   variantOpacity: number | undefined
   borderOpacity: number | undefined
 
   textShade: Shade | undefined
+  bgShade: Shade | undefined
   variantShade: Shade | undefined
   borderShade: Shade | undefined
 
@@ -212,20 +197,17 @@ export type ObjectToClassNameObjectProp = {
   allowedModifiers?: Set<string>
 }
 
+export type ClassObject =
+  | {
+      [k: string]: string | GenericObject
+    }
+  | undefined
+
 export type ComponentWrapperResponse = {
-  styleObject:
-    | {
-        pseudoObject?: undefined
-        styleObject?: undefined
-      }
-    | {
-        pseudoObject: {
-          [k: string]: string | GenericObject
-        }
-        styleObject: {
-          [k: string]: string | GenericObject
-        }
-      }
+  styleObject: {
+    baseClassObject: ClassObject
+    pseudoClassObject: ClassObject
+  }
   componentTheme: MakUiVerboseThemeVariant
   componentText: MakUiVerboseVariant
   componentColor: MakUiVerboseVariant
@@ -235,6 +217,12 @@ export type ComponentWrapperResponse = {
   globalThemeMode: MakUiThemeKey
   globalPalette: MakUiVerbosePalette
   globalTheme: MakUiVerboseTheme
-  className: string | undefined
+  twClassName: string | undefined
   makClassName: string | undefined
+  modeVariant: MakUiThemeKey | undefined
+  themeVariant: MakUiThemeVariantKey | undefined
+  colorVariant: MakUiVariantKey | undefined
+  borderVariant: MakUiVariantKey | undefined
+  textVariant: MakUiVariantKey | undefined
+  bgVariant: MakUiVariantKey | undefined
 }

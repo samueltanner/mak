@@ -2,13 +2,23 @@ import { ComponentWrapperResponse, TypeProps } from "../types/component-types"
 import ComponentWrapper from "./ComponentWrapper"
 import { mak } from "../elements/ts/mak"
 import styled from "@emotion/styled"
+import { ensureUtilityClass } from "../functions/helpers"
 
-const DummyStyledElement = styled.div({
-  backgroundColor: "blue",
-  display: "flex",
+const StyledSpan = styled.span({
+  height: "8rem",
   width: "fit-content",
+  backgroundColor: "red",
+
   'input[type="checkbox"].peer:checked ~ &': {
-    backgroundColor: "red",
+    backgroundColor: "blue",
+
+    "*": {
+      backgroundColor: "purple",
+    },
+
+    'input[type="checkbox"].peer:checked ~ & *': {
+      backgroundColor: "yellow",
+    },
   },
 })
 
@@ -16,59 +26,44 @@ type ToggleProps = TypeProps & {
   checked?: boolean
   onChange?: (e?: React.ChangeEvent<HTMLInputElement>) => void
   disabled?: boolean
-  color?: string
-  checkedColor?: string
+  toggleColor?: string
+  toggleCheckedColor?: string
   bgColor?: string
   bgCheckedColor?: string
+  toggleBorderPx?: number
+  toggleBorder?: string
 }
 
 const ToggleComponent = ({
   checked: checkedProp,
   disabled,
   onChange,
-  color,
-  checkedColor,
-  bgColor,
-  bgCheckedColor,
+  toggleColor = "bg-light-200",
+  toggleCheckedColor = toggleColor,
+  bgColor = "bg-light-600",
+  bgCheckedColor = bgColor,
+  toggleBorderPx = 0,
+  toggleBorder = "border-light-200",
   ...computedProps
 }: ToggleProps & ComponentWrapperResponse) => {
-  const computedBgColor = () => {
-    let bgColorArray = []
-    if (bgColor) {
-      const bgString = bgColor.split("bg-")[1] || bgColor.split("bg-")[0]
-      bgColorArray.push(`bg-${bgString}`)
-    } else {
-      bgColorArray.push("bg-light-200")
-    }
-    if (bgCheckedColor) {
-      const bgString =
-        bgCheckedColor.split("bg-")[1] || bgCheckedColor.split("bg-")[0]
-      bgColorArray.push(`peer-checked:bg-${bgString}`)
-    } else {
-      bgColorArray.push("peer-checked:bg-primary-400")
-    }
-    return bgColorArray.join(" ")
-  }
-
-  const computedToggleColor = () => {
-    let colorArray = []
-    if (color) {
-      const colorString = color.split("text-")[1] || color.split("text-")[0]
-      colorArray.push(`text-${colorString}`)
-    } else {
-      color = "bg-primary-400"
-    }
-    if (checkedColor) {
-      const colorString =
-        checkedColor.split("text-")[1] || checkedColor.split("text-")[0]
-      colorArray.push(`checked:text-${colorString}`)
-    }
-    return colorArray.join(" ")
-  }
-
+  const {
+    borderPx = 0,
+    makClassName,
+    bgVariant,
+    colorVariant,
+    borderVariant,
+  } = computedProps
+  toggleColor = ensureUtilityClass("bg", colorVariant || toggleColor)
+  toggleCheckedColor = ensureUtilityClass(
+    "bg",
+    colorVariant || toggleCheckedColor
+  )
+  bgColor = ensureUtilityClass("bg", bgVariant || bgColor)
+  bgCheckedColor = ensureUtilityClass("bg", bgVariant || bgCheckedColor)
+  toggleBorder = ensureUtilityClass("border", borderVariant || toggleBorder)
   return (
     <span className="flex items-center">
-      <label className="relative inline-flex items-center cursor-pointer">
+      <label className="group relative inline-flex items-center cursor-pointer">
         <input
           type="checkbox"
           checked={checkedProp}
@@ -78,18 +73,20 @@ const ToggleComponent = ({
             onChange && onChange(e)
           }}
         />
-        <DummyStyledElement className="peer">hi</DummyStyledElement>
-        <span className="size-4 bg-red-500 peer-checked:bg-blue-500" />
 
         <mak.span
-          className="w-12 h-6 rounded-full items-center flex"
-          makClassName={computedBgColor()}
+          className={`relative w-12 h-6 rounded-full items-center flex fade-in-out mak(text-primary)`}
+          makClassName={`${checkedProp ? bgColor : bgCheckedColor}`}
+          style={{ borderWidth: `${borderPx}px` }}
         >
           <mak.span
-            className={`size-[20px] flex rounded-full mx-0.5 transition duration-100 ease-in-out ${
-              checkedProp ? "translate-x-6" : "translate-x-0"
-            }`}
-            makClassName={computedToggleColor()}
+            className={`size-[20px] flex rounded-full mx-0 transition duration-100 ease-in-out ${
+              checkedProp && !disabled
+                ? "translate-x-[26px]"
+                : "translate-x-[2px]"
+            } ${toggleBorderPx > 0 ? `${toggleBorder}` : ""}`}
+            makClassName={`${checkedProp ? toggleColor : toggleCheckedColor}`}
+            style={{ borderWidth: `${toggleBorderPx}px` }}
           />
         </mak.span>
       </label>

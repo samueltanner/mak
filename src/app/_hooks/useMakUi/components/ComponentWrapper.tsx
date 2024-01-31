@@ -1,20 +1,6 @@
-import {
-  makUiThemeVariants,
-  makUiThemeVariantsSet,
-  makUiVariantsSet,
-} from "../constants/ui-constants"
 import { useMakUi } from "../context/MakUiContext"
-import {
-  objectToClassName,
-  parseClassNameToStyleObject,
-} from "../functions/helpers"
+import { parseClassNameToStyleObject } from "../functions/helpers"
 import { TypeProps, ComponentWrapperResponse } from "../types/component-types"
-import {
-  MakUiStateKey,
-  MakUiThemeVariantKey,
-  MakUiVariantKey,
-  TailwindModifier,
-} from "../types/ui-types"
 import { withComputedProps } from "./componentTypeProps"
 
 type ComponentWrapperProps = TypeProps & {
@@ -60,6 +46,7 @@ export const componentWrapperLogic = ({
     color: colorProps,
     text: textProps,
     border: borderProps,
+    bg: bgProps,
     className,
     makClassName,
     ...restWithComputedProps
@@ -110,8 +97,17 @@ export const componentWrapperLogic = ({
       : borderClassName
   }
 
-  const { styleObject, twClassNames } = parseClassNameToStyleObject({
-    className: className,
+  if (bgProps) {
+    const bgClassName = `bg-${bgProps}`
+    makClassName = makClassName ? `${makClassName} ${bgClassName}` : bgClassName
+  }
+
+  const {
+    styleObject,
+    twClassName,
+    makClassName: makClassNames,
+  } = parseClassNameToStyleObject({
+    className,
     makClassName,
     activeTheme,
   })
@@ -127,8 +123,14 @@ export const componentWrapperLogic = ({
     globalThemeMode: makTheme,
     globalTheme: makVerboseTheme,
     globalPalette: makVerbosePalette,
-    className: twClassNames,
-    makClassName,
+    twClassName,
+    makClassName: makClassNames,
+    modeVariant: themeMode,
+    themeVariant: themeProps,
+    colorVariant: colorProps,
+    textVariant: textProps,
+    borderVariant: borderProps,
+    bgVariant: bgProps,
     ...restWithComputedProps,
   }
 
