@@ -38,6 +38,8 @@ export const typeProps: TypeProps = {
   danger: false,
   info: false,
   custom: false,
+  dark: false,
+  light: false,
   variant: "primary",
   variantShade: 500,
   variantOpacity: 100,
@@ -51,6 +53,8 @@ export const typeProps: TypeProps = {
   textDanger: false,
   textInfo: false,
   textCustom: false,
+  textLight: false,
+  textDark: false,
   text: "primary",
   textShade: 500,
   textOpacity: 100,
@@ -79,6 +83,8 @@ export const typeProps: TypeProps = {
   borderDanger: false,
   borderInfo: false,
   borderCustom: false,
+  borderLight: false,
+  borderDark: false,
   border: "primary",
   borderShade: 500,
   borderOpacity: 100,
@@ -87,7 +93,8 @@ export const typeProps: TypeProps = {
   borderPx: undefined,
   className: undefined,
   makClassName: undefined,
-  state: [],
+  height: undefined,
+  width: undefined,
 }
 
 const getThemeModeValue = (props: TypeProps): MakUiThemeKey | undefined => {
@@ -124,6 +131,8 @@ const getColorValue = (props: TypeProps) => {
   if (props.danger) return "danger"
   if (props.info) return "info"
   if (props.custom) return "custom"
+  if (props.light) return "light"
+  if (props.dark) return "dark"
   return undefined
 }
 
@@ -138,6 +147,8 @@ const getBorderValue = (props: TypeProps) => {
   if (props.borderDanger) return "danger"
   if (props.borderInfo) return "info"
   if (props.borderCustom) return "custom"
+  if (props.borderLight) return "light"
+  if (props.borderDark) return "dark"
   return undefined
 }
 
@@ -152,6 +163,8 @@ const getTextValue = (props: TypeProps) => {
   if (props.textDanger) return "danger"
   if (props.textInfo) return "info"
   if (props.textCustom) return "custom"
+  if (props.textLight) return "light"
+  if (props.textDark) return "dark"
   return undefined
 }
 
@@ -205,9 +218,10 @@ export const withComputedProps = (
       typeProps.variantShade
     ),
     borderShade: allowFalsyFallback(props.borderShade, typeProps.borderShade),
-    state: allowFalsyFallback(props.state, typeProps.state),
     borderPx: allowFalsyFallback(props.borderPx, typeProps.borderPx),
     className: props.className,
     makClassName: props.makClassName,
+    height: props.height,
+    width: props.width,
   }
 }

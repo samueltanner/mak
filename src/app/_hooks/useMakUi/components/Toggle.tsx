@@ -32,6 +32,7 @@ type ToggleProps = TypeProps & {
   bgCheckedColor?: string
   toggleBorderPx?: number
   toggleBorder?: string
+  toggleHoverColor?: string
 }
 
 const ToggleComponent = ({
@@ -44,6 +45,7 @@ const ToggleComponent = ({
   bgCheckedColor = bgColor,
   toggleBorderPx = 0,
   toggleBorder = "border-light-200",
+  toggleHoverColor = "bg-primary-200",
   ...computedProps
 }: ToggleProps & ComponentWrapperResponse) => {
   const { borderPx = 0, bgVariant, colorVariant, borderVariant } = computedProps
@@ -55,6 +57,7 @@ const ToggleComponent = ({
   bgColor = ensureUtilityClass("bg", bgVariant || bgColor)
   bgCheckedColor = ensureUtilityClass("bg", bgVariant || bgCheckedColor)
   toggleBorder = ensureUtilityClass("border", borderVariant || toggleBorder)
+  toggleHoverColor = ensureUtilityClass("bg", toggleHoverColor)
   return (
     <span className="flex items-center">
       <label className="group relative inline-flex items-center cursor-pointer">
@@ -76,12 +79,12 @@ const ToggleComponent = ({
           style={{ borderWidth: `${borderPx}px`, opacity: disabled ? 0.5 : 1 }}
         >
           <mak.span
-            className={`size-[20px] flex rounded-full mx-0 transition duration-100 ease-in-out ${
+            className={`size-[20px] flex rounded-full mx-0 transition duration-100 ease-in-out fade-in-out ${
               checkedProp && !disabled
                 ? "translate-x-[26px]"
                 : "translate-x-[2px]"
             } ${toggleBorderPx > 0 ? `${toggleBorder}` : ""}`}
-            makClassName={`${checkedProp ? toggleColor : toggleCheckedColor}`}
+            makClassName={`${checkedProp ? toggleColor : toggleCheckedColor} hover:${toggleHoverColor}`}
             style={{ borderWidth: `${toggleBorderPx}px` }}
           />
         </mak.span>

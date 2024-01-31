@@ -6,6 +6,7 @@ import styled from "@emotion/styled"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 import StyledComponent from "../_hooks/useMakUi/elements/ts/StyledComponent"
 import Toggle from "../_hooks/useMakUi/components/Toggle"
+import { AnimatePresence } from "framer-motion"
 
 interface StyledElementProps {
   color: string
@@ -42,6 +43,21 @@ const ConditionalStyledComponent = styled.div({
   },
 })
 
+const divVariants = {
+  hidden: {
+    opacity: 0,
+    height: 0,
+  },
+  visible: {
+    opacity: 1,
+    height: "fit-content",
+  },
+  exit: {
+    opacity: 0,
+    height: 0,
+  },
+}
+
 const DummyPage = () => {
   const [toggle, setToggle] = useState<boolean>(false)
   const [color, setColor] = useState<string>("red")
@@ -55,16 +71,13 @@ const DummyPage = () => {
   return (
     <div>
       <h1>Test Page</h1>
-      <Toggle
-        checked={toggle}
-        onChange={() => setToggle(!toggle)}
-        darkMode
-        // primary
-        // secondary
-        // border="primary-500"
-        // bgColor="#854d0e"
-        // bgCheckedColor="blue-500"
-      />
+      <button
+        onClick={() => {
+          setToggle(!toggle)
+        }}
+      >
+        toggle
+      </button>
     </div>
   )
 }

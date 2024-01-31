@@ -12,7 +12,7 @@ import styled from "@emotion/styled"
 export default function Home() {
   const { simplePalette, simpleTheme, verbosePalette, verboseTheme } =
     useMakUi()
-
+  console.log(verbosePalette)
   const divStyle = css({
     backgroundColor: "red",
   })

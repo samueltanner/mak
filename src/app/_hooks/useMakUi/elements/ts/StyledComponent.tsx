@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import { GenericObject } from "../../types/ui-types"
+import { motion } from "framer-motion"
 
 // Define the base styled component
 const BaseStyledComponent = styled.div<any>(({ styleObject }) => ({

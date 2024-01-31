@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
 import Toggle from "../_hooks/useMakUi/components/Toggle"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
-import { MakUiVariantKey } from "../_hooks/useMakUi/types/ui-types"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 
 const ButtonListView = () => {
   const { simpleTheme, verboseTheme } = useMakUi()
 
-  const { theme, color, text, border } = simpleTheme
+  const { theme, color, text, border } = verboseTheme
 
   const [outlined, setOutlined] = useState(false)
 
@@ -18,22 +17,28 @@ const ButtonListView = () => {
         return (
           <Button
             key={index}
-            outline={outlined}
-            buttonType={cName as MakUiVariantKey}
-            textLight={!outlined && cName !== "light"}
-            textDark={cName === "light"}
-            borderCustom={cName === "light"}
+            text={cName}
+            bg={cName}
+            border={cName}
+            outlined={outlined}
+            // borderPx={2}
+            // buttonType={cName as MakUiVariantKey}
+            // textLight={!outlined && cName !== "light"}
+            // textDark={cName === "light"}
+            // borderCustom={cName === "light"}
+            // disabled
           >
             <span className="capitalize">{cName}</span>
           </Button>
         )
       })}
+
       <div className="flex flex-shrink-0 gap-2 items-center justify-center ml-3">
         <mak.span
           className={`size-5 rounded-md fade-in-out cursor-pointer mak(${
             !outlined ? "bg-primary" : "bg-custom"
-          } hover:bg-red-500)`}
-          onClick={() => setOutlined(!outlined)}
+          } hover:bg-primary-500/70)`}
+          onClick={() => setOutlined(false)}
         />
 
         <Toggle
@@ -43,9 +48,10 @@ const ButtonListView = () => {
         />
 
         <mak.span
-          className={`size-5 rounded-md border-4 fade-in-out mak(${
+          className={`size-5 rounded-md border-4 fade-in-out cursor-pointer mak(${
             outlined ? "border-primary" : "border-custom"
-          })`}
+          } hover:border-primary-500/70)`}
+          onClick={() => setOutlined(true)}
         />
       </div>
     </div>

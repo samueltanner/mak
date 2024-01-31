@@ -19,11 +19,17 @@ export const ModalView = () => {
         onClose={() => {
           setModalIsOpen(false)
         }}
-        className={`bg-${simpleTheme.theme.secondary[500]} h-10 rounded-md select-none text-${simpleTheme.text.primary["500"]} px-6 py-4 flex gap-6 drop-shadow-md`}
-        backdropClassName="backdrop-blur-sm bg-black bg-opacity-10"
+        className={`h-10 rounded-md select-none px-6 py-4 flex gap-6 drop-shadow-md`}
+        makClassName="bg-theme|secondary"
+        backdropClassName="backdrop-blur-sm"
+        backDropMakClassName="bg-dark-900/50"
       >
-        <ModalHeader className="text-md font-semibold">Lorem ipsum</ModalHeader>
-        <ModalContent className={`text-md font-normal `}>
+        <ModalHeader className="text-md font-semibold"
+          makClassName="text-primary-500"
+        >Lorem ipsum</ModalHeader>
+        <ModalContent className={`text-md font-normal`}
+          makClassName="text-primary"
+        >
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
           tempora accusantium ipsum, veniam dolores explicabo deserunt suscipit
           possimus, error nihil adipisci animi hic nam molestiae voluptatum
@@ -32,9 +38,9 @@ export const ModalView = () => {
         <ModalFooter className="text-md font-semibold">
           <Button
             custom
-            outline
+            outlined
             onClick={() => setModalIsOpen(!modalIsOpen)}
-            showFocusRing={false}
+            // showFocusRing={false}
           >
             Close
           </Button>
@@ -44,9 +50,10 @@ export const ModalView = () => {
         onClick={() => {
           setModalIsOpen(true)
         }}
-        showFocusRing={false}
-        dark
+        // showFocusRing={false}
+        borderDark
         textLight
+        width="w-fit"
       >
         Open Modal
       </Button>

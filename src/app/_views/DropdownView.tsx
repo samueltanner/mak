@@ -15,15 +15,15 @@ const DropdownView = () => {
   return (
     <div className="flex gap-4 items-center">
       <Button
-        primary
+        bgPrimary
         textLight
-        keepStatusVisible
-        isLoading={buttonState === "loading"}
-        isSuccess={buttonState === "success"}
-        isError={buttonState === "error"}
-        error={buttonState === "error"}
-        success={buttonState === "success"}
-        info={buttonState === "loading"}
+        // keepStatusVisible
+        // isLoading={buttonState === "loading"}
+        // isSuccess={buttonState === "success"}
+        // isError={buttonState === "error"}
+        // error={buttonState === "error"}
+        // success={buttonState === "success"}
+        // info={buttonState === "loading"}
       >
         <span className="capitalize">{buttonState}</span>
       </Button>

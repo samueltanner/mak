@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 import React, { useContext, createContext } from "react"
 import { BiSolidDownArrowCircle, BiXCircle } from "react-icons/bi"
 import { motion, AnimatePresence } from "framer-motion"
-
+import { mak } from "../elements/ts/mak"
 const ModalContext = createContext<{
   onClose?: () => void
   onOpen?: () => void
@@ -15,34 +15,39 @@ const ModalContext = createContext<{
 const ModalBackDrop = ({
   onClose,
   className,
+  makClassName,
 }: {
   onClose: () => void
   className?: string
+  makClassName?: string
 }) => {
   return (
-    <motion.div
+    <mak.div
       key="blur"
       onClick={onClose}
       className={`absolute left-0 top-0 z-40 h-screen w-screen fade-in-out ${className}`}
-      initial={{
-        opacity: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: 10,
+      makClassName={makClassName}
+      motion={{
+        initial: {
+          opacity: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 10,
+        },
+        animate: {
+          opacity: 1,
+          width: "100%",
+          height: "100%",
+          zIndex: 10,
+        },
+        exit: {
+          opacity: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 10,
+        },
+        transition: { duration: 0.2 },
       }}
-      animate={{
-        opacity: 1,
-        width: "100%",
-        height: "100%",
-        zIndex: 10,
-      }}
-      exit={{
-        opacity: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: 10,
-      }}
-      transition={{ duration: 0.2 }}
     />
   )
 }
@@ -50,24 +55,31 @@ const ModalBackDrop = ({
 export const ModalContent = ({
   children,
   className,
+  makClassName,
 }: {
   children: React.ReactNode
   className?: string
+  makClassName?: string
 }) => {
   return (
-    <div className={`flex h-full w-full overflow-auto ${className}`}>
+    <mak.div
+      className={`flex h-full w-full overflow-auto ${className}`}
+      makClassName={makClassName}
+    >
       {children}
-    </div>
+    </mak.div>
   )
 }
 
 export const ModalHeader = ({
   children,
   className,
+  makClassName,
 }: {
   hideClose?: boolean
   children: React.ReactNode
   className?: string
+  makClassName?: string
 }) => {
   const { onClose } = useContext(ModalContext)
 
@@ -75,17 +87,27 @@ export const ModalHeader = ({
     throw new Error("ModalHeader must be used within a Modal")
   }
 
-  return <div className={className}>{children}</div>
+  return (
+    <mak.div className={className} makClassName={makClassName}>
+      {children}
+    </mak.div>
+  )
 }
 
 export const ModalFooter = ({
   children,
   className,
+  makClassName,
 }: {
   children: React.ReactNode
   className?: string
+  makClassName?: string
 }) => {
-  return <div className={className}>{children}</div>
+  return (
+    <mak.div className={className} makClassName={makClassName}>
+      {children}
+    </mak.div>
+  )
 }
 
 const Modal = ({
@@ -95,7 +117,9 @@ const Modal = ({
   onOpen,
   width,
   className,
+  makClassName,
   backdropClassName,
+  backDropMakClassName,
 }: {
   children: React.ReactNode
   isOpen: boolean | string | number
@@ -103,7 +127,9 @@ const Modal = ({
   onOpen?: () => void
   width?: "sm" | "md" | "lg" | "xl" | "2xl"
   className?: string
+  makClassName?: string
   backdropClassName?: string
+  backDropMakClassName?: string
 }) => {
   const [showButton, setShowButton] = React.useState(true)
 
@@ -205,21 +231,28 @@ const Modal = ({
     >
       <AnimatePresence>
         {isOpen && (
-          <motion.div className="absolute left-0 top-0 z-50 flex h-screen w-screen items-center justify-center">
-            <motion.div
+          <div className="absolute left-0 top-0 z-50 flex h-screen w-screen items-center justify-center">
+            <mak.div
               className={`relative flex flex-col overflow-hidden ${className}`}
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              transition={{ duration: 0.2 }}
+              makClassName={makClassName}
+              motion={{
+                initial: "hidden",
+                animate: "visible",
+                exit: "exit",
+                variants: modalVariants,
+                transition: { duration: 0.2 },
+              }}
               ref={containerRef}
               onScroll={handleScroll}
             >
               {children}
-            </motion.div>
-            <ModalBackDrop onClose={onClose} className={backdropClassName} />
-          </motion.div>
+            </mak.div>
+            <ModalBackDrop
+              onClose={onClose}
+              className={backdropClassName}
+              makClassName={backDropMakClassName}
+            />
+          </div>
         )}
       </AnimatePresence>
     </ModalContext.Provider>

@@ -5,9 +5,10 @@ import { forwardRef, ReactNode, useMemo, memo } from "react"
 import { useMakUi } from "../../context/MakUiContext"
 import { MakUiElementProps } from "./mak-custom-types"
 import { componentWrapperLogic } from "../../components/ComponentWrapper"
-import styled from "@emotion/styled"
-import { GenericObject } from "../../types/ui-types"
 import StyledComponent from "./StyledComponent"
+import { isEmptyObject } from "../../../../../globals/global-helper-functions"
+import StyledMotionComponent from "./StyledMotionComponent"
+import { AnimatePresence } from "framer-motion"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -17,7 +18,7 @@ type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
 
 const MakComponent = memo(
   forwardRef<HTMLElement, HTMLMakComponentProps<keyof JSX.IntrinsicElements>>(
-    ({ component, ...props }, ref) => {
+    ({ component, motion, ...props }, ref) => {
       const makUi = useMakUi()
       const response = useMemo(() => {
         return componentWrapperLogic({
@@ -41,6 +42,20 @@ const MakComponent = memo(
       const inlineStyles = {
         ...baseClassObject,
         ...pseudoClassObject,
+      }
+      const isMotionObject = motion && !isEmptyObject(motion)
+
+      if (isMotionObject) {
+        console.log("motion", motion)
+        return (
+          <StyledMotionComponent
+            styleObject={inlineStyles}
+            as={component}
+            motionProps={motion}
+            className={twClassName}
+            {...allProps}
+          />
+        )
       }
 
       return (

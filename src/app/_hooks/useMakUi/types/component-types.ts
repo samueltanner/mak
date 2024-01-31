@@ -109,6 +109,8 @@ export type TypeProps = {
   danger?: boolean
   info?: boolean
   custom?: boolean
+  light?: boolean
+  dark?: boolean
   variant?: MakUiVariantKey | string | undefined
   variantShade?: Shade | undefined
   variantOpacity?: number | undefined
@@ -154,6 +156,8 @@ export type TypeProps = {
   borderDanger?: boolean
   borderInfo?: boolean
   borderCustom?: boolean
+  borderLight?: boolean
+  borderDark?: boolean
   border?: MakUiVariantKey | string | undefined
   borderShade?: Shade | undefined
   borderOpacity?: number | undefined
@@ -162,7 +166,8 @@ export type TypeProps = {
   borderPx?: number
   className?: string
   makClassName?: string
-  state?: MakUiStateKey[]
+  height?: string
+  width?: string
 }
 
 export type WithComponentPropsResponse = {
@@ -183,11 +188,11 @@ export type WithComponentPropsResponse = {
   variantShade: Shade | undefined
   borderShade: Shade | undefined
 
-  state: MakUiStateKey[] | undefined
-
   borderPx: number | undefined
   className: string | undefined
   makClassName: string | undefined
+  height: string | undefined
+  width: string | undefined
 }
 
 export type ObjectToClassNameObjectProp = {

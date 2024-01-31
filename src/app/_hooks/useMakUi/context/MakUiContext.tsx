@@ -101,8 +101,6 @@ const MakUiProviderChild = ({
   useEffect(() => {
     if (paletteInputRef.current !== JSON.stringify(paletteInput)) {
       paletteInputRef.current = JSON.stringify(paletteInput)
-      console.log("palette input changed")
-      console.log(paletteInputRef.current)
     }
     return
   }, [JSON.stringify(paletteInput)])
@@ -214,7 +212,6 @@ const MakUiProviderChild = ({
   }, [componentConfig, enabledThemeModes])
 
   const palettesMemo = useMemo(() => {
-    console.log("palette memo")
     const { verbose, simple } =
       paletteFactory({
         paletteInput: paletteInput as MakUiFlexiblePaletteInput,

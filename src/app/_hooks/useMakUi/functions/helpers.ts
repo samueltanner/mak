@@ -109,6 +109,11 @@ export const constructTailwindObject = ({
     tailwindColors[i] = getColor(i)
   }
 
+  if (includeNearAbsolutes) {
+    tailwindColors[50] = getColor(50)
+    tailwindColors[950] = getColor(950)
+  }
+
   if (includeBlackAndWhite) {
     tailwindColors[0] = whiteHex
     tailwindColors[1000] = blackHex
@@ -649,7 +654,6 @@ export const concatNestedKeys = (
   let result: NestedObject = {}
 
   Object.keys(obj).forEach((key) => {
-    // Construct the new key using the prefix
     const newKey = prefix ? `${prefix}-${key}` : key
 
     if (
@@ -657,48 +661,14 @@ export const concatNestedKeys = (
       obj[key] !== null &&
       !Array.isArray(obj[key])
     ) {
-      // If the value is a nested object, call the function recursively
       Object.assign(result, concatNestedKeys(obj[key], newKey))
     } else {
-      // Otherwise, add the key-value pair to the result
       result[newKey] = obj[key]
     }
   })
 
   return result
 }
-
-// export const getTwColor = (
-//   hex: string,
-//   objectToCheck?: NestedObject | GenericObject
-// ) => {
-//   if (objectToCheck) {
-//     const concatObject = concatNestedKeys(objectToCheck)
-//     const customColor = Object.entries(concatObject).find(([key, value]) => {
-//       return value === hex
-//     })?.[0]
-//     if (customColor) {
-//       return customColor
-//     }
-//   }
-//   const twConfigColors = twConfig?.theme?.extend?.colors as TailwindCustomColors
-
-//   const customColorsObj = concatNestedKeys(twConfigColors || {})
-//   const customColor = Object.entries(customColorsObj).find(([key, value]) => {
-//     return value === hex
-//   })?.[0]
-//   if (customColor) {
-//     return customColor
-//   }
-//   const twColorsObj = concatNestedKeys(colors)
-
-//   const twColor = Object.entries(twColorsObj).find(([key, value]) => {
-//     return value === hex
-//   })?.[0]
-//   if (twColor) {
-//     return twColor
-//   }
-// }
 
 export const getTwHex = ({
   colorString,
@@ -1424,6 +1394,7 @@ const parseMakClassNames = ({
       let mcn: string | undefined
       let opacity = undefined
       let color
+      let altPaletteVariant: MakUiPaletteKey | undefined = undefined
 
       const keyMap = {
         bg: "backgroundColor",
@@ -1442,12 +1413,19 @@ const parseMakClassNames = ({
       variant =
         (mcn?.split("-")[1] as MakUiVariantKey) ||
         ("primary" as MakUiVariantKey)
+
+      if (variant.includes("|")) {
+        const splitVariant = variant.split("|")
+        variant = splitVariant[1] as MakUiVariantKey
+        altPaletteVariant = splitVariant[0] as MakUiPaletteKey
+      }
+
       const shadeString = mcn?.split("-")[2] || "500"
       shade = Number(shadeString) as Shade
 
-      if (paletteVariant !== "theme") {
-        color = activeTheme?.[paletteVariant]?.[variant]?.[shade]
-
+      let resolvedVariant = altPaletteVariant || paletteVariant
+      if (resolvedVariant !== "theme") {
+        color = activeTheme?.[resolvedVariant]?.[variant]?.[shade]
         if (!color) {
           let twKey = mcn
           twKey = twKey.split("-").slice(1).join("-")

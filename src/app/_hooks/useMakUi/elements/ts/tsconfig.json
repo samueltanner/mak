@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
     "skipLibCheck": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "paths": {
+      "@/*": ["../../../../../../src/*"],
+      "@ui-helpers/*": ["./src/app/_hooks/useMakUi/functions/helpers/*"],
+      "@globals/*": ["../../../../../globals/*"]
+    }
   },
-
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

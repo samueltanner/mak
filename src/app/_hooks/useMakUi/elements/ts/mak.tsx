@@ -2,6 +2,7 @@
 
 import { MakComponent } from "./MakComponent"
 import { MakUiElementProps } from "./mak-custom-types"
+import { MotionProps } from "framer-motion"
 
 type ExtendedHTMLElement<K extends keyof JSX.IntrinsicElements> =
   React.ComponentType<JSX.IntrinsicElements[K] & MakUiElementProps>
