@@ -1,6 +1,7 @@
 import { useMakUi } from "../context/MakUiContext"
 import { parseClassNameToStyleObject } from "../functions/helpers"
 import { TypeProps, ComponentWrapperResponse } from "../types/component-types"
+import { MakUiVariantKey } from "../types/ui-types"
 import { withComputedProps } from "./componentTypeProps"
 
 type ComponentWrapperProps = TypeProps & {
@@ -127,10 +128,10 @@ export const componentWrapperLogic = ({
     makClassName: makClassNames,
     modeVariant: themeMode,
     themeVariant: themeProps,
-    colorVariant: colorProps,
-    textVariant: textProps,
-    borderVariant: borderProps,
-    bgVariant: bgProps,
+    colorVariant: colorProps as MakUiVariantKey | undefined,
+    textVariant: textProps as MakUiVariantKey | undefined,
+    borderVariant: borderProps as MakUiVariantKey | undefined,
+    bgVariant: bgProps as MakUiVariantKey | undefined,
     ...restWithComputedProps,
   }
 

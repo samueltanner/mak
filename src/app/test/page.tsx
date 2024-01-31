@@ -59,7 +59,8 @@ const DummyPage = () => {
         checked={toggle}
         onChange={() => setToggle(!toggle)}
         darkMode
-        custom
+        // primary
+        // secondary
         // border="primary-500"
         // bgColor="#854d0e"
         // bgCheckedColor="blue-500"

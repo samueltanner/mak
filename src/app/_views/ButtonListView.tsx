@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
 import Toggle from "../_hooks/useMakUi/components/Toggle"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
@@ -39,6 +39,7 @@ const ButtonListView = () => {
         <Toggle
           checked={outlined}
           onChange={() => setOutlined(!outlined)}
+          // disabled
         />
 
         <mak.span

@@ -27,8 +27,8 @@ const StyledComponent = ({ as: Component = "div", styleObject, ...props }) => {
       as={Component}
       styleObject={styleObject}
       className={props.className}
-      data-makClass={props.makClassName}
-      data-makStyle={formattedStyleString}
+      data-mak-class={props.makClassName}
+      data-mak-style={formattedStyleString}
       {...props}
     />
   )

@@ -15,23 +15,6 @@ type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
     children?: ReactNode
   } & JSX.IntrinsicElements[K]
 
-const createStyledElement = memoize((styleObject: GenericObject) => {
-  return styled.span({
-    ...styleObject,
-  })
-})
-
-function memoize(fn: any) {
-  const cache = {}
-  return function (...args: any[]) {
-    const key = JSON.stringify(args)
-    if (!cache[key]) {
-      cache[key] = fn(...args)
-    }
-    return cache[key]
-  }
-}
-
 const MakComponent = memo(
   forwardRef<HTMLElement, HTMLMakComponentProps<keyof JSX.IntrinsicElements>>(
     ({ component, ...props }, ref) => {

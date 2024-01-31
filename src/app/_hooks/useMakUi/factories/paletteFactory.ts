@@ -32,7 +32,6 @@ export const paletteFactory = ({
 }: {
   paletteInput: MakUiFlexiblePaletteInput
   enabledThemeModes: MakUiThemeKey[]
-  enabledInteractionStates: MakUiInteractionStateKey[]
   defaultShades: MakUiThemeShades
   shadeStep: ShadeStep
   includeBlackAndWhite: boolean

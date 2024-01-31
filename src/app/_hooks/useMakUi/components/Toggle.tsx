@@ -46,13 +46,7 @@ const ToggleComponent = ({
   toggleBorder = "border-light-200",
   ...computedProps
 }: ToggleProps & ComponentWrapperResponse) => {
-  const {
-    borderPx = 0,
-    makClassName,
-    bgVariant,
-    colorVariant,
-    borderVariant,
-  } = computedProps
+  const { borderPx = 0, bgVariant, colorVariant, borderVariant } = computedProps
   toggleColor = ensureUtilityClass("bg", colorVariant || toggleColor)
   toggleCheckedColor = ensureUtilityClass(
     "bg",
@@ -75,9 +69,11 @@ const ToggleComponent = ({
         />
 
         <mak.span
-          className={`relative w-12 h-6 rounded-full items-center flex fade-in-out mak(text-primary)`}
+          className={`relative w-12 h-6 rounded-full items-center flex fade-in-out ${
+            disabled ? "cursor-not-allowed" : "cursor-pointer"
+          }`}
           makClassName={`${checkedProp ? bgColor : bgCheckedColor}`}
-          style={{ borderWidth: `${borderPx}px` }}
+          style={{ borderWidth: `${borderPx}px`, opacity: disabled ? 0.5 : 1 }}
         >
           <mak.span
             className={`size-[20px] flex rounded-full mx-0 transition duration-100 ease-in-out ${

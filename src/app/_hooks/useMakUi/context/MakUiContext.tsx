@@ -97,7 +97,18 @@ const MakUiProviderChild = ({
   defaultTheme = "light",
   paletteGenProps = defaultPaletteGenProps,
 }: MakUiProviderProps) => {
+  const paletteInputRef = React.useRef<string>()
+  useEffect(() => {
+    if (paletteInputRef.current !== JSON.stringify(paletteInput)) {
+      paletteInputRef.current = JSON.stringify(paletteInput)
+      console.log("palette input changed")
+      console.log(paletteInputRef.current)
+    }
+    return
+  }, [JSON.stringify(paletteInput)])
+
   let { theme: themeMode, setTheme: setThemeMode } = useTheme()
+
   const mergedPaletteGenProps = deepMerge(
     defaultPaletteGenProps,
     paletteGenProps
@@ -203,11 +214,11 @@ const MakUiProviderChild = ({
   }, [componentConfig, enabledThemeModes])
 
   const palettesMemo = useMemo(() => {
+    console.log("palette memo")
     const { verbose, simple } =
       paletteFactory({
         paletteInput: paletteInput as MakUiFlexiblePaletteInput,
         enabledThemeModes,
-        enabledInteractionStates,
         defaultShades: themeShades!,
         shadeStep: shadeStep!,
         includeBlackAndWhite: includeBlackAndWhite!,
@@ -220,7 +231,7 @@ const MakUiProviderChild = ({
       simplePalette: simple as MakUiSimplePalette,
       verbosePalette: verbose as MakUiVerbosePalette,
     }
-  }, [JSON.stringify(paletteInput), enabledThemeModes])
+  }, [paletteInputRef])
 
   const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>(
     {} as MakUiSimpleTheme
@@ -237,8 +248,6 @@ const MakUiProviderChild = ({
     setTheme(themeMode as MakUiThemeKey)
   }, [themeMode])
 
-  // const [safeList, setSafeList] = useState<any[]>([])
-
   const formattingThemes =
     isEmptyObject(simpleTheme) ||
     isEmptyObject(verboseTheme) ||
@@ -253,34 +262,6 @@ const MakUiProviderChild = ({
   }, [themeMode, currentTheme])
 
   const { simplePalette, verbosePalette } = palettesMemo
-
-  // useEffect(() => {
-  //   const safeList = getTwConfigSafelist({
-  //     simplePalette,
-  //     enabledTwVariants,
-  //   })
-
-  //   setSafeList(safeList)
-  // }, [])
-
-  // const getSafeList = () => {
-  //   console.log(
-  //     "********************************************************************************************"
-  //   )
-  //   console.log(
-  //     "Copy this to your tailwind.config.js safelist array at the root level of the config object."
-  //   )
-  //   console.log(
-  //     "Please note that this contains stringified regex patterns. You will need to remove the quotes before and after each 'pattern' value."
-  //   )
-  //   console.log(
-  //     "If you add any additional colors, interaction states or need access to additional tailwind variants, you will need to add them to your palette input and/or the enabledStates array in your component config (or in the global enabled states passed as a prop to the MakUi context provider)."
-  //   )
-  //   console.log(JSON.stringify(safeList, null, 2))
-  //   console.log(
-  //     "********************************************************************************************"
-  //   )
-  // }
 
   const value = {
     simplePalette,
