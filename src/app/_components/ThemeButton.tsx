@@ -1,6 +1,7 @@
 import { BiParty, BiSolidMoon, BiSun } from "react-icons/bi"
 import Button from "../_hooks/useMakUi/components/Button"
 import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
+import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 
 const ThemeButton = () => {
   const {
@@ -13,8 +14,8 @@ const ThemeButton = () => {
   } = useMakUi()
   return (
     <Button
-      primary
-      outline
+      bgLight
+      outlined
       onClick={() => {
         setTheme(
           isDark
@@ -24,25 +25,19 @@ const ThemeButton = () => {
             : "dark"
         )
       }}
-      showFocusRing={false}
+      // showFocusRing={false}
     >
-      {isDark && (
-        <BiSun
-          className={`size-6 text-${simpleTheme.text.primary.base} hover:text-${simpleTheme.color.primary.base} fade-in-out`}
-        />
-      )}
-      {isLight && (
-        <BiSolidMoon
-          // className="text-zinc-500 group-hover:text-blue-500"
+      <mak.span makClassName="*:text-primary">
+        {isDark && <BiSun className={`size-6 fade-in-out`} />}
+        {isLight && (
+          <BiSolidMoon
+            // className="text-zinc-500 group-hover:text-blue-500"
 
-          className={`size-6 text-${simpleTheme.text.primary.base} hover:text-${simpleTheme.color.primary.base} fade-in-out`}
-        />
-      )}
-      {isCustom && (
-        <BiParty
-          className={`size-6 text-${simpleTheme.text.primary.base} hover:text-${simpleTheme.color.primary.base}`}
-        />
-      )}
+            className={`size-6 fade-in-out`}
+          />
+        )}
+        {isCustom && <BiParty className={`size-6`} />}
+      </mak.span>
     </Button>
   )
 }

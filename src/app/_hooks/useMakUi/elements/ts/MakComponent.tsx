@@ -8,7 +8,6 @@ import { componentWrapperLogic } from "../../components/ComponentWrapper"
 import StyledComponent from "./StyledComponent"
 import { isEmptyObject } from "../../../../../globals/global-helper-functions"
 import StyledMotionComponent from "./StyledMotionComponent"
-import { AnimatePresence } from "framer-motion"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -26,9 +25,9 @@ const MakComponent = memo(
           makUi,
         })
       }, [props, makUi])
+
       const { styleObject, twClassName, makClassName, ...responseRest } =
         response
-
       const { baseClassObject = {}, pseudoClassObject = {} } = styleObject
 
       const allProps = {

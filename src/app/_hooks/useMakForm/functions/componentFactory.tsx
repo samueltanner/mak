@@ -1,8 +1,11 @@
-import { ButtonFieldConfig, SelectFieldConfig } from "../types/field-types";
+import { ButtonFieldConfig, SelectFieldConfig } from "../types/field-types"
 import DynamicComponent from "../DynamicComponent"
 import { FieldConfig } from "../types/field-types"
 import { FormAccessor } from "../useMakForm"
-import { DynamicComponentType } from "../types/component-types"
+import {
+  ComponentOutputType,
+  DynamicComponentType,
+} from "../types/component-types"
 
 export const getComponentName = (fieldName: string) => {
   const words = fieldName.split(/[\s-_]+/)
@@ -15,11 +18,13 @@ export const getComponentName = (fieldName: string) => {
 interface ComponentFactoryProps {
   formAccessor: FormAccessor
   name: string
+  outputType: ComponentOutputType
 }
 
 const componentFactory = ({
   formAccessor,
   name,
+  outputType,
 }: ComponentFactoryProps): DynamicComponentType => {
   const { form, setForm, setFormErrors, formIsCurrent } = formAccessor
   const config = form[name] as FieldConfig
@@ -71,7 +76,9 @@ const componentFactory = ({
       // ... existing logic for updating configuration
     }
 
-    return <DynamicComponent {...hookProps} {...props} />
+    return (
+      <DynamicComponent outputType={outputType} {...hookProps} {...props} />
+    )
   }
 
   ComponentWrapper.displayName = `${getComponentName(name)}`
@@ -100,13 +107,17 @@ const componentFactory = ({
 
 export default componentFactory
 
-const constructDynamicComponents = (formAccessor: FormAccessor) => {
+const constructDynamicComponents = (
+  formAccessor: FormAccessor,
+  outputType: ComponentOutputType
+) => {
   const { form, setForm, setFormErrors } = formAccessor
   return Object.keys(form || {}).reduce((acc, name) => {
     const componentName = getComponentName(name) as string
     const component = componentFactory({
       name,
       formAccessor,
+      outputType,
     })
 
     return {

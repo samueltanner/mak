@@ -1,3 +1,5 @@
+import { ComponentOutputType } from "../types/component-types"
+
 const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
 
@@ -67,6 +69,36 @@ const mergeWithFallback = (primary: any, fallback: any) => {
     }
   })
   return result
+}
+
+export const ensureSingleElementType = ({
+  useMakElements = true,
+  useHTMLComponents = false,
+  useMakComponents = false,
+}: {
+  useMakElements?: boolean
+  useHTMLComponents?: boolean
+  useMakComponents?: boolean
+}): ComponentOutputType => {
+  let elementTypeObject: { [Key in ComponentOutputType]: boolean } = {
+    makElements: useMakElements,
+    htmlElements: useHTMLComponents,
+    makComponents: useMakComponents,
+  }
+  if (useMakElements) {
+    elementTypeObject["htmlElements"] = false
+    elementTypeObject["makComponents"] = false
+  } else if (useHTMLComponents) {
+    elementTypeObject["makElements"] = false
+  }
+
+  if (!useMakComponents && !useHTMLComponents && !useMakElements) {
+    elementTypeObject["makElements"] = true
+  }
+
+  return Object.keys(elementTypeObject).find(
+    (key) => elementTypeObject[key as ComponentOutputType]
+  ) as ComponentOutputType
 }
 
 export { isEqual, isObject, mergeWithFallback, getDifference }

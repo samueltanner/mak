@@ -4,6 +4,8 @@ import handleChange from "./functions/handleChange"
 import { FieldConfig, OptionType } from "./types/field-types"
 import { InputChangeEvent } from "./types/event-types"
 import { mergeWithFallback } from "./functions/helpers"
+import { ComponentOutputType } from "./types/component-types"
+import { mak } from "../useMakUi/elements/ts/mak"
 
 export interface DynamicComponents {
   [key: string]: (props: { [key: string]: any }) => JSX.Element
@@ -28,6 +30,8 @@ type DynamicComponentProps = {
   labelKey?: string
   valueKey?: string
   selectFieldValue?: string
+
+  outputType?: ComponentOutputType
 }
 
 const DynamicComponent = (props: DynamicComponentProps) => {
@@ -43,7 +47,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     onClick,
 
     selectFieldValue,
-
+    outputType,
     ...otherProps
   } = props
   const updatedProps = mergeWithFallback(props, config)
@@ -51,6 +55,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
 
   const type = updatedProps.type
   const className = updatedProps.className
+  const makClassName = updatedProps.makClassName
   const value = updatedProps.value
   const defaultValue = updatedProps.defaultValue
   const placeholder = updatedProps.placeholder
@@ -84,19 +89,34 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     const onClickAction =
       onClick || isSubmit ? SubmitAction : isReset ? ResetAction : () => {}
 
-    return (
-      <button
-        value={value}
-        onClick={onClickAction}
-        className={className}
-        // {...otherProps}
-      >
-        {children ? children : otherProps.label}
-      </button>
-    )
+    if (outputType === "htmlElements") {
+      return (
+        <button
+          value={value}
+          onClick={onClickAction}
+          className={className}
+          // {...otherProps}
+        >
+          {children ? children : otherProps.label}
+        </button>
+      )
+    }
+    if (outputType === "makElements") {
+      return (
+        <mak.button
+          value={value}
+          onClick={onClickAction}
+          className={className}
+          makClassName={makClassName}
+          // {...otherProps}
+        >
+          {children ? children : otherProps.label}
+        </mak.button>
+      )
+    }
   }
 
-  if (type === "select") {
+  if (type === "select" && outputType === "htmlElements") {
     return (
       <select
         onChange={handleLocalChange}
@@ -121,17 +141,59 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     )
   }
 
-  return (
-    <input
-      type={type}
-      value={localValue}
-      onChange={handleLocalChange}
-      onBlur={handleBlur}
-      placeholder={placeholder}
-      className={className}
-      // {...otherProps}
-    />
-  )
+  if (type === "select" && outputType === "makElements") {
+    return (
+      <mak.select
+        onChange={handleLocalChange}
+        onBlur={handleBlur}
+        className={className}
+        makClassName={makClassName}
+        value={localValue}
+        defaultValue={defaultValue || ""}
+      >
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder as string}
+          </option>
+        )}
+        {options.map((option) => {
+          return (
+            <option key={option[valueKey]} value={option[valueKey]}>
+              {option[labelKey]}
+            </option>
+          )
+        })}
+      </mak.select>
+    )
+  }
+
+  if (outputType === "htmlElements") {
+    return (
+      <input
+        type={type}
+        value={localValue}
+        onChange={handleLocalChange}
+        onBlur={handleBlur}
+        placeholder={placeholder}
+        className={className}
+        // {...otherProps}
+      />
+    )
+  }
+  if (outputType === "makElements") {
+    return (
+      <mak.input
+        type={type}
+        value={localValue}
+        onChange={handleLocalChange}
+        onBlur={handleBlur}
+        placeholder={placeholder}
+        className={className}
+        makClassName={makClassName}
+        // {...otherProps}
+      />
+    )
+  }
 }
 
 export default DynamicComponent

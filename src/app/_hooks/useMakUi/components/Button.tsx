@@ -24,8 +24,8 @@ const ButtonComponent = ({
   ...computedProps
 }: ButtonProps & ComponentWrapperResponse) => {
   let {
-    bgVariant,
-    borderVariant,
+    bgVariant = "primary",
+    borderVariant = bgVariant,
     textVariant,
     borderPx,
     height,
@@ -34,9 +34,6 @@ const ButtonComponent = ({
   } = computedProps
   if ((outlined && borderPx === 0) || !borderPx) {
     borderPx = 2
-  }
-  if (!borderVariant) {
-    borderVariant = bgVariant
   }
 
   height = height ? ensureUtilityClass("h", height) : ""
@@ -49,15 +46,16 @@ const ButtonComponent = ({
   const background = isLightOrDark
     ? `${lightBackground} ${darkBackground}`
     : defaultBackground
-  const textClassName = textVariant
+  let textClassName = textVariant
     ? `text-${textVariant}`
-    : `${textVariant} ${
+    : `${
         outlined
           ? `text-color|${bgVariant}-${
               globalThemeMode === "light" ? "600" : "200"
             }`
           : ""
       } ${!outlined && bgVariant === "light" ? "text-dark-800" : ""}`
+  textClassName = textClassName ? textClassName : "text-primary"
 
   const defaultMakClassName = `${
     !outlined && background

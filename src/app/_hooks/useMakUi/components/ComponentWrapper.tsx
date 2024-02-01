@@ -53,6 +53,13 @@ export const componentWrapperLogic = ({
     ...restWithComputedProps
   } = withComputedProps(props)
 
+  className = className
+    ? className.trim().replace(/^undefined /g, "")
+    : undefined
+  makClassName = makClassName
+    ? makClassName.trim().replace(/^undefined /g, "")
+    : undefined
+
   const activeThemeMode = themeMode
     ? themeMode
     : makTheme

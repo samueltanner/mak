@@ -2,7 +2,7 @@
 import { constructDynamicComponents } from "./functions/componentFactory"
 import constructForm from "./functions/constructForm"
 import { constructInputElements } from "./functions/inputElementFactory"
-import { isEqual } from "./functions/helpers"
+import { ensureSingleElementType, isEqual } from "./functions/helpers"
 import { FormErrors, FormObject } from "./types/form-types"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getComponentName } from "./functions/componentFactory"
@@ -12,6 +12,9 @@ interface useMakFormProps {
   formConfig?: FormObject
   onSubmit?: (input?: any) => void
   onReset?: (input?: any) => void
+  useMakElements?: boolean
+  useHTMLComponents?: boolean
+  useMakComponents?: boolean
 }
 
 export interface FormAccessor {
@@ -25,7 +28,17 @@ export interface FormAccessor {
   formIsCurrent: () => boolean
 }
 
-export const useMakForm = ({ formConfig }: useMakFormProps) => {
+export const useMakForm = ({
+  formConfig,
+  useMakElements = true,
+  useHTMLComponents = false,
+  useMakComponents = false,
+}: useMakFormProps) => {
+  const outputType = ensureSingleElementType({
+    useMakElements,
+    useHTMLComponents,
+    useMakComponents,
+  })
   const originalFormRef = useRef<FormObject>()
   const previousFormRef = useRef<FormObject>({})
   const previousComponentsRef = useRef<DynamicComponents>({})
@@ -76,7 +89,7 @@ export const useMakForm = ({ formConfig }: useMakFormProps) => {
     const constructedForm = constructForm(formAccessor)
 
     setForm(constructedForm)
-    setDynamicComponents(constructDynamicComponents(formAccessor))
+    setDynamicComponents(constructDynamicComponents(formAccessor, outputType))
     setInputElements(constructInputElements(formAccessor))
 
     previousFormRef.current = constructedForm

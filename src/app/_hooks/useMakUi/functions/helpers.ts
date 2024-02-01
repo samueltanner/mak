@@ -45,6 +45,7 @@ import {
   makUiThemesSet,
   makUiVariants,
   makUiVariantsSet,
+  tailwindToCssModifierObject,
   tailwindVariants,
   tailwindVariantsSet,
 } from "../constants/ui-constants"
@@ -1340,20 +1341,26 @@ export const parseClassNameToStyleObject = ({
 }
 
 const separateTwModifiers = (className: string) => {
-  if (!className || typeof className !== "string")
+  if (!className || typeof className !== "string") {
     return {
       className,
       modifiersArray: [],
       modifiers: "",
     }
-  const regex = /^(.*):([^:]+)$/
+  }
+
+  // Updated regex to handle brackets
+  const regex = /^([^\[]+)(?:\[(.*?)\])?:([^:]+)$/
   const match = className.match(regex)
 
   if (match) {
+    const modifiers = match[1]
+    let bracketContent = match[2] ? [...match[2].split(",")] : []
+    bracketContent = bracketContent.map((b) => b?.trim())
     return {
-      modifiers: match[1],
-      modifiersArray: match[1].split(":"),
-      className: match[2],
+      modifiers: modifiers,
+      modifiersArray: [modifiers, ...bracketContent],
+      className: match[3],
     }
   } else {
     return {
@@ -1363,7 +1370,6 @@ const separateTwModifiers = (className: string) => {
     }
   }
 }
-
 const parseMakClassNames = ({
   makClassName,
   activeTheme,
@@ -1386,7 +1392,7 @@ const parseMakClassNames = ({
 
       let key: string = "backgroundColor"
       let modifierKey: string | undefined = undefined
-      let paletteVariant: MakUiPaletteKey = "bg"
+      let paletteVariant: MakUiPaletteKey | undefined = undefined
       let modifierClass: string | undefined = undefined
       let modifier: string | undefined = undefined
       let variant: MakUiVariantKey = "primary"
@@ -1402,12 +1408,19 @@ const parseMakClassNames = ({
         border: "borderColor",
         theme: "backgroundColor",
         color: "backgroundColor",
+        outline: "outlineColor",
+        ring: "outlineColor",
+        "ring-offset": "boxShadow",
+        divide: "borderColor",
       }
 
       modifier = modifiers
       mcn = className
       opacity = mcn?.split("/")[1]
       mcn = mcn?.split("/")[0]
+
+      variant =
+        (mcn?.split(`${paletteVariant}-`)?.[1] as MakUiVariantKey) || "primary"
       paletteVariant =
         (mcn?.split("-")[0] as MakUiPaletteKey) || ("bg" as MakUiPaletteKey)
       variant =
@@ -1455,28 +1468,58 @@ const parseMakClassNames = ({
           .css()
       }
 
-      if (modifier) {
-        if (modifier === "peer-checked") {
-          modifierKey = 'input[type="checkbox"].peer:checked ~ &'
-          key = keyMap[paletteVariant]
+      if (modifiersArray.length) {
+        const twModifier = modifiersArray[0]
+        const selector = modifiersArray?.[1]
+        const altSelector = modifiersArray?.[2]
+        const utilityKey = keyMap[paletteVariant]
+        let modifierKey = tailwindToCssModifierObject?.[twModifier]
+        if (typeof modifierKey === "string") {
           modifierMap.set(modifierKey, {
-            [key]: color,
+            [utilityKey]: color,
           })
           continue
         }
-        const splitModifier = modifier.split("-")
-        if (splitModifier.length > 1) {
-          modifierClass = splitModifier[0]
-          modifier = splitModifier[1]
-          modifierKey = `.${modifierClass}:${modifier} &`
-        } else {
-          modifier = splitModifier[0]
-          modifierKey = `&:${modifier}`
+        if (typeof modifierKey === "function"){
+          modifierKey = modifierKey(selector, altSelector)
+          modifierMap.set(modifierKey, {
+            [utilityKey]: color,
+          })
+
+          continue
         }
-        key = keyMap[paletteVariant]
-        modifierMap.set(modifierKey, {
-          [key]: color,
-        })
+        // if (tailwindToCssModifierObject?.[modifier]) {
+        //   const cssModifier = tailwindToCssModifierObject[modifier]
+        //   if (typeof cssModifier === "string") {
+        //     modifierKey = cssModifier
+        //     key = keyMap[paletteVariant]
+        //     modifierMap.set(modifierKey, {
+        //       [key]: color,
+        //     })
+        //   }
+        //   continue
+        // }
+        // if (modifier === "peer-checked") {
+        //   modifierKey = 'input[type="checkbox"].peer:checked ~ &'
+        //   key = keyMap[paletteVariant]
+        //   modifierMap.set(modifierKey, {
+        //     [key]: color,
+        //   })
+        //   continue
+        // }
+        // const splitModifier = modifier.split("-")
+        // if (splitModifier.length > 1) {
+        //   modifierClass = splitModifier[0]
+        //   modifier = splitModifier[1]
+        //   modifierKey = `.${modifierClass}:${modifier} &`
+        // } else {
+        //   modifier = splitModifier[0]
+        //   modifierKey = `&:${modifier}`
+        // }
+        // key = keyMap[paletteVariant]
+        // modifierMap.set(modifierKey, {
+        //   [key]: color,
+        // })
       } else if (paletteVariant && color) {
         key = keyMap[paletteVariant]
         styleMap.set(key, color)
