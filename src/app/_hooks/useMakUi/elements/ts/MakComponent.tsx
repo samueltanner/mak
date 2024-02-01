@@ -46,7 +46,6 @@ const MakComponent = memo(
       const isMotionObject = motion && !isEmptyObject(motion)
 
       if (isMotionObject) {
-        console.log("motion", motion)
         return (
           <StyledMotionComponent
             styleObject={inlineStyles}

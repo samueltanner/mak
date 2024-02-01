@@ -38,7 +38,7 @@ export const useMakForm = ({ formConfig }: useMakFormProps) => {
   }, [form, previousFormRef.current])
   const handleSetForm = (newForm: FormObject) => {
     if (isEqual(form, previousFormRef.current)) return
-    console.log("handleSetForm")
+
     setForm(newForm)
     previousFormRef.current = newForm
   }

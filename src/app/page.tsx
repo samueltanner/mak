@@ -10,12 +10,6 @@ import { css } from "@emotion/react"
 import styled from "@emotion/styled"
 
 export default function Home() {
-  const { simplePalette, simpleTheme, verbosePalette, verboseTheme } =
-    useMakUi()
-  console.log(verbosePalette)
-  const divStyle = css({
-    backgroundColor: "red",
-  })
   return (
     <div className={`relative h-screen w-screen p-4`}>
       <div className="flex w-full h-full justify-between">

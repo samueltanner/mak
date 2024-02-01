@@ -3,6 +3,7 @@ import React, { useContext, createContext } from "react"
 import { BiSolidDownArrowCircle, BiXCircle } from "react-icons/bi"
 import { motion, AnimatePresence } from "framer-motion"
 import { mak } from "../elements/ts/mak"
+import BackDrop from "./BackDrop"
 const ModalContext = createContext<{
   onClose?: () => void
   onOpen?: () => void
@@ -12,45 +13,7 @@ const ModalContext = createContext<{
   scrollToBottom?: () => void
 }>({})
 
-const ModalBackDrop = ({
-  onClose,
-  className,
-  makClassName,
-}: {
-  onClose: () => void
-  className?: string
-  makClassName?: string
-}) => {
-  return (
-    <mak.div
-      key="blur"
-      onClick={onClose}
-      className={`absolute left-0 top-0 z-40 h-screen w-screen fade-in-out ${className}`}
-      makClassName={makClassName}
-      motion={{
-        initial: {
-          opacity: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 10,
-        },
-        animate: {
-          opacity: 1,
-          width: "100%",
-          height: "100%",
-          zIndex: 10,
-        },
-        exit: {
-          opacity: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 10,
-        },
-        transition: { duration: 0.2 },
-      }}
-    />
-  )
-}
+const ModalBackDrop = BackDrop
 
 export const ModalContent = ({
   children,

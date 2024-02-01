@@ -107,13 +107,10 @@ const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
 
   const isSelect = (option: any) => {
     if (typeof option === "string" && typeof value === "string") {
-      console.log(1)
       return option.toLowerCase() === value.toLowerCase()
     } else if (typeof option === "number" && typeof value === "number") {
-      console.log(2)
       return option === value
     } else if (isObject(option) && isObject(value)) {
-      console.log(3)
       return JSON.stringify(option) === JSON.stringify(value)
     } else if (
       typeof option === "object" &&
@@ -153,7 +150,6 @@ const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
                       }`}
                       onClick={() => {
                         if (onChange) {
-                          console.log("onChange", option)
                           if (valueKey && isObject(option)) {
                             onChange(option[valueKey])
                           } else {
@@ -213,7 +209,6 @@ const DropdownTrigger = ({
       <div
         onClick={() => {
           setDropdownOpen(!dropdownOpen)
-          console.log("click", dropdownOpen)
         }}
         className="relative flex h-fit items-center justify-center gap-1"
       >
@@ -230,7 +225,6 @@ const DropdownTrigger = ({
         {label && labelLeft && (
           <LabelElement
             onClick={() => {
-              console.log("click", dropdownOpen)
               setDropdownOpen(!dropdownOpen)
             }}
             label={label}
@@ -240,7 +234,6 @@ const DropdownTrigger = ({
         {label && labelRight && (
           <LabelElement
             onClick={() => {
-              console.log("click", dropdownOpen)
               setDropdownOpen(!dropdownOpen)
             }}
             label={label}
@@ -384,7 +377,7 @@ const Dropdown = ({
         hiddenDropdownRef.current.getBoundingClientRect()
       const menuHeight = hiddenDropdownRect.height
       const menuWidth = hiddenDropdownRect.width
-      console.log({ menuHeight, menuWidth })
+
       const triggerWidth = triggerRect.width
       const padding = 8
       let triggerLeft = triggerRect.left
@@ -395,7 +388,7 @@ const Dropdown = ({
       const viewportHeight = window.innerHeight
       let menuTop = 0
       let menuLeft = 0
-      console.log({ triggerLeft, triggerTop, triggerRight, triggerBottom })
+
       if (menuPosition.includes("top")) {
         menuTop = triggerTop - menuHeight - padding
       }
@@ -433,7 +426,7 @@ const Dropdown = ({
         menuLeft = triggerLeft
       }
       const position = { top: menuTop, left: menuLeft }
-      console.log({ position })
+
       setPosition(position)
     }
   }

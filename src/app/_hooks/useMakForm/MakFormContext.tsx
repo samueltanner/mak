@@ -29,12 +29,9 @@ const defaultContextValue: MakFormContextType = {
 const MakFormContext = createContext<MakFormContextType>(defaultContextValue)
 
 export const MakFormProvider = ({ children }: MakFormProviderProps) => {
-  console.log("MakFormProvider")
   const [form, setForm] = useState<FormObject>({})
   const originalFormRef = useRef<FormObject>({})
   const previousFormRef = useRef<FormObject>({})
-
-  console.log("context form", form)
 
   const values = { form, setForm, originalFormRef, previousFormRef }
 
@@ -44,6 +41,5 @@ export const MakFormProvider = ({ children }: MakFormProviderProps) => {
 }
 
 export const useMakFormContext = () => {
-  console.log("useMakFormContext")
   return useContext(MakFormContext)
 }

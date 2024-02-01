@@ -16,8 +16,6 @@ const handleChange = ({ event, setForm, setFormErrors }: HandleChangeProps) => {
   const value = target?.type === "checkbox" ? target.checked : target.value
   const fieldName = target.name
 
-  console.log({ fieldName, value })
-
   // const validation = validateField({
   //   fieldName,
   //   value,

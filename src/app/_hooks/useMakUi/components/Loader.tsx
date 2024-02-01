@@ -4,6 +4,7 @@ import { BiCheckCircle, BiErrorCircle, BiLoaderCircle } from "react-icons/bi"
 import { mak } from "../elements/ts/mak"
 import { use, useEffect, useState } from "react"
 import { AnimatePresence } from "framer-motion"
+import BackDrop from "./BackDrop"
 type LoaderProps = TypeProps & {
   children?: React.ReactNode
   makClassName?: string
@@ -17,8 +18,11 @@ type LoaderProps = TypeProps & {
   errorIcon?: React.ReactNode
   successIcon?: React.ReactNode
   loadingState?: "default" | "loading" | "error" | "success" | undefined
-
   showIcon?: boolean
+  backdropClassName?: string
+  backdropMakClassName?: string
+
+  onClose?: () => void
 }
 
 const iconVariants = {
@@ -46,6 +50,11 @@ export const LoaderComponent = ({
   persistState = false,
   showIcon = true,
   loadingState,
+  size = "inline",
+  backdropClassName,
+  backdropMakClassName,
+
+  onClose,
   ...computedProps
 }: LoaderProps) => {
   const [state, setState] = useState<
@@ -70,7 +79,6 @@ export const LoaderComponent = ({
 
   useEffect(() => {
     if (state === "loading" || persistState) return
-    console.log(`state is not loading or persisted: ${state}`)
 
     const timeoutId = setTimeout(() => {
       setState(undefined)
@@ -86,10 +94,6 @@ export const LoaderComponent = ({
     error: errorIcon,
     success: successIcon,
   }
-
-  useEffect(() => {
-    console.log(`state: ${state}`)
-  }, [state])
 
   const Icon = (
     <AnimatePresence mode="wait">
@@ -113,11 +117,30 @@ export const LoaderComponent = ({
     </AnimatePresence>
   )
 
+  if (size === "screen") {
+    return (
+      <BackDrop
+        className={`${
+          backdropClassName ||
+          "items-center justify-center backdrop-blur-sm gap-2 *:flex *:gap-2 *:items-center *:justify-center"
+        } h-screen w-screen absolute top-0 left-0 flex`}
+        makClassName={backdropMakClassName || "bg-dark-900/50"}
+        onClose={onClose}
+      >
+        <mak.span className={className} makClassName={makClassName}>
+          {children && children}
+          {showIcon && Icon}
+        </mak.span>
+      </BackDrop>
+    )
+  }
   return (
-    <mak.span className={className} makClassName={makClassName}>
-      {children && children}
-      {showIcon && Icon}
-    </mak.span>
+    <>
+      <mak.span className={`${className}`} makClassName={makClassName}>
+        {children && children}
+        {showIcon && Icon}
+      </mak.span>
+    </>
   )
 }
 
