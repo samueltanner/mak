@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react"
 import React, { useContext, createContext } from "react"
-import { BiSolidDownArrowCircle, BiXCircle } from "react-icons/bi"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence } from "framer-motion";
 import { mak } from "../elements/ts/mak"
 import BackDrop from "./BackDrop"
 const ModalContext = createContext<{

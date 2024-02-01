@@ -26,7 +26,7 @@ export const typeProps: TypeProps = {
   themeSecondary: false,
   themeTertiary: false,
   themeCustom: false,
-  themeVariant: "primary",
+  themeVariant: undefined,
   themeOpacity: 100,
 
   primary: false,
@@ -40,7 +40,7 @@ export const typeProps: TypeProps = {
   custom: false,
   dark: false,
   light: false,
-  variant: "primary",
+  variant: undefined,
   variantShade: 500,
   variantOpacity: 100,
 
@@ -55,7 +55,7 @@ export const typeProps: TypeProps = {
   textCustom: false,
   textLight: false,
   textDark: false,
-  text: "primary",
+  text: undefined,
   textShade: 500,
   textOpacity: 100,
 
@@ -85,7 +85,7 @@ export const typeProps: TypeProps = {
   borderCustom: false,
   borderLight: false,
   borderDark: false,
-  border: "primary",
+  border: undefined,
   borderShade: 500,
   borderOpacity: 100,
 

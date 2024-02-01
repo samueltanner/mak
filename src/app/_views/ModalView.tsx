@@ -42,16 +42,17 @@ export const ModalView = () => {
         <ModalFooter className="text-md font-semibold flex w-full justify-between">
           <Button
             borderDark
-            textLight
+            textPrimary
             width="w-fit"
             onClick={() => setModalIsOpen(!modalIsOpen)}
             // showFocusRing={false}
           >
             Close
           </Button>
-          <Button 
+          <Button
             onClick={() => setModalIsOpen(!modalIsOpen)}
-          makClassName="bg-tertiary-500 text-light-100 border-tertiary hover:bg-tertiary-600">
+            makClassName="bg-tertiary-500 text-light-100 border-tertiary hover:bg-tertiary-600"
+          >
             Accept
           </Button>
         </ModalFooter>
@@ -62,7 +63,7 @@ export const ModalView = () => {
         }}
         // showFocusRing={false}
         borderDark
-        textLight
+        textPrimary
         width="w-fit"
       >
         Open Modal

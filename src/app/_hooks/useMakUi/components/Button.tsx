@@ -23,7 +23,15 @@ const ButtonComponent = ({
   makClassName,
   ...computedProps
 }: ButtonProps & ComponentWrapperResponse) => {
-  let { bgVariant, borderVariant, borderPx, height, width } = computedProps
+  let {
+    bgVariant,
+    borderVariant,
+    textVariant,
+    borderPx,
+    height,
+    width,
+    globalThemeMode,
+  } = computedProps
   if ((outlined && borderPx === 0) || !borderPx) {
     borderPx = 2
   }
@@ -41,14 +49,21 @@ const ButtonComponent = ({
   const background = isLightOrDark
     ? `${lightBackground} ${darkBackground}`
     : defaultBackground
+  const textClassName = textVariant
+    ? `text-${textVariant}`
+    : `${textVariant} ${
+        outlined
+          ? `text-color|${bgVariant}-${
+              globalThemeMode === "light" ? "600" : "200"
+            }`
+          : ""
+      } ${!outlined && bgVariant === "light" ? "text-dark-800" : ""}`
 
   const defaultMakClassName = `${
     !outlined && background
   } disabled:bg-${bgVariant}-500/50 hover:bg-${bgVariant}-600 ${
     outlined ? `border-${borderVariant}-500` : ``
-  } ${outlined ? `text-color|${bgVariant}-100` : ""} ${
-    !outlined && bgVariant === "light" ? "text-dark-800" : ""
-  }`
+  } ${textClassName}`
 
   const defaultClassName = `cursor-pointer disabled:cursor-not-allowed px-2 py-1 rounded-md fade-in-out text-sm font-semibold ${height} ${width}`
   return (

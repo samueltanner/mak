@@ -230,4 +230,7 @@ export type ComponentWrapperResponse = {
   borderVariant: MakUiVariantKey | undefined
   textVariant: MakUiVariantKey | undefined
   bgVariant: MakUiVariantKey | undefined
+
+  _makClassName: string | undefined
+  _className: string | undefined
 }

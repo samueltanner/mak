@@ -132,6 +132,9 @@ export const componentWrapperLogic = ({
     textVariant: textProps as MakUiVariantKey | undefined,
     borderVariant: borderProps as MakUiVariantKey | undefined,
     bgVariant: bgProps as MakUiVariantKey | undefined,
+
+    _className: twClassName,
+    _makClassName: makClassNames,
     ...restWithComputedProps,
   }
 

@@ -15,19 +15,7 @@ const ButtonListView = () => {
     <div className="flex gap-2 items-center">
       {Object.entries(color).map(([cName, cVal], index) => {
         return (
-          <Button
-            key={index}
-            text={cName}
-            bg={cName}
-            border={cName}
-            outlined={outlined}
-            // borderPx={2}
-            // buttonType={cName as MakUiVariantKey}
-            // textLight={!outlined && cName !== "light"}
-            // textDark={cName === "light"}
-            // borderCustom={cName === "light"}
-            // disabled
-          >
+          <Button key={index} bg={cName} border={cName} outlined={outlined}>
             <span className="capitalize">{cName}</span>
           </Button>
         )

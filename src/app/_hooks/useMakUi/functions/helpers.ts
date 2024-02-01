@@ -1420,7 +1420,16 @@ const parseMakClassNames = ({
         altPaletteVariant = splitVariant[0] as MakUiPaletteKey
       }
 
-      const shadeString = mcn?.split("-")[2] || "500"
+      let shadeString = mcn?.split("-")[2]
+      if (!shadeString) {
+        if (variant === "light") {
+          shadeString = "100"
+        } else if (variant === "dark") {
+          shadeString = "900"
+        } else {
+          shadeString = "500"
+        }
+      }
       shade = Number(shadeString) as Shade
 
       let resolvedVariant = altPaletteVariant || paletteVariant
