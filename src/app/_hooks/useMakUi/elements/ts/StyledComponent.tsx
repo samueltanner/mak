@@ -1,8 +1,6 @@
 import styled from "@emotion/styled"
 import { GenericObject } from "../../types/ui-types"
-import { motion } from "framer-motion"
 
-// Define the base styled component
 const BaseStyledComponent = styled.div<any>(({ styleObject }) => ({
   ...styleObject,
 }))
@@ -19,7 +17,6 @@ const formatJsonToHtmlString = (jsonObject: GenericObject) => {
     .join("; ")
 }
 
-// Higher-order component to dynamically assign the element type
 const StyledComponent = ({ as: Component = "div", styleObject, ...props }) => {
   const formattedStyleString = formatJsonToHtmlString(styleObject)
 

@@ -24,10 +24,14 @@ export const ModalView = () => {
         backdropClassName="backdrop-blur-sm"
         backDropMakClassName="bg-dark-900/50"
       >
-        <ModalHeader className="text-md font-semibold"
+        <ModalHeader
+          className="text-md font-semibold"
           makClassName="text-primary-500"
-        >Lorem ipsum</ModalHeader>
-        <ModalContent className={`text-md font-normal`}
+        >
+          Lorem ipsum
+        </ModalHeader>
+        <ModalContent
+          className={`text-md font-normal`}
           makClassName="text-primary"
         >
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
@@ -35,14 +39,20 @@ export const ModalView = () => {
           possimus, error nihil adipisci animi hic nam molestiae voluptatum
           saepe velit eveniet quam.
         </ModalContent>
-        <ModalFooter className="text-md font-semibold">
+        <ModalFooter className="text-md font-semibold flex w-full justify-between">
           <Button
-            custom
-            outlined
+            borderDark
+            textLight
+            width="w-fit"
             onClick={() => setModalIsOpen(!modalIsOpen)}
             // showFocusRing={false}
           >
             Close
+          </Button>
+          <Button 
+            onClick={() => setModalIsOpen(!modalIsOpen)}
+          makClassName="bg-tertiary-500 text-light-100 border-tertiary hover:bg-tertiary-600">
+            Accept
           </Button>
         </ModalFooter>
       </Modal>

@@ -1,41 +1,45 @@
 import { useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
 import Dropdown, { DropdownMenu } from "../_hooks/useMakUi/components/Dropdown"
-import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
-import { objectToClassName } from "../_hooks/useMakUi/functions/helpers"
-
+import Loader from "../_hooks/useMakUi/components/Loader"
+import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 const DropdownView = () => {
-  const { simpleTheme, verboseTheme, simplePalette, verbosePalette } =
-    useMakUi()
-
   const [buttonState, setButtonState] = useState<
     "error" | "success" | "loading" | "default"
   >("default")
 
+  const buttonStateMap = {
+    default: "primary",
+    loading: "secondary",
+    error: "danger",
+    success: "success",
+  }
+
   return (
     <div className="flex gap-4 items-center">
       <Button
-        bgPrimary
+        bg={buttonStateMap[buttonState]}
         textLight
-        // keepStatusVisible
-        // isLoading={buttonState === "loading"}
-        // isSuccess={buttonState === "success"}
-        // isError={buttonState === "error"}
-        // error={buttonState === "error"}
-        // success={buttonState === "success"}
-        // info={buttonState === "loading"}
+        height="fit"
+        width="fit"
       >
-        <span className="capitalize">{buttonState}</span>
+        <mak.div
+          motion={{
+            layout: true,
+          }}
+          className={`flex items-center justify-center ${
+            buttonState !== "default" ? "gap-1" : "gap-0"
+          }`}
+        >
+          <Loader loadingState={buttonState} />
+
+          <span className="capitalize">{buttonState}</span>
+        </mak.div>
       </Button>
 
       <Dropdown
         label={
-          <span
-            className={`capitalize ${objectToClassName({
-              object: verboseTheme.text.primary,
-              variant: "text",
-            })}`}
-          >
+          <span className={`capitalize `}>
             {buttonState === "default" ? "default" : buttonState}
           </span>
         }

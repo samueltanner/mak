@@ -78,6 +78,21 @@ const DummyPage = () => {
       >
         toggle
       </button>
+      <AnimatePresence>
+        {toggle && (
+          <mak.div
+            motion={{
+              variants: divVariants,
+              initial: "hidden",
+              animate: "visible",
+              exit: "exit",
+              transition: { duration: 0.2 },
+            }}
+          >
+            hello from motion
+          </mak.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

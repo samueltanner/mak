@@ -10,6 +10,8 @@ type ButtonProps = TypeProps & {
   type?: "button" | "submit" | "reset"
   form?: string
   outlined?: boolean
+  className?: string
+  makClassName?: string
 }
 
 const ButtonComponent = ({
@@ -17,6 +19,8 @@ const ButtonComponent = ({
   disabled,
   outlined = false,
   onClick,
+  className,
+  makClassName,
   ...computedProps
 }: ButtonProps & ComponentWrapperResponse) => {
   let { bgVariant, borderVariant, borderPx, height, width } = computedProps
@@ -37,19 +41,23 @@ const ButtonComponent = ({
   const background = isLightOrDark
     ? `${lightBackground} ${darkBackground}`
     : defaultBackground
+
+  const defaultMakClassName = `${
+    !outlined && background
+  } disabled:bg-${bgVariant}-500/50 hover:bg-${bgVariant}-600 ${
+    outlined ? `border-${borderVariant}-500` : ``
+  } ${outlined ? `text-color|${bgVariant}-100` : ""} ${
+    !outlined && bgVariant === "light" ? "text-dark-800" : ""
+  }`
+
+  const defaultClassName = `cursor-pointer disabled:cursor-not-allowed px-2 py-1 rounded-md fade-in-out text-sm font-semibold ${height} ${width}`
   return (
     <mak.button
       onClick={onClick}
       border={borderVariant}
       disabled={disabled}
-      makClassName={`${
-        !outlined && background
-      } disabled:bg-${bgVariant}-500/50 hover:bg-${bgVariant}-600 ${
-        outlined ? `border-${borderVariant}-500` : ``
-      } ${outlined ? `text-color|${bgVariant}-100` : ""} ${
-        !outlined && bgVariant === "light" ? "text-dark-800" : ""
-      }`}
-      className={`cursor-pointer disabled:cursor-not-allowed px-2 py-1 rounded-md fade-in-out text-sm font-semibold ${height} ${width}`}
+      makClassName={makClassName || defaultMakClassName}
+      className={className || defaultClassName}
       style={{ borderWidth: borderPx }}
     >
       {children}
@@ -61,7 +69,12 @@ const Button = (props: ButtonProps) => {
   return (
     <ComponentWrapper {...props}>
       {(computedProps) => (
-        <ButtonComponent {...computedProps} children={props.children} />
+        <ButtonComponent
+          {...computedProps}
+          children={props.children}
+          makClassName={props.makClassName}
+          className={props.className}
+        />
       )}
     </ComponentWrapper>
   )

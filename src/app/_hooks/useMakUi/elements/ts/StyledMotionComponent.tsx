@@ -20,7 +20,7 @@ const StyledMotionComponent = ({
     globalThemeMode,
     globalTheme,
     globalPalette,
-    
+
     ...restProps
   } = props
   const MotionComponent = motion[Component]
@@ -32,7 +32,6 @@ const StyledMotionComponent = ({
       }
     }
   )
-  console.log("motionProps", { motionProps, props })
 
   const formatJsonToHtmlString = (jsonObject: GenericObject) => {
     return Object.entries(jsonObject)
