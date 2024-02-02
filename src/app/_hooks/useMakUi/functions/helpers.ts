@@ -1347,7 +1347,7 @@ const separateTwModifiers = (className: string) => {
     }
   }
 }
-const parseMakClassNames = ({
+export const parseMakClassNames = ({
   makClassName,
   activeTheme,
 }: {
@@ -1445,7 +1445,7 @@ const parseMakClassNames = ({
 
       if (modifiersArray.length) {
         const twModifier = modifiersArray[0]
-        const selector = modifiersArray?.[1]
+        let selector = modifiersArray?.[1]
         const altSelector = modifiersArray?.[2]
         const utilityKey = keyMap[paletteVariant]
         let modifierKey = tailwindToCssModifierObject?.[twModifier]
@@ -1456,6 +1456,14 @@ const parseMakClassNames = ({
           continue
         }
         if (typeof modifierKey === "function") {
+          if (!selector) {
+            let escapedMcn = mcn
+            if (escapedMcn.includes("|")){
+              const [beforePipe, afterPipe] = escapedMcn.split("|")
+              escapedMcn = `${beforePipe}\\|${afterPipe}`
+            }
+            selector = `\\:${escapedMcn}`
+          }
           modifierKey = modifierKey(selector, altSelector)
           modifierMap.set(modifierKey, {
             [utilityKey]: color,

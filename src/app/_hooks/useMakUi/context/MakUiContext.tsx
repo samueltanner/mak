@@ -1,5 +1,5 @@
 "use client"
-import React, { createContext, useEffect, useMemo, useState } from "react"
+import React, { createContext, useEffect, useMemo, useState } from "react";
 import { paletteFactory } from "../factories/paletteFactory"
 import { ThemeProvider, useTheme } from "next-themes"
 import { constructTailwindObject } from "../functions/helpers"
@@ -28,6 +28,7 @@ import {
   MakUiRootComponentConfigInput,
 } from "../types/component-types"
 import { deepMerge, isEmptyObject } from "@/globals/global-helper-functions"
+import styled from "@emotion/styled"
 
 type PaletteGeneratorProps = {
   palette: MakUiFlexiblePaletteInput
@@ -73,6 +74,10 @@ export const MakUiProvider = (props: MakUiProviderProps) => {
   )
 }
 
+const GlobalStyleSheetWrapper = styled.div<GenericObject>(({ styleSheet }) => ({
+  ...styleSheet,
+}))
+
 const defaultPaletteGenProps: PaletteGeneratorProps = {
   palette: {} as MakUiFlexiblePaletteInput,
   themeShades: makUiDefaultThemeShades,
@@ -94,6 +99,12 @@ const MakUiProviderChild = ({
   defaultTheme = "light",
   paletteGenProps = defaultPaletteGenProps,
 }: MakUiProviderProps) => {
+  const [styleSheet, setStyleSheet] = useState<GenericObject>({})
+  useEffect(() => {
+    console.log("updating global styles")
+    console.log(styleSheet)
+  }, [styleSheet])
+
   const paletteInputRef = React.useRef<string>()
   useEffect(() => {
     if (paletteInputRef.current !== JSON.stringify(paletteInput)) {
@@ -264,13 +275,16 @@ const MakUiProviderChild = ({
     isLight: theme === "light",
     isCustom: theme === "custom",
     enabledThemeModes,
-    // getSafeList,
+    styleSheet,
+    setStyleSheet,
     constructTailwindColorScale: constructTailwindObject,
   }
 
   return (
     <MakUiContext.Provider value={value}>
-      {formattingThemes ? <></> : <>{children}</>}
+      <GlobalStyleSheetWrapper styleSheet={styleSheet}>
+        {formattingThemes ? <></> : <>{children}</>}
+      </GlobalStyleSheetWrapper>
     </MakUiContext.Provider>
   )
 }
@@ -290,8 +304,8 @@ interface MakUiContext {
   verbosePalette: MakUiVerbosePalette
   simpleTheme: MakUiSimpleTheme
   verboseTheme: MakUiVerboseTheme
-
-  // getSafeList: () => void
+  styleSheet: GenericObject
+  setStyleSheet: (styleSheet: GenericObject) => void
   constructTailwindColorScale: ({
     hex,
     step,

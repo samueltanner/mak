@@ -389,7 +389,7 @@ export const tailwindToCssModifierObject: {
 
   //styles applied to child of a group
   //tw eg. group-hover:bg-red-500
-  "group-hover": ".group &:hover",
+  "group-hover": (selector: string) => `.group:hover .group-hover${selector}`,
   "group-focus": ".group &:focus",
   "group-focus-within": ".group &:focus-within",
   "group-focus-visible": ".group &:focus-visible",

@@ -6,45 +6,18 @@ import { useMakUi } from "./_hooks/useMakUi/context/MakUiContext"
 import { mak } from "./_hooks/useMakUi/elements/ts/mak"
 import styled from "@emotion/styled"
 
+const Global = styled.div({
+  ".group:hover .group-hover\\:bg-danger": {
+    backgroundColor: "#dc2626",
+  },
+})
+
 export default function Home() {
   return (
     <div className="relative h-screen w-screen p-4">
       <div className="flex w-full h-full justify-between">
-        {/* <MakUiView /> */}
-        <MakFormView />
-
-        {/* <Global> */}
-        <div className="flex flex-col gap-2 size-fit p-4 border-2 group">
-          PARENT
-          <mak.span className="flex flex-col gap-2 size-fit p-4 border-2 peer">
-            first child
-            <span className="flex flex-col gap-2 size-fit p-4 border-2 group-hover/child:bg-blue-500">
-              first grandchild
-            </span>
-          </mak.span>
-          <mak.span
-            className="flex flex-col gap-2 size-fit p-4 border-2 "
-            makClassName="peer-not-checked:bg-primary"
-          >
-            second child
-            <span className="flex flex-col gap-2 size-fit p-4 border-2 group-hover/child:bg-blue-500">
-              second grandchild
-            </span>
-          </mak.span>
-          <input type="checkbox" className="peer" checked={false} />
-        </div>
-        {/* <StyledParent className="p-4 flex flex-col gap-4 border-2 h-fit w-fit group">
-          i am the parent
-          <mak.span className="group-hover">I am the other child</mak.span>
-        </StyledParent>
-        <mak.span
-          className="p-4 flex flex-col gap-4 border-2 h-fit w-fit group"
-          makClassName="*-hover:bg-primary"
-        >
-          i am the parent
-          <mak.span>I am the other child</mak.span>
-        </mak.span> */}
-        {/* </Global> */}
+        <MakUiView />
+        {/* <MakFormView /> */}
 
         <div className="absolute bottom-4 right-4">
           <ThemeButton />

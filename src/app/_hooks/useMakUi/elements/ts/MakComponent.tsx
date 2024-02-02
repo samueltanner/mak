@@ -1,7 +1,7 @@
 // MakComponent.tsx
 /** @jsxImportSource @emotion/react */
 
-import { forwardRef, ReactNode, useMemo, memo } from "react"
+import { forwardRef, ReactNode, useMemo, memo, useEffect } from "react"
 import { useMakUi } from "../../context/MakUiContext"
 import { MakUiElementProps } from "./mak-custom-types"
 import { componentWrapperLogic } from "../../components/ComponentWrapper"
@@ -12,7 +12,8 @@ import {
   MakUiComponentConfig,
   MakUiRootComponentConfig,
 } from "../../types/component-types"
-import { mergeDefaultConfig } from "../../functions/helpers"
+import { mergeDefaultConfig, parseMakClassNames } from "../../functions/helpers"
+import { GenericObject } from "../../types/ui-types"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -24,6 +25,7 @@ const MakComponent = memo(
   forwardRef<HTMLElement, HTMLMakComponentProps<keyof JSX.IntrinsicElements>>(
     ({ component, motion, useConfig, ...props }, ref) => {
       const makUi = useMakUi()
+      const { setStyleSheet, styleSheet } = makUi
 
       let { resolvedClassName, resolvedMakClassName, componentConfig } =
         mergeDefaultConfig({
@@ -45,14 +47,24 @@ const MakComponent = memo(
         response
       const { baseClassObject = {}, pseudoClassObject = {} } = styleObject
 
-      if (component === "span") {
-        console.log("MakComponent.tsx: resolvedClassName", resolvedClassName)
-        console.log(
-          "MakComponent.tsx: resolvedMakClassName",
-          resolvedMakClassName
-        )
-        console.log(styleObject)
-      }
+      useEffect(() => {
+        if (resolvedMakClassName?.includes("group-") && styleSheet) {
+          const updatedStyleSheet = {
+            ...styleSheet,
+          }
+          Object.entries(pseudoClassObject).forEach(([key, value]) => {
+            if (!styleSheet[key]) {
+              updatedStyleSheet[key] = value
+              setStyleSheet(updatedStyleSheet)
+            }
+          })
+        }
+      }, [setStyleSheet, pseudoClassObject])
+
+      resolvedClassName = [resolvedClassName, resolvedMakClassName]
+        .join(" ")
+        .trim()
+
       const allProps = {
         className: resolvedClassName,
         makClassName: resolvedMakClassName,

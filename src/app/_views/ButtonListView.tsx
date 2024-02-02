@@ -4,9 +4,11 @@ import Toggle from "../_hooks/useMakUi/components/Toggle"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 import { MakUiVariantKey } from "../_hooks/useMakUi/types/ui-types"
 import { makUiVariants } from "../_hooks/useMakUi/constants/ui-constants"
+import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
 
 const ButtonListView = () => {
   const [outlined, setOutlined] = useState(false)
+  const { isDark } = useMakUi()
 
   return (
     <div className="flex gap-2 items-center">
@@ -18,7 +20,7 @@ const ButtonListView = () => {
             border={cName as MakUiVariantKey}
             className="px-2 py-1 rounded-md fade-in-out"
             makClassName={`hover:bg-${cName}-600 ${
-              outlined ? `text-color|${cName}-200` : ""
+              outlined ? `text-color|${cName}-${isDark ? "200" : "800"}` : ""
             } ${!outlined && cName === "light" ? "text-dark-800" : ""}`}
           >
             <span className="capitalize">{cName}</span>

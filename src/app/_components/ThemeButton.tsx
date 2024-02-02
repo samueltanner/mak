@@ -44,25 +44,14 @@ const ThemeButton = () => {
         isDark ? "light-100/10" : isLight ? "dark-800/80" : "primary"
       }`}
     >
-      {/* <StyledSpan>hi</StyledSpan> */}
       {isDark && (
-        <mak.span
-          makClassName={`${
-            isDark
-              ? "text-color|warning-400"
-              : "text-color|secondary-600 group-hover:text-color|warning-500"
-          }`}
-        >
+        <mak.span makClassName={`${isDark && "text-color|warning-400"}`}>
           <BiSun className={`size-6 fade-in-out `} />
         </mak.span>
       )}
       {isLight && (
         <mak.span
-          makClassName={`${
-            isDark
-              ? "text-color|warning-400"
-              : "text-color|secondary-600 group-hover:text-color|warning-500"
-          }`}
+          makClassName={`${"text-color|secondary-600 group-hover:text-color|warning-500"}`}
         >
           <BiSolidMoon className={`size-6 fade-in-out`} />
         </mak.span>
