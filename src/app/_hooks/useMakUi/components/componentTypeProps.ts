@@ -19,6 +19,8 @@ import {
 
 export const typeProps: TypeProps = {
   //theme
+  useConfig: true,
+
   darkMode: false,
   lightMode: false,
   customMode: false,
@@ -227,6 +229,8 @@ export const withComputedProps = (
     | undefined
   return {
     ...props,
+    useConfig:
+      props.useConfig === undefined ? typeProps.useConfig : props.useConfig,
     mode: computedModeProps,
     hasModeProps: !!computedModeProps,
     theme: computedThemeProps,

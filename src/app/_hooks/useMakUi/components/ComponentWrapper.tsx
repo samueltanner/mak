@@ -1,5 +1,8 @@
 import { useMakUi } from "../context/MakUiContext"
-import { parseClassNameToStyleObject } from "../functions/helpers"
+import {
+  mergeDefaultConfig,
+  parseClassNameToStyleObject,
+} from "../functions/helpers"
 import {
   TypeProps,
   ComponentWrapperResponse,
@@ -13,13 +16,19 @@ import { withComputedProps } from "./componentTypeProps"
 
 type ComponentWrapperProps = TypeProps & {
   children: ((props: any) => JSX.Element) | JSX.Element
+  type?: keyof JSX.IntrinsicElements
 }
 
-const ComponentWrapper = ({ children, ...props }: ComponentWrapperProps) => {
+const ComponentWrapper = ({
+  children,
+  type,
+  ...props
+}: ComponentWrapperProps) => {
   const makUi = useMakUi()
   const response = componentWrapperLogic({
     props,
     makUi,
+    type,
   })
 
   return (
@@ -39,15 +48,18 @@ export default ComponentWrapper
 export const componentWrapperLogic = ({
   props,
   makUi,
+  type,
 }: {
   props: TypeProps
   makUi: ReturnType<typeof useMakUi>
+  type?: keyof JSX.IntrinsicElements
 }) => {
   const {
     theme: makTheme,
     verbosePalette: makVerbosePalette,
     verboseTheme: makVerboseTheme,
   } = makUi
+
   let {
     mode: themeMode,
     theme: themeProps,
@@ -63,15 +75,24 @@ export const componentWrapperLogic = ({
     hasBgProps,
     className,
     makClassName,
+    useConfig,
     ...restWithComputedProps
   } = withComputedProps(props)
 
-  className = className
-    ? className.trim().replace(/^undefined /g, "")
-    : undefined
-  makClassName = makClassName
-    ? makClassName.trim().replace(/^undefined /g, "")
-    : undefined
+  let { resolvedClassName, resolvedMakClassName } = mergeDefaultConfig({
+    makUi,
+    useConfig,
+    component: type,
+    className,
+    makClassName,
+  })
+
+  // className = className
+  //   ? className.trim().replace(/^undefined /g, "")
+  //   : undefined
+  // makClassName = makClassName
+  //   ? makClassName.trim().replace(/^undefined /g, "")
+  //   : undefined
 
   const activeThemeMode = themeMode
     ? themeMode
@@ -92,36 +113,38 @@ export const componentWrapperLogic = ({
 
   if (themeProps) {
     const themeClassName = `theme-${themeProps}`
-    makClassName = makClassName
-      ? `${makClassName} ${themeClassName}`
+    resolvedMakClassName = resolvedMakClassName
+      ? `${resolvedMakClassName} ${themeClassName}`
       : themeClassName
   }
 
   if (colorProps) {
     const colorClassName = `bg-${colorProps}`
-    makClassName = makClassName
-      ? `${makClassName} ${colorClassName}`
+    resolvedMakClassName = resolvedMakClassName
+      ? `${resolvedMakClassName} ${colorClassName}`
       : colorClassName
   }
 
   if (textProps) {
     const textClassName = `text-${textProps}`
-    makClassName = makClassName
-      ? `${makClassName} ${textClassName}`
+    resolvedMakClassName = resolvedMakClassName
+      ? `${resolvedMakClassName} ${textClassName}`
       : textClassName
   }
 
   if (borderProps) {
     const borderClassName = `border-${borderProps}`
 
-    makClassName = makClassName
-      ? `${makClassName} ${borderClassName}`
+    resolvedMakClassName = resolvedMakClassName
+      ? `${resolvedMakClassName} ${borderClassName}`
       : borderClassName
   }
 
   if (bgProps) {
     const bgClassName = `bg-${bgProps}`
-    makClassName = makClassName ? `${makClassName} ${bgClassName}` : bgClassName
+    resolvedMakClassName = resolvedMakClassName
+      ? `${resolvedMakClassName} ${bgClassName}`
+      : bgClassName
   }
 
   const {
@@ -129,8 +152,8 @@ export const componentWrapperLogic = ({
     twClassName,
     makClassName: makClassNames,
   } = parseClassNameToStyleObject({
-    className,
-    makClassName,
+    className: resolvedClassName,
+    makClassName: resolvedMakClassName,
     activeTheme,
   })
 
@@ -183,6 +206,5 @@ export const componentWrapperLogic = ({
     children: restWithComputedProps.children,
     ...restWithComputedProps,
   }
-
   return response
 }

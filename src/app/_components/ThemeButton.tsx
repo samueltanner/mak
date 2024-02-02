@@ -14,6 +14,7 @@ const ThemeButton = () => {
   } = useMakUi()
   return (
     <Button
+      useConfig={false}
       borderLight={isDark && "100/50"}
       borderDark={isLight && "800/50"}
       onClick={() => {

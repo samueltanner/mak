@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <div className="relative h-screen w-screen p-4">
       <div className="flex w-full h-full justify-between">
-        <MakUiView />
+        {/* <MakUiView /> */}
         {/* <MakFormView /> */}
         <div className="absolute bottom-4 right-4">
           <ThemeButton />

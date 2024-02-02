@@ -2,10 +2,7 @@
 import React, { createContext, useEffect, useMemo, useState } from "react"
 import { paletteFactory } from "../factories/paletteFactory"
 import { ThemeProvider, useTheme } from "next-themes"
-import {
-  constructTailwindObject,
-  getActiveTwVariants,
-} from "../functions/helpers"
+import { constructTailwindObject } from "../functions/helpers"
 
 import {
   MakUiFlexiblePaletteInput,
@@ -178,38 +175,31 @@ const MakUiProviderChild = ({
 
   const componentConfig = useMemo(() => {
     const configObject: MakUiComponentConfig = {
-      buttonConfig:
-        (componentConfigInput?.buttonConfig as MakUiRootComponentConfig) ||
-        defaultComponentConfig.buttonConfig,
-      inputConfig:
-        (componentConfigInput?.inputConfig as MakUiRootComponentConfig) ||
-        defaultComponentConfig.inputConfig,
-      textConfig:
-        (componentConfigInput?.textConfig as MakUiRootComponentConfig) ||
-        defaultComponentConfig.textConfig,
-      selectConfig:
-        (componentConfigInput?.selectConfig as MakUiRootComponentConfig) ||
-        defaultComponentConfig.selectConfig,
-      formConfig:
-        (componentConfigInput?.formConfig as MakUiRootComponentConfig) ||
-        defaultComponentConfig.formConfig,
-      dialogConfig:
-        (componentConfigInput?.dialogConfig as MakUiRootComponentConfig) ||
-        defaultComponentConfig.dialogConfig,
-      textareaConfig:
-        (componentConfigInput?.textareaConfig as MakUiRootComponentConfig) ||
-        defaultComponentConfig.textareaConfig,
+      button:
+        (componentConfigInput?.button as MakUiRootComponentConfig) ||
+        defaultComponentConfig.button,
+      input:
+        (componentConfigInput?.input as MakUiRootComponentConfig) ||
+        defaultComponentConfig.input,
+      text:
+        (componentConfigInput?.text as MakUiRootComponentConfig) ||
+        defaultComponentConfig.text,
+      select:
+        (componentConfigInput?.select as MakUiRootComponentConfig) ||
+        defaultComponentConfig.select,
+      form:
+        (componentConfigInput?.form as MakUiRootComponentConfig) ||
+        defaultComponentConfig.form,
+      dialog:
+        (componentConfigInput?.dialog as MakUiRootComponentConfig) ||
+        defaultComponentConfig.dialog,
+      textarea:
+        (componentConfigInput?.textarea as MakUiRootComponentConfig) ||
+        defaultComponentConfig.textarea,
     }
 
     return configObject
   }, [JSON.stringify(componentConfigInput)])
-
-  const { enabledTwVariants, enabledInteractionStates } = useMemo(() => {
-    return getActiveTwVariants({
-      enabledThemeModes,
-      componentConfig,
-    })
-  }, [componentConfig, enabledThemeModes])
 
   const palettesMemo = useMemo(() => {
     const { verbose, simple } =
@@ -265,7 +255,6 @@ const MakUiProviderChild = ({
     verbosePalette,
     simpleTheme,
     verboseTheme,
-    buttonConfig: componentConfig.buttonConfig,
     componentConfig,
     themeMode,
     setTheme: setThemeMode,

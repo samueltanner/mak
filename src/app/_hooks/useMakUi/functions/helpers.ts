@@ -51,7 +51,9 @@ import {
 } from "../constants/ui-constants"
 import {
   ClassObject,
+  MakUiComponentConfig,
   MakUiComponentConfigInput,
+  MakUiRootComponentConfig,
   ObjectToClassNameObjectProp,
 } from "../types/component-types"
 import {
@@ -61,6 +63,7 @@ import {
   isObject,
   nearestMultiple,
 } from "@/globals/global-helper-functions"
+import { useMakUi } from "../context/MakUiContext"
 
 export const constructTailwindObject = ({
   hex,
@@ -1145,32 +1148,6 @@ const parseMakClassName = (string: string) => {
   return makClassNameObj
 }
 
-export const getActiveTwVariants = ({
-  componentConfig,
-  enabledThemeModes,
-}: {
-  componentConfig: MakUiComponentConfigInput
-  enabledThemeModes: MakUiThemeKey[]
-}) => {
-  const enabledInteractionStates: MakUiInteractionStateKey[] = []
-  const enabledTwVariants: string[] = []
-  Object.values(componentConfig).forEach((config) => {
-    const themeModes = config?.enabledStates as MakUiInteractionStateKey[]
-    themeModes && enabledInteractionStates.push(...themeModes)
-  })
-  for (const theme of enabledThemeModes) {
-    for (const state of enabledInteractionStates) {
-      if (theme === "light") {
-        enabledTwVariants.push(`${state}`)
-      } else {
-        enabledTwVariants.push(`${theme}:${state}`)
-      }
-    }
-  }
-
-  return { enabledTwVariants, enabledInteractionStates }
-}
-
 export const getTwConfigSafelist = ({
   simplePalette,
   enabledTwVariants,
@@ -1524,4 +1501,74 @@ export const ensureUtilityClass = (utility: string, className: string) => {
 
 export const mergeClassNames = (...props: string[]) => {
   return props.join(" ")
+}
+
+export const mergeDefaultConfig = ({
+  makUi,
+  useConfig,
+  component,
+  className,
+  makClassName,
+}: {
+  makUi: ReturnType<typeof useMakUi>
+  useConfig: boolean | undefined
+  component?: keyof JSX.IntrinsicElements
+  className?: string
+  makClassName?: string
+}): {
+  componentConfig: MakUiRootComponentConfig | undefined
+  defaultClassName: string | undefined
+  defaultMakClassName: string | undefined
+  componentClassName: string | undefined
+  componentMakClassName: string | undefined
+  resolvedClassName: string | undefined
+  resolvedMakClassName: string | undefined
+} => {
+  className = className
+    ? className.trim().replace(/^undefined /g, "")
+    : undefined
+  makClassName = makClassName
+    ? makClassName.trim().replace(/^undefined /g, "")
+    : undefined
+
+  if (!component)
+    return {
+      componentConfig: undefined,
+      componentClassName: className,
+      componentMakClassName: makClassName,
+      defaultClassName: undefined,
+      defaultMakClassName: undefined,
+      resolvedClassName: className,
+      resolvedMakClassName: makClassName,
+    }
+  const componentConfig: MakUiRootComponentConfig | undefined =
+    makUi.componentConfig?.[component]
+  const defaultClassName = componentConfig?.className
+  const defaultMakClassName = componentConfig?.makClassName
+  const componentClassName = className
+  const componentMakClassName = makClassName
+  let resolvedClassName: string | undefined
+  let resolvedMakClassName: string | undefined
+
+  if (useConfig) {
+    resolvedClassName = [defaultClassName || "", componentClassName || ""]
+      .join(" ")
+      .trim()
+    resolvedMakClassName = [defaultMakClassName, componentMakClassName]
+      .join(" ")
+      .trim()
+  } else {
+    resolvedClassName = componentClassName
+    resolvedMakClassName = componentMakClassName
+  }
+
+  return {
+    componentConfig,
+    defaultClassName,
+    defaultMakClassName,
+    componentClassName,
+    componentMakClassName,
+    resolvedClassName,
+    resolvedMakClassName,
+  }
 }

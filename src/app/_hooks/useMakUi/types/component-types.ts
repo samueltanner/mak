@@ -13,41 +13,20 @@ import {
 } from "./ui-types"
 
 export type MakUiRootComponentConfigInput = {
-  [key: string]: string | undefined | MakUiInteractionStateKey[]
-  borderRadius?: string
-  borderWidth?: string
-  borderStyle?: string
   className?: string
-  text?: string
-  enabledStates?: MakUiInteractionStateKey[]
+  makClassName?: string
 }
 export type MakUiRootComponentConfig = {
-  [key: string]: string | undefined | MakUiInteractionStateKey[]
-  borderRadius?: string
-  borderWidth?: string
-  borderStyle?: string
-  className: string
-  text?: string
-  enabledStates: MakUiInteractionStateKey[]
+  className?: string
+  makClassName?: string
 }
+
 export type MakUiComponentConfigInput = {
-  buttonConfig?: MakUiRootComponentConfigInput
-  inputConfig?: MakUiRootComponentConfigInput
-  textConfig?: MakUiRootComponentConfigInput
-  formConfig?: MakUiRootComponentConfigInput
-  dialogConfig?: MakUiRootComponentConfigInput
-  selectConfig?: MakUiRootComponentConfigInput
-  textareaConfig?: MakUiRootComponentConfigInput
+  [Key in keyof JSX.IntrinsicElements]?: MakUiRootComponentConfigInput
 }
 
 export type MakUiComponentConfig = {
-  buttonConfig: MakUiRootComponentConfig
-  inputConfig: MakUiRootComponentConfig
-  textConfig: MakUiRootComponentConfig
-  formConfig: MakUiRootComponentConfig
-  dialogConfig: MakUiRootComponentConfig
-  selectConfig: MakUiRootComponentConfig
-  textareaConfig: MakUiRootComponentConfig
+  [Key in keyof JSX.IntrinsicElements]?: MakUiRootComponentConfig
 }
 export type ButtonVariants = {
   [key: string]: ButtonStates
@@ -86,6 +65,7 @@ export type VariantWithShadeAndOpacity = `${MakUiVariantKey}-${Shade}/${number}`
 export type ThemeVariantWithOpacity = `${MakUiThemeVariantKey}-${number}`
 export type FalsyValue = false | null | undefined
 export type TypeProps = {
+  useConfig?: boolean
   //theme
   darkMode?: boolean
   lightMode?: boolean

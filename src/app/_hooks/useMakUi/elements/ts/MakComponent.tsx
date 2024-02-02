@@ -8,6 +8,11 @@ import { componentWrapperLogic } from "../../components/ComponentWrapper"
 import StyledComponent from "./StyledComponent"
 import { isEmptyObject } from "../../../../../globals/global-helper-functions"
 import StyledMotionComponent from "./StyledMotionComponent"
+import {
+  MakUiComponentConfig,
+  MakUiRootComponentConfig,
+} from "../../types/component-types"
+import { mergeDefaultConfig } from "../../functions/helpers"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -17,11 +22,20 @@ type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
 
 const MakComponent = memo(
   forwardRef<HTMLElement, HTMLMakComponentProps<keyof JSX.IntrinsicElements>>(
-    ({ component, motion, ...props }, ref) => {
+    ({ component, motion, useConfig, ...props }, ref) => {
       const makUi = useMakUi()
+
+      let { resolvedClassName, resolvedMakClassName, componentConfig } = mergeDefaultConfig({
+        makUi,
+        useConfig,
+        component,
+        className: props?.className,
+        makClassName: props?.makClassName,
+      })
+
       const response = useMemo(() => {
         return componentWrapperLogic({
-          props,
+          props: props,
           makUi,
         })
       }, [props, makUi])
@@ -35,6 +49,7 @@ const MakComponent = memo(
         makClassName,
         component,
         ref,
+        defaultConfig: componentConfig,
         ...responseRest,
       }
 

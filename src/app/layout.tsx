@@ -35,7 +35,7 @@ const palette: MakUiFlexiblePaletteInput = {
 }
 
 const componentConfig: MakUiComponentConfigInput = {
-  buttonConfig: {
+  button: {
     className:
       "px-2.5 py-1 h-fit w-fit text-sm rounded-md fade-in-out font-semibold",
   },

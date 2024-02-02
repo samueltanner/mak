@@ -3,6 +3,7 @@ import Button from "../_hooks/useMakUi/components/Button"
 import Dropdown, { DropdownMenu } from "../_hooks/useMakUi/components/Dropdown"
 import Loader from "../_hooks/useMakUi/components/Loader"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
+import { MakUiVariantKey } from "../_hooks/useMakUi/types/ui-types"
 const DropdownView = () => {
   const [buttonState, setButtonState] = useState<
     "error" | "success" | "loading" | "default"
@@ -18,10 +19,9 @@ const DropdownView = () => {
   return (
     <div className="flex gap-4 items-center">
       <Button
-        bg={buttonStateMap[buttonState]}
+        bg={buttonStateMap[buttonState] as MakUiVariantKey}
         textLight
-        height="fit"
-        width="fit"
+        className="px-2 py-1 rounded-md fade-in-out"
       >
         <mak.div
           motion={{

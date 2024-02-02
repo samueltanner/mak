@@ -9,7 +9,6 @@ import {
 } from "../_hooks/useMakUi/components/Modal"
 
 export const ModalView = () => {
-  const { simpleTheme } = useMakUi()
   const [modalIsOpen, setModalIsOpen] = useState(false)
 
   return (
