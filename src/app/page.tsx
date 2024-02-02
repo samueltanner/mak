@@ -11,17 +11,27 @@ export default function Home() {
     <div className="relative h-screen w-screen p-4">
       <div className="flex w-full h-full justify-between">
         {/* <MakUiView /> */}
-        {/* <MakFormView /> */}
+        <MakFormView />
 
         {/* <Global> */}
         <div className="flex flex-col gap-2 size-fit p-4 border-2 group">
           PARENT
-          <span className="flex flex-col gap-2 size-fit p-4 border-2 group-hover:bg-red-500 group/child">
+          <mak.span className="flex flex-col gap-2 size-fit p-4 border-2 peer">
             first child
             <span className="flex flex-col gap-2 size-fit p-4 border-2 group-hover/child:bg-blue-500">
               first grandchild
             </span>
-          </span>
+          </mak.span>
+          <mak.span
+            className="flex flex-col gap-2 size-fit p-4 border-2 "
+            makClassName="peer-not-checked:bg-primary"
+          >
+            second child
+            <span className="flex flex-col gap-2 size-fit p-4 border-2 group-hover/child:bg-blue-500">
+              second grandchild
+            </span>
+          </mak.span>
+          <input type="checkbox" className="peer" checked={false} />
         </div>
         {/* <StyledParent className="p-4 flex flex-col gap-4 border-2 h-fit w-fit group">
           i am the parent

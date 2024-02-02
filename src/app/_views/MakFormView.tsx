@@ -37,7 +37,7 @@ const StyledGroup = styled.div({
 })
 
 const StyledChild = styled.span`
-  &:is(span):has(~ :checked) {
+  &:has(~ .peer:hover) {
     background-color: blue;
   }
 `
