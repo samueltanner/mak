@@ -25,13 +25,14 @@ const MakComponent = memo(
     ({ component, motion, useConfig, ...props }, ref) => {
       const makUi = useMakUi()
 
-      let { resolvedClassName, resolvedMakClassName, componentConfig } = mergeDefaultConfig({
-        makUi,
-        useConfig,
-        component,
-        className: props?.className,
-        makClassName: props?.makClassName,
-      })
+      let { resolvedClassName, resolvedMakClassName, componentConfig } =
+        mergeDefaultConfig({
+          makUi,
+          useConfig,
+          component,
+          className: props?.className,
+          makClassName: props?.makClassName,
+        })
 
       const response = useMemo(() => {
         return componentWrapperLogic({
@@ -44,9 +45,17 @@ const MakComponent = memo(
         response
       const { baseClassObject = {}, pseudoClassObject = {} } = styleObject
 
+      if (component === "span") {
+        console.log("MakComponent.tsx: resolvedClassName", resolvedClassName)
+        console.log(
+          "MakComponent.tsx: resolvedMakClassName",
+          resolvedMakClassName
+        )
+        console.log(styleObject)
+      }
       const allProps = {
-        className: twClassName,
-        makClassName,
+        className: resolvedClassName,
+        makClassName: resolvedMakClassName,
         component,
         ref,
         defaultConfig: componentConfig,
@@ -65,7 +74,7 @@ const MakComponent = memo(
             styleObject={inlineStyles}
             as={component}
             motionProps={motion}
-            className={twClassName}
+            className={resolvedClassName}
             {...allProps}
           />
         )
@@ -75,7 +84,7 @@ const MakComponent = memo(
         <StyledComponent
           styleObject={inlineStyles}
           as={component}
-          className={twClassName}
+          className={resolvedClassName}
           {...allProps}
         />
       )

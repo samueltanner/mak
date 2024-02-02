@@ -302,17 +302,15 @@ export const makUiDefaultStates: MakUiDefaultStateColors = {
 export const defaultButtonConfig: MakUiRootComponentConfigInput = {
   className:
     "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold fade-in-out",
-  enabledStates: ["hover", "focus", "disabled"],
 }
 
 export const defaultInputConfig: MakUiRootComponentConfigInput = {
   className: "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold",
-  enabledStates: ["hover", "focus", "disabled"],
 }
 
 export const defaultComponentConfig: MakUiComponentConfigInput = {
-  buttonConfig: defaultButtonConfig,
-  inputConfig: defaultInputConfig,
+  button: defaultButtonConfig,
+  input: defaultInputConfig,
 }
 
 export const tailwindToCssModifierObject: {

@@ -87,13 +87,6 @@ export const componentWrapperLogic = ({
     makClassName,
   })
 
-  // className = className
-  //   ? className.trim().replace(/^undefined /g, "")
-  //   : undefined
-  // makClassName = makClassName
-  //   ? makClassName.trim().replace(/^undefined /g, "")
-  //   : undefined
-
   const activeThemeMode = themeMode
     ? themeMode
     : makTheme

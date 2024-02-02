@@ -10,7 +10,7 @@ import {
 
 export const ModalView = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
-
+  const { isDark } = useMakUi()
   return (
     <>
       <Modal
@@ -60,10 +60,10 @@ export const ModalView = () => {
         onClick={() => {
           setModalIsOpen(true)
         }}
-        // showFocusRing={false}
         borderDark
         textPrimary
         width="w-fit"
+        makClassName={`hover:bg-${isDark ? "dark-900/50" : "light-100/30"}`}
       >
         Open Modal
       </Button>
