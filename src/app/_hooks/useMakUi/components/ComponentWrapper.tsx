@@ -1,7 +1,14 @@
 import { useMakUi } from "../context/MakUiContext"
 import { parseClassNameToStyleObject } from "../functions/helpers"
-import { TypeProps, ComponentWrapperResponse } from "../types/component-types"
-import { MakUiVariantKey } from "../types/ui-types"
+import {
+  TypeProps,
+  ComponentWrapperResponse,
+  ThemeVariantWithOpacity,
+  VariantWithShade,
+  VariantWithShadeAndOpacity,
+  FalsyValue,
+} from "../types/component-types"
+import { MakUiThemeVariantKey, MakUiVariantKey } from "../types/ui-types"
 import { withComputedProps } from "./componentTypeProps"
 
 type ComponentWrapperProps = TypeProps & {
@@ -48,6 +55,12 @@ export const componentWrapperLogic = ({
     text: textProps,
     border: borderProps,
     bg: bgProps,
+    hasModeProps,
+    hasThemeProps,
+    hasColorProps,
+    hasTextProps,
+    hasBorderProps,
+    hasBgProps,
     className,
     makClassName,
     ...restWithComputedProps
@@ -100,6 +113,7 @@ export const componentWrapperLogic = ({
 
   if (borderProps) {
     const borderClassName = `border-${borderProps}`
+
     makClassName = makClassName
       ? `${makClassName} ${borderClassName}`
       : borderClassName
@@ -120,7 +134,7 @@ export const componentWrapperLogic = ({
     activeTheme,
   })
 
-  const response: ComponentWrapperResponse = {
+  const response: ComponentWrapperResponse & TypeProps = {
     styleObject,
     componentTheme: themePalette,
     componentText: textPalette,
@@ -134,14 +148,39 @@ export const componentWrapperLogic = ({
     twClassName,
     makClassName: makClassNames,
     modeVariant: themeMode,
-    themeVariant: themeProps,
-    colorVariant: colorProps as MakUiVariantKey | undefined,
-    textVariant: textProps as MakUiVariantKey | undefined,
-    borderVariant: borderProps as MakUiVariantKey | undefined,
-    bgVariant: bgProps as MakUiVariantKey | undefined,
-
+    hasModeProps,
+    hasThemeProps,
+    hasColorProps,
+    hasTextProps,
+    hasBorderProps,
+    hasBgProps,
+    themeVariant: themeProps as
+      | MakUiThemeVariantKey
+      | ThemeVariantWithOpacity
+      | FalsyValue,
+    colorVariant: colorProps as
+      | MakUiVariantKey
+      | VariantWithShade
+      | VariantWithShadeAndOpacity
+      | FalsyValue,
+    textVariant: textProps as
+      | MakUiVariantKey
+      | VariantWithShade
+      | VariantWithShadeAndOpacity
+      | FalsyValue,
+    borderVariant: borderProps as
+      | MakUiVariantKey
+      | VariantWithShade
+      | VariantWithShadeAndOpacity
+      | FalsyValue,
+    bgVariant: bgProps as
+      | MakUiVariantKey
+      | VariantWithShade
+      | VariantWithShadeAndOpacity
+      | FalsyValue,
     _className: twClassName,
     _makClassName: makClassNames,
+    children: restWithComputedProps.children,
     ...restWithComputedProps,
   }
 

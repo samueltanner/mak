@@ -2,11 +2,18 @@ import {
   allowFalsyFallback,
   deepMerge,
 } from "@/globals/global-helper-functions"
-import { TypeProps, WithComponentPropsResponse } from "../types/component-types"
+import {
+  ThemeVariantWithOpacity,
+  TypeProps,
+  VariantWithShade,
+  VariantWithShadeAndOpacity,
+  WithComponentPropsResponse,
+} from "../types/component-types"
 import {
   MakUiStateKey,
   MakUiThemeKey,
   MakUiThemeVariantKey,
+  MakUiVariantKey,
   TailwindModifier,
 } from "../types/ui-types"
 
@@ -105,96 +112,133 @@ const getThemeModeValue = (props: TypeProps): MakUiThemeKey | undefined => {
   return undefined
 }
 
-const getThemeVariantValue = (
-  props: TypeProps
-): MakUiThemeVariantKey | undefined => {
-  if (props.themeVariant) return props.themeVariant as MakUiThemeVariantKey
-  if (props.themePrimary) return "primary" as MakUiThemeVariantKey
-  if (props.themeSecondary) return "secondary" as MakUiThemeVariantKey
-  if (props.themeTertiary) return "tertiary" as MakUiThemeVariantKey
-  if (props.themeCustom) return "custom" as MakUiThemeVariantKey
-  if (props.themeLight) return "light" as MakUiThemeVariantKey
-  if (props.themeDark) return "dark" as MakUiThemeVariantKey
-  if (props.themeWhite) return "white" as MakUiThemeVariantKey
-  if (props.themeBlack) return "black" as MakUiThemeVariantKey
-  return undefined
+const propValue = (props: any, variant: string): string | undefined => {
+  if (!props) return undefined
+  if (props === true) return variant as string
+  if (props === false) return undefined
+
+  if (typeof props !== "boolean") return `${variant}-${props}`
 }
 
+const getThemeVariantValue = (props: TypeProps) => {
+  if (props.themeVariant) return props.themeVariant
+  if (props.themePrimary) return propValue(props.themePrimary, "primary")
+  if (props.themeSecondary) return propValue(props.themeSecondary, "secondary")
+  if (props.themeTertiary) return propValue(props.themeTertiary, "tertiary")
+  if (props.themeCustom) return propValue(props.themeCustom, "custom")
+  if (props.themeLight) return propValue(props.themeLight, "light")
+  if (props.themeDark) return propValue(props.themeDark, "dark")
+  if (props.themeWhite) return propValue(props.themeWhite, "white")
+  if (props.themeBlack) return propValue(props.themeBlack, "black")
+  return undefined
+}
 const getColorValue = (props: TypeProps) => {
   if (props.variant) return props.variant
-  if (props.primary) return "primary"
-  if (props.secondary) return "secondary"
-  if (props.tertiary) return "tertiary"
-  if (props.success) return "success"
-  if (props.error) return "error"
-  if (props.warning) return "warning"
-  if (props.danger) return "danger"
-  if (props.info) return "info"
-  if (props.custom) return "custom"
-  if (props.light) return "light"
-  if (props.dark) return "dark"
+  if (props.primary) return propValue(props.primary, "primary")
+  if (props.secondary) return propValue(props.secondary, "secondary")
+  if (props.tertiary) return propValue(props.tertiary, "tertiary")
+  if (props.success) return propValue(props.success, "success")
+  if (props.error) return propValue(props.error, "error")
+  if (props.warning) return propValue(props.warning, "warning")
+  if (props.danger) return propValue(props.danger, "danger")
+  if (props.info) return propValue(props.info, "info")
+  if (props.custom) return propValue(props.custom, "custom")
+  if (props.light) return propValue(props.light, "light")
+  if (props.dark) return propValue(props.dark, "dark")
   return undefined
 }
 
 const getBorderValue = (props: TypeProps) => {
   if (props.border) return props.border
-  if (props.borderPrimary) return "primary"
-  if (props.borderSecondary) return "secondary"
-  if (props.borderTertiary) return "tertiary"
-  if (props.borderSuccess) return "success"
-  if (props.borderError) return "error"
-  if (props.borderWarning) return "warning"
-  if (props.borderDanger) return "danger"
-  if (props.borderInfo) return "info"
-  if (props.borderCustom) return "custom"
-  if (props.borderLight) return "light"
-  if (props.borderDark) return "dark"
+  if (props.borderPrimary) return propValue(props.borderPrimary, "primary")
+  if (props.borderSecondary)
+    return propValue(props.borderSecondary, "secondary")
+  if (props.borderTertiary) return propValue(props.borderTertiary, "tertiary")
+  if (props.borderSuccess) return propValue(props.borderSuccess, "success")
+  if (props.borderError) return propValue(props.borderError, "error")
+  if (props.borderWarning) return propValue(props.borderWarning, "warning")
+  if (props.borderDanger) return propValue(props.borderDanger, "danger")
+  if (props.borderInfo) return propValue(props.borderInfo, "info")
+  if (props.borderCustom) return propValue(props.borderCustom, "custom")
+  if (props.borderLight) return propValue(props.borderLight, "light")
+  if (props.borderDark) return propValue(props.borderDark, "dark")
   return undefined
 }
 
 const getTextValue = (props: TypeProps) => {
   if (props.text) return props.text
-  if (props.textPrimary) return "primary"
-  if (props.textSecondary) return "secondary"
-  if (props.textTertiary) return "tertiary"
-  if (props.textSuccess) return "success"
-  if (props.textError) return "error"
-  if (props.textWarning) return "warning"
-  if (props.textDanger) return "danger"
-  if (props.textInfo) return "info"
-  if (props.textCustom) return "custom"
-  if (props.textLight) return "light"
-  if (props.textDark) return "dark"
+  if (props.textPrimary) return propValue(props.textPrimary, "primary")
+  if (props.textSecondary) return propValue(props.textSecondary, "secondary")
+  if (props.textTertiary) return propValue(props.textTertiary, "tertiary")
+  if (props.textSuccess) return propValue(props.textSuccess, "success")
+  if (props.textError) return propValue(props.textError, "error")
+  if (props.textWarning) return propValue(props.textWarning, "warning")
+  if (props.textDanger) return propValue(props.textDanger, "danger")
+  if (props.textInfo) return propValue(props.textInfo, "info")
+  if (props.textCustom) return propValue(props.textCustom, "custom")
+  if (props.textLight) return propValue(props.textLight, "light")
+  if (props.textDark) return propValue(props.textDark, "dark")
   return undefined
 }
 
 const getBgValue = (props: TypeProps) => {
   if (props.bg) return props.bg
-  if (props.bgPrimary) return "primary"
-  if (props.bgSecondary) return "secondary"
-  if (props.bgTertiary) return "tertiary"
-  if (props.bgSuccess) return "success"
-  if (props.bgError) return "error"
-  if (props.bgWarning) return "warning"
-  if (props.bgDanger) return "danger"
-  if (props.bgInfo) return "info"
-  if (props.bgCustom) return "custom"
-  if (props.bgLight) return "light"
-  if (props.bgDark) return "dark"
+  if (props.bgPrimary) return propValue(props.bgPrimary, "primary")
+  if (props.bgSecondary) return propValue(props.bgSecondary, "secondary")
+  if (props.bgTertiary) return propValue(props.bgTertiary, "tertiary")
+  if (props.bgSuccess) return propValue(props.bgSuccess, "success")
+  if (props.bgError) return propValue(props.bgError, "error")
+  if (props.bgWarning) return propValue(props.bgWarning, "warning")
+  if (props.bgDanger) return propValue(props.bgDanger, "danger")
+  if (props.bgInfo) return propValue(props.bgInfo, "info")
+  if (props.bgCustom) return propValue(props.bgCustom, "custom")
+  if (props.bgLight) return propValue(props.bgLight, "light")
+  if (props.bgDark) return propValue(props.bgDark, "dark")
   return undefined
 }
 
 export const withComputedProps = (
   props: TypeProps
-): WithComponentPropsResponse => {
+): WithComponentPropsResponse & TypeProps => {
+  const computedModeProps = getThemeModeValue(props)
+  const computedThemeProps = getThemeVariantValue(props) as
+    | MakUiThemeVariantKey
+    | ThemeVariantWithOpacity
+    | undefined
+  const computedColorProps = getColorValue(props) as
+    | MakUiVariantKey
+    | VariantWithShade
+    | VariantWithShadeAndOpacity
+    | undefined
+  const computedBorderProps = getBorderValue(props) as
+    | MakUiVariantKey
+    | VariantWithShade
+    | VariantWithShadeAndOpacity
+    | undefined
+  const computedTextProps = getTextValue(props) as
+    | MakUiVariantKey
+    | VariantWithShade
+    | VariantWithShadeAndOpacity
+    | undefined
+  const hasBgProps = getBgValue(props) as
+    | MakUiVariantKey
+    | VariantWithShade
+    | VariantWithShadeAndOpacity
+    | undefined
   return {
     ...props,
-    mode: getThemeModeValue(props),
-    theme: getThemeVariantValue(props),
-    color: getColorValue(props),
-    border: getBorderValue(props),
-    text: getTextValue(props),
-    bg: getBgValue(props),
+    mode: computedModeProps,
+    hasModeProps: !!computedModeProps,
+    theme: computedThemeProps,
+    hasThemeProps: !!computedThemeProps,
+    color: computedColorProps,
+    hasColorProps: !!computedColorProps,
+    border: computedBorderProps,
+    hasBorderProps: !!computedBorderProps,
+    text: computedTextProps,
+    hasTextProps: !!computedTextProps,
+    bg: hasBgProps,
+    hasBgProps: !!hasBgProps,
     themeOpacity: allowFalsyFallback(
       props.themeOpacity,
       typeProps.themeOpacity

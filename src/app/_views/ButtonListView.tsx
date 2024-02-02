@@ -1,21 +1,26 @@
 import { useState } from "react"
 import Button from "../_hooks/useMakUi/components/Button"
 import Toggle from "../_hooks/useMakUi/components/Toggle"
-import { useMakUi } from "../_hooks/useMakUi/context/MakUiContext"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
+import { MakUiVariantKey } from "../_hooks/useMakUi/types/ui-types"
+import { makUiVariants } from "../_hooks/useMakUi/constants/ui-constants"
 
 const ButtonListView = () => {
-  const { simpleTheme, verboseTheme } = useMakUi()
-
-  const { theme, color, text, border } = verboseTheme
-
   const [outlined, setOutlined] = useState(false)
 
   return (
     <div className="flex gap-2 items-center">
-      {Object.entries(color).map(([cName, cVal], index) => {
+      {makUiVariants.map((cName, index) => {
         return (
-          <Button key={index} bg={cName} border={cName} outlined={outlined}>
+          <Button
+            key={index}
+            bg={!outlined && (cName as MakUiVariantKey)}
+            border={cName as MakUiVariantKey}
+            className="px-2 py-1 rounded-md fade-in-out"
+            makClassName={`hover:bg-${cName}-600 ${
+              outlined ? `text-color|${cName}-200` : ""
+            } ${!outlined && cName === "light" ? "text-dark-800" : ""}`}
+          >
             <span className="capitalize">{cName}</span>
           </Button>
         )

@@ -14,8 +14,8 @@ const ThemeButton = () => {
   } = useMakUi()
   return (
     <Button
-      bgLight
-      outlined
+      borderLight={isDark && "100/50"}
+      borderDark={isLight && "800/50"}
       onClick={() => {
         setTheme(
           isDark
@@ -25,9 +25,16 @@ const ThemeButton = () => {
             : "dark"
         )
       }}
-      // showFocusRing={false}
+      className="flex items-center justify-center size-10 rounded-md fade-in-out"
+      makClassName={`hover:bg-${
+        isDark ? "light-100/10" : isLight ? "dark-300/50" : "primary"
+      }`}
     >
-      <mak.span makClassName="*:text-primary">
+      <mak.span
+        makClassName={`${
+          isDark ? "text-color|warning-400" : "text-color|secondary-600"
+        }`}
+      >
         {isDark && <BiSun className={`size-6 fade-in-out`} />}
         {isLight && (
           <BiSolidMoon

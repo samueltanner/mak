@@ -1391,9 +1391,7 @@ const parseMakClassNames = ({
         separateTwModifiers(makClassName)
 
       let key: string = "backgroundColor"
-      let modifierKey: string | undefined = undefined
       let paletteVariant: MakUiPaletteKey | undefined = undefined
-      let modifierClass: string | undefined = undefined
       let modifier: string | undefined = undefined
       let variant: MakUiVariantKey = "primary"
       let shade: Shade | undefined = undefined
@@ -1480,7 +1478,7 @@ const parseMakClassNames = ({
           })
           continue
         }
-        if (typeof modifierKey === "function"){
+        if (typeof modifierKey === "function") {
           modifierKey = modifierKey(selector, altSelector)
           modifierMap.set(modifierKey, {
             [utilityKey]: color,
@@ -1488,38 +1486,6 @@ const parseMakClassNames = ({
 
           continue
         }
-        // if (tailwindToCssModifierObject?.[modifier]) {
-        //   const cssModifier = tailwindToCssModifierObject[modifier]
-        //   if (typeof cssModifier === "string") {
-        //     modifierKey = cssModifier
-        //     key = keyMap[paletteVariant]
-        //     modifierMap.set(modifierKey, {
-        //       [key]: color,
-        //     })
-        //   }
-        //   continue
-        // }
-        // if (modifier === "peer-checked") {
-        //   modifierKey = 'input[type="checkbox"].peer:checked ~ &'
-        //   key = keyMap[paletteVariant]
-        //   modifierMap.set(modifierKey, {
-        //     [key]: color,
-        //   })
-        //   continue
-        // }
-        // const splitModifier = modifier.split("-")
-        // if (splitModifier.length > 1) {
-        //   modifierClass = splitModifier[0]
-        //   modifier = splitModifier[1]
-        //   modifierKey = `.${modifierClass}:${modifier} &`
-        // } else {
-        //   modifier = splitModifier[0]
-        //   modifierKey = `&:${modifier}`
-        // }
-        // key = keyMap[paletteVariant]
-        // modifierMap.set(modifierKey, {
-        //   [key]: color,
-        // })
       } else if (paletteVariant && color) {
         key = keyMap[paletteVariant]
         styleMap.set(key, color)
@@ -1554,4 +1520,8 @@ export const ensureUtilityClass = (utility: string, className: string) => {
     className = `${utility}${className}`
   }
   return className
+}
+
+export const mergeClassNames = (...props: string[]) => {
+  return props.join(" ")
 }
