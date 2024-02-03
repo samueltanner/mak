@@ -107,11 +107,8 @@ const componentFactory = ({
 
 export default componentFactory
 
-const constructDynamicComponents = (
-  formAccessor: FormAccessor,
-  outputType: ComponentOutputType
-) => {
-  const { form, setForm, setFormErrors } = formAccessor
+const constructDynamicComponents = (formAccessor: FormAccessor) => {
+  const { form, setForm, setFormErrors, outputType } = formAccessor
   return Object.keys(form || {}).reduce((acc, name) => {
     const componentName = getComponentName(name) as string
     const component = componentFactory({

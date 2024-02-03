@@ -20,7 +20,7 @@ const ButtonListView = () => {
             border={cName as MakUiVariantKey}
             className="px-2 py-1 rounded-md fade-in-out"
             makClassName={`hover:bg-${cName}-600 ${
-              outlined ? `text-color|${cName}-${isDark ? "200" : "800"}` : ""
+              outlined ? `text-bg|${cName}-${isDark ? "200" : "800"}` : ""
             } ${!outlined && cName === "light" ? "text-dark-800" : ""}`}
           >
             <span className="capitalize">{cName}</span>

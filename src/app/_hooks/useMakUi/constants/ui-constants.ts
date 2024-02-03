@@ -1,6 +1,6 @@
 import {
-  MakUiComponentConfigInput,
-  MakUiRootComponentConfigInput,
+  MakUiComponentConfig,
+  MakUiRootComponentConfig,
 } from "../types/component-types"
 import {
   HtmlElementKey,
@@ -299,16 +299,16 @@ export const makUiDefaultStates: MakUiDefaultStateColors = {
   visited: "zinc-500",
 }
 
-export const defaultButtonConfig: MakUiRootComponentConfigInput = {
+export const defaultButtonConfig: MakUiRootComponentConfig = {
   className:
     "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold fade-in-out",
 }
 
-export const defaultInputConfig: MakUiRootComponentConfigInput = {
+export const defaultInputConfig: MakUiRootComponentConfig = {
   className: "h-fit w-fit px-2 py-1 text-sm rounded-md font-semibold",
 }
 
-export const defaultComponentConfig: MakUiComponentConfigInput = {
+export const defaultComponentConfig: MakUiComponentConfig = {
   button: defaultButtonConfig,
   input: defaultInputConfig,
 }
@@ -389,13 +389,20 @@ export const tailwindToCssModifierObject: {
 
   //styles applied to child of a group
   //tw eg. group-hover:bg-red-500
-  "group-hover": (selector: string) => `.group:hover .group-hover${selector}`,
-  "group-focus": ".group &:focus",
-  "group-focus-within": ".group &:focus-within",
-  "group-focus-visible": ".group &:focus-visible",
-  "group-active": ".group &:active",
-  "group-visited": ".group &:visited",
-  "group-target": ".group &:target",
+  "group-hover": (selector: string, altSelector: string) =>
+    `.group${altSelector}:hover .group-hover${altSelector}${selector}`,
+  "group-focus": (selector: string, altSelector: string) =>
+    `.group${altSelector}:focus .group-focus${altSelector}${selector}`,
+  "group-focus-within": (selector: string, altSelector: string) =>
+    `.group${altSelector}:focus-within .group-focus-within${altSelector}${selector}`,
+  "group-focus-visible": (selector: string) =>
+    `.group:focus-visible .group-focus-visible${selector}`,
+  "group-active": (selector: string) =>
+    `.group:active .group-active${selector}`,
+  "group-visited": (selector: string) =>
+    `.group:visited .group-visited${selector}`,
+  "group-target": (selector: string) =>
+    `.group:target .group-target${selector}`,
   "group-has": (selector: string) => `.group &:has(${selector})`,
   "group-has-not": (selector: string) => `.group &:not(has:(${selector}))`,
   "group-is": (selector: string) => `.group &:is(${selector})`,
@@ -535,7 +542,9 @@ export const tailwindToCssModifierObject: {
   "peer-empty": "&:has(~ .peer:empty)",
   "peer-disabled": "&:has(~ .peer:disabled)",
   "peer-enabled": "&:has(~ .peer:enabled)",
-  "peer-checked": "&:has(~ &:has(~ .peer:checked))",
+  // "peer-checked": "&:has(~ .peer:checked)",
+  "peer-checked": (selector: string, altSelector: string) =>
+    `.peer${altSelector}:checked .peer-checked${altSelector}${selector}`,
   "peer-indeterminate": "&:has(~ .peer:indeterminate)",
   "peer-default": "&:has(~ .peer:default)",
   "peer-required": "&:has(~ .peer:required)",

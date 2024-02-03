@@ -1,62 +1,74 @@
 import { motion } from "framer-motion"
 import styled from "@emotion/styled"
-import { GenericObject } from "../../types/ui-types"
+import { forwardRef } from "react"
+import { GenericObject, MakUiVerboseTheme } from "../../types/ui-types"
+import { ComponentWrapperResponse } from "../../types/component-types"
+import { formatJsonToHtmlString } from "../../functions/helpers"
 
-const StyledMotionComponent = ({
-  as: Component = "div",
-  styleObject,
-  motionProps,
-  ...props
-}) => {
-  const {
-    makClassName,
-    component,
-    componentTheme,
-    componentBorder,
-    componentText,
-    componentColor,
-    fullComponentTheme,
-    componentThemeMode,
-    globalThemeMode,
-    globalTheme,
-    globalPalette,
+const StyledMotionComponent = forwardRef(
+  (
+    {
+      as: Component = "div",
+      styleObject,
+      motionProps,
+      ...props
+    }: {
+      as: string
+      styleObject: GenericObject
+      ref?: React.Ref<any>
+      motionProps?: GenericObject
+      className?: string
+      makClassName?: string
+      componentTheme?: ComponentWrapperResponse["componentTheme"]
+      componentBorder?: ComponentWrapperResponse["componentBorder"]
+      componentText?: ComponentWrapperResponse["componentText"]
+      componentColor?: ComponentWrapperResponse["componentColor"]
+      fullComponentTheme?: ComponentWrapperResponse["fullComponentTheme"]
+      componentThemeMode?: ComponentWrapperResponse["componentThemeMode"]
+      globalThemeMode?: ComponentWrapperResponse["globalThemeMode"]
+      globalTheme?: ComponentWrapperResponse["globalTheme"]
+      globalPalette?: ComponentWrapperResponse["globalPalette"]
+    },
+    ref
+  ) => {
+    const {
+      makClassName,
+      componentTheme,
+      componentBorder,
+      componentText,
+      componentColor,
+      fullComponentTheme,
+      componentThemeMode,
+      globalThemeMode,
+      globalTheme,
+      globalPalette,
+      ...restProps
+    } = props
+    const MotionComponent = motion[Component]
 
-    ...restProps
-  } = props
-  const MotionComponent = motion[Component]
-
-  const BaseStyledComponent = styled(MotionComponent)<any>(
-    ({ styleObject }) => {
-      return {
-        ...styleObject,
-      }
-    }
-  )
-
-  const formatJsonToHtmlString = (jsonObject: GenericObject) => {
-    return Object.entries(jsonObject)
-      .map(([key, value]) => {
-        if (typeof value === "object") {
-          return `${key}: {${formatJsonToHtmlString(value)}}`
-        } else {
-          return `${key}: ${value}`
+    const BaseStyledComponent = styled(MotionComponent)<any>(
+      ({ styleObject }) => {
+        return {
+          ...styleObject,
         }
-      })
-      .join("; ")
-  }
-  const formattedStyleString = formatJsonToHtmlString(styleObject)
+      }
+    )
 
-  return (
-    <BaseStyledComponent
-      as={Component}
-      styleObject={styleObject}
-      className={props.className}
-      data-mak-class={props.makClassName}
-      data-mak-style={formattedStyleString}
-      {...motionProps}
-      {...restProps}
-    />
-  )
-}
+    const formattedStyleString = formatJsonToHtmlString(styleObject)
+
+    return (
+      <BaseStyledComponent
+        as={Component}
+        styleObject={styleObject}
+        className={props.className}
+        data-mak-class={props.makClassName}
+        data-mak-style={formattedStyleString}
+        ref={ref}
+        {...motionProps}
+        {...restProps}
+      />
+    )
+  }
+)
 
 export default StyledMotionComponent

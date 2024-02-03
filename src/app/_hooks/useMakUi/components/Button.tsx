@@ -53,10 +53,11 @@ const Button = (props: ButtonProps) => {
         return (
           <ButtonComponent
             {...computedProps}
-            children={props.children}
             makClassName={props.makClassName}
             className={props.className}
-          />
+          >
+            {props.children}
+          </ButtonComponent>
         )
       }}
     </ComponentWrapper>

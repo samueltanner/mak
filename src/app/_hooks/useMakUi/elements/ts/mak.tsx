@@ -2,23 +2,31 @@
 
 import { MakComponent } from "./MakComponent"
 import { MakUiElementProps } from "./mak-custom-types"
-import { MotionProps } from "framer-motion"
+import { forwardRef } from "react"
 
 type ExtendedHTMLElement<K extends keyof JSX.IntrinsicElements> =
-  React.ComponentType<JSX.IntrinsicElements[K] & MakUiElementProps>
+  React.ComponentType<
+    JSX.IntrinsicElements[K] & MakUiElementProps & { ref?: React.Ref<any> }
+  >
 
 type Mak = {
   [K in keyof JSX.IntrinsicElements]: ExtendedHTMLElement<K>
 }
 
-const componentCache = {}
+const componentCache = {} as Record<keyof JSX.IntrinsicElements, any>
 
 const handler: ProxyHandler<{}> = {
   get(_: any, tag: keyof JSX.IntrinsicElements) {
     if (!componentCache[tag]) {
-      componentCache[tag] = (props: any) => (
-        <MakComponent component={tag} {...props} />
-      )
+      const ForwardedComponent = forwardRef((props: any, ref) => {
+        return <MakComponent component={tag} {...props} ref={ref} />
+      })
+
+      ForwardedComponent.displayName = `Mak${
+        tag.charAt(0).toUpperCase() + tag.slice(1)
+      }`
+
+      componentCache[tag] = ForwardedComponent
     }
     return componentCache[tag]
   },

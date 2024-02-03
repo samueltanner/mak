@@ -6,7 +6,7 @@ import componentFactory from "./componentFactory"
 import inputElementFactory from "./inputElementFactory"
 
 const constructForm = (formAccessor: FormAccessor): FormObject => {
-  const { form, setForm, setFormErrors } = formAccessor
+  const { form, setForm, setFormErrors, outputType } = formAccessor
   const constructedForm = {} as FormObject
 
   Object.keys(form).forEach((fieldName) => {
@@ -54,6 +54,7 @@ const constructForm = (formAccessor: FormAccessor): FormObject => {
     const component = componentFactory({
       name,
       formAccessor,
+      outputType,
     })
 
     const config = {

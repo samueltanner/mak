@@ -16,7 +16,7 @@ import { withComputedProps } from "./componentTypeProps"
 
 type ComponentWrapperProps = TypeProps & {
   children: ((props: any) => JSX.Element) | JSX.Element
-  type?: keyof JSX.IntrinsicElements
+  type?: string
 }
 
 const ComponentWrapper = ({
@@ -52,7 +52,7 @@ export const componentWrapperLogic = ({
 }: {
   props: TypeProps
   makUi: ReturnType<typeof useMakUi>
-  type?: keyof JSX.IntrinsicElements
+  type?: string
 }) => {
   const {
     theme: makTheme,

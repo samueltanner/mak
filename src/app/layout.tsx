@@ -4,8 +4,8 @@ import { Inter } from "next/font/google"
 
 import { MakUiProvider } from "./_hooks/useMakUi/context/MakUiContext"
 import { MakUiFlexiblePaletteInput } from "./_hooks/useMakUi/types/ui-types"
-import { MakUiComponentConfigInput } from "./_hooks/useMakUi/types/component-types"
 import ThemeWrapper from "./_views/ThemeWrapper"
+import { MakUiComponentConfig } from "./_hooks/useMakUi/types/component-types"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -34,7 +34,7 @@ const palette: MakUiFlexiblePaletteInput = {
   },
 }
 
-const componentConfig: MakUiComponentConfigInput = {
+const componentConfig: MakUiComponentConfig = {
   button: {
     className:
       "px-2.5 py-1 h-fit w-fit text-sm rounded-md fade-in-out font-semibold",

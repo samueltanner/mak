@@ -1,5 +1,5 @@
 "use client"
-import React, { createContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useEffect, useMemo, useState } from "react"
 import { paletteFactory } from "../factories/paletteFactory"
 import { ThemeProvider, useTheme } from "next-themes"
 import { constructTailwindObject } from "../functions/helpers"
@@ -23,9 +23,7 @@ import {
 } from "../constants/ui-constants"
 import {
   MakUiComponentConfig,
-  MakUiComponentConfigInput,
   MakUiRootComponentConfig,
-  MakUiRootComponentConfigInput,
 } from "../types/component-types"
 import { deepMerge, isEmptyObject } from "@/globals/global-helper-functions"
 import styled from "@emotion/styled"
@@ -46,8 +44,8 @@ type PaletteGeneratorProps = {
 type MakUiProviderProps = {
   children: React.ReactNode
   palette?: MakUiFlexiblePaletteInput
-  componentConfig?: MakUiComponentConfigInput
-  buttonConfig?: MakUiRootComponentConfigInput
+  componentConfig?: MakUiComponentConfig
+  buttonConfig?: MakUiRootComponentConfig
   themeShades?: MakUiThemeShades
   stateShades?: MakUiStateShades
   enableSystem?: boolean

@@ -39,9 +39,9 @@ const DropdownView = () => {
 
       <Dropdown
         label={
-          <span className={`capitalize `}>
+          <mak.span className="capitalize" makClassName="text-primary">
             {buttonState === "default" ? "default" : buttonState}
-          </span>
+          </mak.span>
         }
         chevronRight
         onChange={(value) => setButtonState(value as any)}

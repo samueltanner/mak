@@ -1,35 +1,42 @@
 import styled from "@emotion/styled"
 import { GenericObject } from "../../types/ui-types"
+import { forwardRef } from "react"
+import { formatJsonToHtmlString } from "../../functions/helpers"
 
 const BaseStyledComponent = styled.div<any>(({ styleObject }) => ({
   ...styleObject,
 }))
 
-const formatJsonToHtmlString = (jsonObject: GenericObject) => {
-  return Object.entries(jsonObject)
-    .map(([key, value]) => {
-      if (typeof value === "object") {
-        return `${key}: {${formatJsonToHtmlString(value)}}`
-      } else {
-        return `${key}: ${value}`
-      }
-    })
-    .join("; ")
-}
+const StyledComponent = forwardRef(
+  (
+    {
+      as: Component = "div",
+      styleObject,
+      ...props
+    }: {
+      as: keyof JSX.IntrinsicElements
+      styleObject: GenericObject
+      className?: string
+      makClassName?: string
+      ref?: React.Ref<any>
+    },
+    ref
+  ) => {
+    const formattedStyleString = formatJsonToHtmlString(styleObject)
 
-const StyledComponent = ({ as: Component = "div", styleObject, ...props }) => {
-  const formattedStyleString = formatJsonToHtmlString(styleObject)
+    return (
+      <BaseStyledComponent
+        as={Component}
+        styleObject={styleObject}
+        className={props.className}
+        data-mak-class={props.makClassName}
+        data-mak-style={formattedStyleString}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
 
-  return (
-    <BaseStyledComponent
-      as={Component}
-      styleObject={styleObject}
-      className={props.className}
-      data-mak-class={props.makClassName}
-      data-mak-style={formattedStyleString}
-      {...props}
-    />
-  )
-}
-
+StyledComponent.displayName = "StyledComponent"
 export default StyledComponent

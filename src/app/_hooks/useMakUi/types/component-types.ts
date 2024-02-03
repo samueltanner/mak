@@ -12,21 +12,13 @@ import {
   TailwindModifier,
 } from "./ui-types"
 
-export type MakUiRootComponentConfigInput = {
-  className?: string
-  makClassName?: string
-}
 export type MakUiRootComponentConfig = {
   className?: string
   makClassName?: string
 }
 
-export type MakUiComponentConfigInput = {
-  [Key in keyof JSX.IntrinsicElements]?: MakUiRootComponentConfigInput
-}
-
 export type MakUiComponentConfig = {
-  [Key in keyof JSX.IntrinsicElements]?: MakUiRootComponentConfig
+  [key: string]: MakUiRootComponentConfig | undefined
 }
 export type ButtonVariants = {
   [key: string]: ButtonStates
@@ -65,6 +57,7 @@ export type VariantWithShadeAndOpacity = `${MakUiVariantKey}-${Shade}/${number}`
 export type ThemeVariantWithOpacity = `${MakUiThemeVariantKey}-${number}`
 export type FalsyValue = false | null | undefined
 export type TypeProps = {
+  type?: string 
   useConfig?: boolean
   //theme
   darkMode?: boolean

@@ -51,8 +51,6 @@ import {
 } from "../constants/ui-constants"
 import {
   ClassObject,
-  MakUiComponentConfig,
-  MakUiComponentConfigInput,
   MakUiRootComponentConfig,
   ObjectToClassNameObjectProp,
 } from "../types/component-types"
@@ -1347,6 +1345,7 @@ const separateTwModifiers = (className: string) => {
     }
   }
 }
+
 export const parseMakClassNames = ({
   makClassName,
   activeTheme,
@@ -1444,11 +1443,13 @@ export const parseMakClassNames = ({
       }
 
       if (modifiersArray.length) {
-        const twModifier = modifiersArray[0]
+        let twModifierGroup = modifiersArray[0]
         let selector = modifiersArray?.[1]
-        const altSelector = modifiersArray?.[2]
+        let altSelector = modifiersArray?.[2]
         const utilityKey = keyMap[paletteVariant]
+        const [twModifier, modifierIdentifier] = twModifierGroup.split("/")
         let modifierKey = tailwindToCssModifierObject?.[twModifier]
+
         if (typeof modifierKey === "string") {
           modifierMap.set(modifierKey, {
             [utilityKey]: color,
@@ -1457,12 +1458,14 @@ export const parseMakClassNames = ({
         }
         if (typeof modifierKey === "function") {
           if (!selector) {
-            let escapedMcn = mcn
-            if (escapedMcn.includes("|")){
-              const [beforePipe, afterPipe] = escapedMcn.split("|")
-              escapedMcn = `${beforePipe}\\|${afterPipe}`
+            if (modifierIdentifier) {
             }
-            selector = `\\:${escapedMcn}`
+            const escapedClassName = className.replace(
+              /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
+              "\\$&"
+            )
+            selector = `\\:${escapedClassName}`
+            altSelector = modifierIdentifier ? `\\/${modifierIdentifier}` : ""
           }
           modifierKey = modifierKey(selector, altSelector)
           modifierMap.set(modifierKey, {
@@ -1520,7 +1523,7 @@ export const mergeDefaultConfig = ({
 }: {
   makUi: ReturnType<typeof useMakUi>
   useConfig: boolean | undefined
-  component?: keyof JSX.IntrinsicElements
+  component?: string
   className?: string
   makClassName?: string
 }): {
@@ -1579,4 +1582,16 @@ export const mergeDefaultConfig = ({
     resolvedClassName,
     resolvedMakClassName,
   }
+}
+
+export const formatJsonToHtmlString = (jsonObject: GenericObject): string => {
+  return Object.entries(jsonObject)
+    .map(([key, value]) => {
+      if (typeof value === "object") {
+        return `${key}: {${formatJsonToHtmlString(value)}}`
+      } else {
+        return `${key}: ${value}`
+      }
+    })
+    .join("; ")
 }

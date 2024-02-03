@@ -8,12 +8,7 @@ import { componentWrapperLogic } from "../../components/ComponentWrapper"
 import StyledComponent from "./StyledComponent"
 import { isEmptyObject } from "../../../../../globals/global-helper-functions"
 import StyledMotionComponent from "./StyledMotionComponent"
-import {
-  MakUiComponentConfig,
-  MakUiRootComponentConfig,
-} from "../../types/component-types"
-import { mergeDefaultConfig, parseMakClassNames } from "../../functions/helpers"
-import { GenericObject } from "../../types/ui-types"
+import { mergeDefaultConfig } from "../../functions/helpers"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -69,7 +64,6 @@ const MakComponent = memo(
         className: resolvedClassName,
         makClassName: resolvedMakClassName,
         component,
-        ref,
         defaultConfig: componentConfig,
         ...responseRest,
       }
@@ -83,10 +77,11 @@ const MakComponent = memo(
       if (isMotionObject) {
         return (
           <StyledMotionComponent
+            ref={ref}
             styleObject={inlineStyles}
             as={component}
             motionProps={motion}
-            className={resolvedClassName}
+            // className={resolvedClassName}
             {...allProps}
           />
         )
@@ -94,9 +89,10 @@ const MakComponent = memo(
 
       return (
         <StyledComponent
+          ref={ref}
           styleObject={inlineStyles}
           as={component}
-          className={resolvedClassName}
+          // className={resolvedClassName}
           {...allProps}
         />
       )

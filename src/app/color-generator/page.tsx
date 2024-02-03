@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import { constructTailwindObject } from "../_hooks/useMakUi/functions/helpers"
 
-export const ColorGenerator = () => {
+const ColorGenerator = () => {
   const [selectedColor, setSelectedColor] = useState<string>("#00a7bd")
 
   const [step, setStep] = useState<number>(50)

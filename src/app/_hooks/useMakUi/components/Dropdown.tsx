@@ -11,7 +11,9 @@ import { AnimatePresence, motion } from "framer-motion"
 import { BiChevronUp } from "react-icons/bi"
 import { useMakUi } from "../context/MakUiContext"
 import { isObject } from "@/globals/global-helper-functions"
-import { MakUiSimpleTheme } from "../types/ui-types"
+import { mak } from "../elements/ts/mak"
+import ComponentWrapper from "./ComponentWrapper"
+import { TypeProps } from "../types/component-types"
 
 type Position = {
   top?: number
@@ -101,8 +103,19 @@ const LabelElement = ({
     )
 }
 
-const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
-  const { simpleTheme } = useMakUi()
+const DropdownMenu = ({
+  children,
+  className,
+  makClassName,
+  liClassName,
+  liMakClassName,
+}: {
+  children?: React.ReactNode
+  className?: string
+  makClassName?: string
+  liClassName?: string
+  liMakClassName?: string
+}) => {
   const { onChange, value, values, options, valueKey } = useDropdownContext()
 
   const isSelect = (option: any) => {
@@ -126,7 +139,10 @@ const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
   }
 
   return (
-    <>
+    <mak.div
+      makClassName={makClassName || "bg-dark-800"}
+      className={className || "p-2 rounded-md drop-shadow-sm text-sm"}
+    >
       <span className="h-full">
         {!children && (
           <>
@@ -136,18 +152,25 @@ const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
                   i = Math.random()
                 }
                 return (
-                  <li
+                  <mak.li
                     key={i}
-                    className={`flex cursor-pointer select-none items-center space-x-2 text-sm font-semibold text-${simpleTheme.text.primary.base}`}
+                    className={
+                      className ||
+                      "flex cursor-pointer select-none items-center space-x-2 text-sm font-semibold"
+                    }
+                    makClassName={
+                      makClassName || "text-primary hover:text-bg|secondary-300"
+                    }
                   >
-                    <span
-                      className={`w-full rounded-md px-4 py-1.5 fade-in-out hover:bg-${
-                        simpleTheme.color.primary.base
-                      } hover:bg-opacity-50 ${
-                        isSelect(option)
-                          ? `bg-${simpleTheme.color.primary.base} bg-opacity-20 `
-                          : " bg-opacity-20 hover:bg-opacity-30"
-                      }`}
+                    <mak.span
+                      className={`w-full rounded-md px-4 py-1.5 fade-in-out`}
+                      //hover:bg-${
+                      //   simpleTheme.color.primary.base
+                      // } hover:bg-opacity-50 ${
+                      //   isSelect(option)
+                      //     ? `bg-${simpleTheme.color.primary.base} bg-opacity-20 `
+                      //     : " bg-opacity-20 hover:bg-opacity-30"
+                      // }
                       onClick={() => {
                         if (onChange) {
                           if (valueKey && isObject(option)) {
@@ -162,8 +185,8 @@ const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
                       {typeof option === "string" || typeof option === "number"
                         ? option
                         : option?.label}
-                    </span>
-                  </li>
+                    </mak.span>
+                  </mak.li>
                 )
               })}
             </ul>
@@ -171,7 +194,7 @@ const DropdownMenu = ({ children }: { children?: React.ReactNode }) => {
         )}
         {!!children && children}
       </span>
-    </>
+    </mak.div>
   )
 }
 
@@ -185,10 +208,7 @@ const DropdownTrigger = ({
   chevronRight,
   chevronLeft,
 }: DropdownElementTriggerProps) => {
-  const { dropdownOpen, setDropdownOpen, triggerRef, simpleTheme } =
-    useDropdownContext()
-
-  const { text } = simpleTheme
+  const { dropdownOpen, setDropdownOpen, triggerRef } = useDropdownContext()
 
   if (!labelLeft && !labelRight) {
     labelLeft = true
@@ -213,14 +233,18 @@ const DropdownTrigger = ({
         className="relative flex h-fit items-center justify-center gap-1"
       >
         {chevronLeft && (
-          <motion.span
-            initial={{ rotate: 0 }}
-            animate={{ rotate: dropdownOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
+          <mak.span
             className="flex items-center"
+            motion={{
+              initial: { rotate: 0 },
+              animate: { rotate: dropdownOpen ? 180 : 0 },
+              transition: { duration: 0.2 },
+            }}
           >
-            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
-          </motion.span>
+            <mak.span makClassName="text-primary">
+              <BiChevronUp className={`size-4`} />
+            </mak.span>
+          </mak.span>
         )}
         {label && labelLeft && (
           <LabelElement
@@ -246,7 +270,9 @@ const DropdownTrigger = ({
             transition={{ duration: 0.2 }}
             className="flex items-center"
           >
-            <BiChevronUp className={`size-4 text-${text.primary.base}`} />
+            <mak.span makClassName="text-primary">
+              <BiChevronUp className={`size-4`} />
+            </mak.span>
           </motion.span>
         )}
       </div>
@@ -254,7 +280,7 @@ const DropdownTrigger = ({
   )
 }
 
-interface DropdownProps {
+type DropdownProps = TypeProps & {
   children?: React.ReactNode
   options?:
     | Array<string | number>
@@ -284,7 +310,6 @@ interface DropdownContextValue extends DropdownProps {
   triggerRef: React.RefObject<HTMLDivElement> | null
   dropdownRef: React.RefObject<HTMLDivElement> | null
   hiddenDropdownRef: React.RefObject<HTMLDivElement> | null
-  simpleTheme: MakUiSimpleTheme
 }
 
 const DropdownContext = createContext<DropdownContextValue | undefined>(
@@ -301,7 +326,7 @@ const useDropdownContext = () => {
   return context
 }
 
-const Dropdown = ({
+const DropdownComponent = ({
   children,
   options,
   value,
@@ -316,8 +341,6 @@ const Dropdown = ({
   chevronLeft,
   valueKey,
 }: DropdownProps) => {
-  const { simpleTheme } = useMakUi()
-
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false)
   const [position, setPosition] = useState<Position>({
     top: 0,
@@ -450,7 +473,6 @@ const Dropdown = ({
         triggerRef,
         dropdownRef,
         hiddenDropdownRef,
-        simpleTheme,
         valueKey,
       }}
     >
@@ -464,27 +486,30 @@ const Dropdown = ({
       />
       <AnimatePresence>
         {dropdownOpen && (
-          <motion.span
-            className={`fixed z-30 flex w-fit p-2 h-full overflow-hidden rounded-lg bg-${simpleTheme?.theme?.secondary}`}
-            variants={menuVariants}
-            initial="hidden"
-            animate={dropdownOpen ? "visible" : "exit"}
-            exit="exit"
-            style={position}
+          <mak.span
+            className={`fixed z-30 flex w-fit p-2 h-full overflow-hidden rounded-lg`}
+            makClassName="bg-dark-800"
+            motion={{
+              variants: menuVariants,
+              initial: "hidden",
+              animate: dropdownOpen ? "visible" : "exit",
+              exit: "exit",
+              style: position,
+            }}
             ref={dropdownRef}
             key={`dropdown`}
           >
             {children ? children : <DropdownMenu />}
-          </motion.span>
+          </mak.span>
         )}
       </AnimatePresence>
       <div
-        className={`fixed left-[-9999px] top-[-9999px] z-[-1000] flex w-fit p-2 overflow-hidden rounded-lg`}
+        className="fixed left-[-9999px] top-[-9999px] z-[-1000] flex w-fit p-2 overflow-hidden rounded-lg"
         ref={hiddenDropdownRef}
         key={"dropdown-hidden"}
       >
         {children && (
-          <DropdownMenu key={"dropdown-children"}>{children}</DropdownMenu>
+          <DropdownMenu key="dropdown-children">{children}</DropdownMenu>
         )}
         {options && !children && <DropdownMenu key={"dropdown-options"} />}
       </div>
@@ -492,5 +517,31 @@ const Dropdown = ({
   )
 }
 
+const Dropdown = (props: DropdownProps) => {
+  return (
+    <ComponentWrapper {...props} type="dropdown">
+      {(computedProps) => {
+        return (
+          <DropdownComponent
+            {...computedProps}
+            options={props.options}
+            value={props.value}
+            values={props.values}
+            onChange={props.onChange}
+            menuPosition={props.menuPosition}
+            icon={props.icon}
+            label={props.label}
+            labelLeft={props.labelLeft}
+            labelRight={props.labelRight}
+            chevronLeft={props.chevronLeft}
+            chevronRight={props.chevronRight}
+            dismissOnClick={props.dismissOnClick}
+            valueKey={props.valueKey}
+          />
+        )
+      }}
+    </ComponentWrapper>
+  )
+}
 export { DropdownMenu }
 export default Dropdown

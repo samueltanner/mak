@@ -150,10 +150,11 @@ const Loader = (props: LoaderProps) => {
       {(computedProps) => (
         <LoaderComponent
           {...computedProps}
-          children={props.children}
           makClassName={props.makClassName}
           className={props.className}
-        />
+        >
+          {props.children}
+        </LoaderComponent>
       )}
     </ComponentWrapper>
   )

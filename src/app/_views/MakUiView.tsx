@@ -10,9 +10,9 @@ const MakUiView = () => {
   return (
     <div>
       <div className="flex flex-col gap-4">
-        <ButtonListView />
+        {/* <ButtonListView /> */}
         <DropdownView />
-        <ModalView />
+        {/* <ModalView /> */}
       </div>
     </div>
   )
