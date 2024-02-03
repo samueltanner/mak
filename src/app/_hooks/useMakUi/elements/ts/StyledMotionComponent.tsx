@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { HTMLMotionProps, MotionProps, motion } from "framer-motion"
 import styled from "@emotion/styled"
 import { forwardRef } from "react"
 import { GenericObject, MakUiVerboseTheme } from "../../types/ui-types"
@@ -16,7 +16,7 @@ const StyledMotionComponent = forwardRef(
       as: string
       styleObject: GenericObject
       ref?: React.Ref<any>
-      motionProps?: GenericObject
+      motionProps?: MotionProps
       className?: string
       makClassName?: string
       componentTheme?: ComponentWrapperResponse["componentTheme"]
@@ -44,7 +44,9 @@ const StyledMotionComponent = forwardRef(
       globalPalette,
       ...restProps
     } = props
-    const MotionComponent = motion[Component]
+    const MotionComponent = motion[
+      Component as keyof typeof motion
+    ] as React.ComponentType<any>
 
     const BaseStyledComponent = styled(MotionComponent)<any>(
       ({ styleObject }) => {
@@ -71,4 +73,5 @@ const StyledMotionComponent = forwardRef(
   }
 )
 
+StyledMotionComponent.displayName = "StyledMotionComponent"
 export default StyledMotionComponent
