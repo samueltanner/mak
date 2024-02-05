@@ -3,13 +3,20 @@ import { constructDynamicComponents } from "./functions/componentFactory"
 import constructForm from "./functions/constructForm"
 import { constructInputElements } from "./functions/inputElementFactory"
 import { ensureSingleElementType, isEqual } from "./functions/helpers"
-import { FormErrors, FormObject } from "./types/form-types"
+// import { FormErrors, FormObject } from "./types/form-types"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getComponentName } from "./functions/componentFactory"
-import { ComponentOutputType, DynamicComponents } from "./types/component-types"
+// import { ComponentOutputType, DynamicComponents } from "./types/component-types"
+import {
+  MakForm,
+  MakFormComponentOutputType,
+  MakFormDynamicComponent,
+  MakFormDynamicComponents,
+  MakFormErrors,
+} from "./types/form-types"
 
 interface useMakFormProps {
-  formConfig?: FormObject
+  formConfig?: MakForm
   onSubmit?: (input?: any) => void
   onReset?: (input?: any) => void
   useMakElements?: boolean
@@ -18,15 +25,15 @@ interface useMakFormProps {
 }
 
 export interface FormAccessor {
-  form: FormObject
-  setForm: React.Dispatch<React.SetStateAction<FormObject>>
-  formErrors: FormErrors
-  setFormErrors: React.Dispatch<React.SetStateAction<FormErrors>>
-  originalFormRef: React.MutableRefObject<FormObject>
-  previousFormRef: React.MutableRefObject<FormObject>
-  previousComponentsRef: React.MutableRefObject<DynamicComponents>
+  form: MakForm
+  setForm: React.Dispatch<React.SetStateAction<MakForm>>
+  formErrors: MakFormErrors
+  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
+  originalFormRef: React.MutableRefObject<MakForm>
+  previousFormRef: React.MutableRefObject<MakForm>
+  previousComponentsRef: React.MutableRefObject<MakFormDynamicComponents>
   formIsCurrent: () => boolean
-  outputType: ComponentOutputType
+  outputType: MakFormComponentOutputType
 }
 
 export const useMakForm = ({
@@ -40,17 +47,17 @@ export const useMakForm = ({
     useHTMLComponents,
     useMakComponents,
   })
-  const originalFormRef = useRef<FormObject>()
-  const previousFormRef = useRef<FormObject>({})
-  const previousComponentsRef = useRef<DynamicComponents>({})
+  const originalFormRef = useRef<MakForm>()
+  const previousFormRef = useRef<MakForm>({})
+  const previousComponentsRef = useRef<MakFormDynamicComponents>({})
 
-  const [form, setForm] = useState<FormObject>(formConfig || {})
-  const [formErrors, setFormErrors] = useState<FormErrors>({})
+  const [form, setForm] = useState<MakForm>(formConfig || {})
+  const [formErrors, setFormErrors] = useState<MakFormErrors>({})
   // const formIsCurrent = isEqual(form, previousFormRef.current)
   const formIsCurrent = useCallback(() => {
     return isEqual(form, previousFormRef.current)
   }, [form, previousFormRef.current])
-  const handleSetForm = (newForm: FormObject) => {
+  const handleSetForm = (newForm: MakForm) => {
     if (isEqual(form, previousFormRef.current)) return
 
     setForm(newForm)
@@ -78,9 +85,8 @@ export const useMakForm = ({
     return dummyComponents
   }
 
-  const [dynamicComponents, setDynamicComponents] = useState<DynamicComponents>(
-    initialComponentNames()
-  )
+  const [dynamicComponents, setDynamicComponents] =
+    useState<MakFormDynamicComponents>(initialComponentNames())
   const [inputElements, setInputElements] = useState(
     constructInputElements(formAccessor)
   )
@@ -102,8 +108,8 @@ export const useMakForm = ({
     components: dynamicComponents,
     inputElements,
   } as {
-    components: DynamicComponents
-    form: FormObject
+    components: MakFormDynamicComponents
+    form: MakForm
     inputElements: { [key: string]: JSX.Element }
   }
 }

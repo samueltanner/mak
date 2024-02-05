@@ -1,52 +1,80 @@
-import { SelectFieldConfig } from "../types/field-types"
-import { FormObject, FormElement } from "../types/form-types"
+import {
+  BooleanFieldConfig,
+  BoundedRangeFieldConfig,
+  MakForm,
+  MakFormElement,
+  NumberFieldConfig,
+  SelectFieldConfig,
+  TextFieldConfig,
+} from "../types/form-types"
 import { FormAccessor } from "../useMakForm"
 
 import componentFactory from "./componentFactory"
 import inputElementFactory from "./inputElementFactory"
 
-const constructForm = (formAccessor: FormAccessor): FormObject => {
+const constructForm = (formAccessor: FormAccessor): MakForm => {
   const { form, setForm, setFormErrors, outputType } = formAccessor
-  const constructedForm = {} as FormObject
+  const constructedForm = {} as MakForm
 
-  Object.keys(form).forEach((fieldName) => {
-    let fieldConfig = form[fieldName]
-    const type = fieldConfig?.type || "text"
-    const key = fieldConfig?.key || fieldName
-    const id = fieldConfig?.id || fieldName
-    const htmlFor = fieldConfig?.htmlFor || fieldName
-    const defaultValue = fieldConfig?.defaultValue
-    const required = fieldConfig?.required || false
-    const placeholder = fieldConfig?.placeholder || undefined
-    const label = fieldConfig?.label
-    const className = fieldConfig?.className
-    const hide = fieldConfig?.hide || false
-    const disabled = fieldConfig?.disabled || false
-    const readonly = fieldConfig?.readonly || false
-    const value = fieldConfig?.value
-    const options = (fieldConfig as SelectFieldConfig)?.options || []
-    const labelKey = (fieldConfig as SelectFieldConfig)?.labelKey
-    const valueKey = (fieldConfig as SelectFieldConfig)?.valueKey
-    const minLength = fieldConfig?.minLength || undefined
-    const maxLength = fieldConfig?.maxLength || undefined
-    const pattern = fieldConfig?.pattern || undefined
-    const onClick = fieldConfig?.onClick || undefined
-    const name = fieldConfig?.name || fieldName
-    const step = fieldConfig?.step || undefined
-    const min = fieldConfig?.min || undefined
-    const max = fieldConfig?.max || undefined
-    const onSubmit = fieldConfig?.onSubmit || undefined
-    const onChange = fieldConfig?.onChange || undefined
-    const onBlur = fieldConfig?.onBlur || undefined
-    const onFocus = fieldConfig?.onFocus || undefined
-    const onReset = fieldConfig?.onReset || undefined
-    const checked = fieldConfig?.checked || undefined
-    const autoComplete = fieldConfig?.autoComplete || undefined
-    const size = fieldConfig?.size || undefined
-    const src = fieldConfig?.src || undefined
-    const width = fieldConfig?.width || undefined
-    const height = fieldConfig?.height || undefined
-    const readOnly = fieldConfig?.readOnly || undefined
+  Object.keys(form).forEach((name) => {
+    const config = form[name] as MakFormElement
+
+    const type = form[name]?.type || "text"
+    const label = config?.label
+    const required = config?.required
+    const defaultValue = config?.defaultValue
+    const disabled = config?.disabled
+    const className = config?.className
+    const makClassName = config?.makClassName
+    const value = config?.value
+    const placeholder = config?.placeholder
+    const readonly = config?.readonly
+    const hide = config?.hide
+    const autoFocus = config?.autoFocus
+    const autoComplete = config?.autoComplete
+    const pattern = config?.pattern
+
+    // "text" | "password"
+    const minLength = (config as TextFieldConfig)?.minLength
+    const maxLength = (config as TextFieldConfig)?.maxLength
+
+    // "select" | "radio" | "multi-select" | "searchable-select"
+    const options = (config as SelectFieldConfig)?.options
+    const labelKey = (config as SelectFieldConfig)?.labelKey || "label"
+    const valueKey = (config as SelectFieldConfig)?.valueKey || "value"
+    const multiple = (config as SelectFieldConfig)?.multiple
+    const size = (config as SelectFieldConfig)?.size
+    const searchable = (config as SelectFieldConfig)?.searchable
+    const clearable = (config as SelectFieldConfig)?.clearable
+    const dismissOnClick = (config as SelectFieldConfig)?.dismissOnClick
+    const onClick = config?.onClick
+    const onBlur = config?.onBlur
+    const onFocus = config?.onFocus
+    const onSubmit = config?.onSubmit
+    const onReset = config?.onReset
+
+    // "boolean"
+    const checked = (config as BooleanFieldConfig)?.checked
+
+    // "number" | "range" | "bounded-range"
+    const min = (config as NumberFieldConfig)?.min
+    const max = (config as NumberFieldConfig)?.max
+    const step = (config as NumberFieldConfig)?.step
+
+    // "bounded-range"
+    const min0 = (config as BoundedRangeFieldConfig)?.min0
+    const max0 = (config as BoundedRangeFieldConfig)?.max0
+    const min1 = (config as BoundedRangeFieldConfig)?.min1
+    const max1 = (config as BoundedRangeFieldConfig)?.max1
+    const step0 = (config as BoundedRangeFieldConfig)?.step0
+    const step1 = (config as BoundedRangeFieldConfig)?.step1
+    const range = (config as BoundedRangeFieldConfig)?.range
+    const defaultValue0 = (config as BoundedRangeFieldConfig)?.defaultValue0
+    const defaultValue1 = (config as BoundedRangeFieldConfig)?.defaultValue1
+    const value0 = (config as BoundedRangeFieldConfig)?.value0
+    const value1 = (config as BoundedRangeFieldConfig)?.value1
+    const disabled0 = (config as BoundedRangeFieldConfig)?.disabled0
+    const disabled1 = (config as BoundedRangeFieldConfig)?.disabled1
     const inputElement = inputElementFactory({
       name,
       formAccessor,
@@ -57,51 +85,66 @@ const constructForm = (formAccessor: FormAccessor): FormObject => {
       outputType,
     })
 
-    const config = {
-      fieldName,
-      autoComplete,
-      size,
-      src,
-      width,
-      height,
-      readOnly,
-      component,
-      inputElement,
+    const configOutput = {
+      form,
+      setForm,
+      setFormErrors,
+      config,
       type,
-      key,
-      id,
-      htmlFor,
-      checked,
-      defaultValue,
+      label,
       required,
       placeholder,
-      label,
-      className,
-      hide,
       disabled,
-      readonly,
+      className,
+      onClick,
       value,
+      name,
+
+      makClassName,
+      readonly,
+      hide,
+      autoFocus,
+      autoComplete,
+      pattern,
+      minLength,
+      maxLength,
       options,
       labelKey,
       valueKey,
-      minLength,
-      maxLength,
-      pattern,
-      onClick,
-      name,
-      step,
+      multiple,
+      size,
+      searchable,
+      clearable,
+      dismissOnClick,
+      checked,
       min,
       max,
-      onSubmit,
-      onChange,
+      step,
+      min0,
+      max0,
+      min1,
+      max1,
+      step0,
+      step1,
+      range,
+      defaultValue0,
+      defaultValue1,
+      value0,
+      value1,
+      disabled0,
+      disabled1,
+      // selectFieldValue,
+
       onBlur,
       onFocus,
+      onSubmit,
       onReset,
-    } as FormElement
+    } as MakFormElement
 
-    constructedForm[fieldName] = {
-      ...config,
+    constructedForm[name] = {
+      ...configOutput,
       inputElement,
+      component,
       errors: null,
     }
   })

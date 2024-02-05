@@ -1,88 +1,135 @@
-import React, { useState } from "react"
-
+import React, {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  useState,
+} from "react"
 import handleChange from "./functions/handleChange"
-import { FieldConfig, OptionType } from "./types/field-types"
-import { InputChangeEvent } from "./types/event-types"
-import { mergeWithFallback } from "./functions/helpers"
-import { ComponentOutputType } from "./types/component-types"
 import { mak } from "../useMakUi/elements/ts/mak"
+import {
+  FieldType,
+  MakForm,
+  MakFormComponentOutputType,
+  MakFormDynamicComponentProps,
+  MakFormErrors,
+  MakFormFieldConfig,
+} from "./types/form-types"
 
-export interface DynamicComponents {
-  [key: string]: (props: { [key: string]: any }) => JSX.Element
-}
-
-type DynamicComponentProps = {
-  [key: string]: any
-  children?: React.ReactNode
-  config?: FieldConfig
-  type?: string
-  placeholder?: string
-  disabled?: boolean
-  className?: string
-  label?: string
-  onClick?: () => void
-  onSubmit?: () => void
-  onReset?: () => void
-  value?: any
-  name?: string
-  // onChange: (e: InputChangeEvent) => void
-  options?: any[]
-  labelKey?: string
-  valueKey?: string
-  selectFieldValue?: string
-
-  outputType?: ComponentOutputType
+type DynamicComponentProps = MakFormDynamicComponentProps & {
+  form: MakForm
+  setForm: React.Dispatch<React.SetStateAction<MakForm>>
+  formErrors: MakFormErrors
+  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
+  config: MakFormFieldConfig
+  name: string
+  outputType: MakFormComponentOutputType
+  type: FieldType
+  label: string
 }
 
 const DynamicComponent = (props: DynamicComponentProps) => {
   const {
     form,
-    config,
     setForm,
     setFormErrors,
-
-    children,
-    onSubmit,
-    onReset,
-    onClick,
-
-    selectFieldValue,
+    config,
     outputType,
-    ...otherProps
-  } = props
-  const updatedProps = mergeWithFallback(props, config)
-  const updatedForm = mergeWithFallback(form, updatedProps)
+    children,
+    type,
+    name,
 
-  const type = updatedProps.type
-  const className = updatedProps.className
-  const makClassName = updatedProps.makClassName
-  const value = updatedProps.value
-  const defaultValue = updatedProps.defaultValue
-  const placeholder = updatedProps.placeholder
-  const options = updatedProps.options as OptionType[]
-  const valueKey = updatedProps.valueKey
-  const labelKey = updatedProps.labelKey
-  const name = updatedProps.name
+    label,
+    required,
+    defaultValue,
+    disabled,
+    className,
+    makClassName,
+    value,
+    placeholder,
+    readonly,
+    hide,
+    autoFocus,
+    autoComplete,
+    pattern,
+    minLength,
+    maxLength,
+    options,
+    labelKey,
+    valueKey,
+    multiple,
+    size,
+    searchable,
+    clearable,
+    dismissOnClick,
+    checked,
+    min,
+    max,
+    step,
+    min0,
+    max0,
+    min1,
+    max1,
+    step0,
+    step1,
+    range,
+    defaultValue0,
+    defaultValue1,
+    value0,
+    value1,
+    disabled0,
+    disabled1,
+    onClick,
+    onBlur,
+    onFocus,
+    onSubmit = () => {},
+    onReset,
+    // ...otherProps
+  } = props
+  // console.log(name, { props, config })
+  // const updatedProps = mergeWithFallback(props, config)
+  // const updatedForm = mergeWithFallback(form, updatedProps)
+
+  // const name = updatedProps.name
 
   const [localValue, setLocalValue] = useState(value)
 
+  type InputChangeEvent = React.ChangeEvent<
+    HTMLSelectElement | HTMLInputElement
+  >
+
   const handleLocalChange = (e: InputChangeEvent) => {
-    setLocalValue(e.target.value)
+    if (multiple && e.target instanceof HTMLSelectElement) {
+      const selectedOptions = e.target.selectedOptions
+      const selectedValues = Array.from(selectedOptions).map(
+        (option) => option.value
+      )
+      setLocalValue(selectedValues)
+    } else {
+      setLocalValue(e.target.value)
+    }
   }
 
   const handleBlur = () => {
+    console.log("MULTIPLE", multiple)
     const event = {
-      target: { name: otherProps.name, value: localValue, type },
+      target: { name, value: localValue, type },
     } as InputChangeEvent
 
     handleChange({ event, setForm, setFormErrors })
   }
 
+  // useEffect(() => {
+  //   if (localValue === value) return
+  //   const timer = setTimeout(() => {
+  //     handleBlur()
+  //   }, 500)
+  //   return () => clearTimeout(timer)
+  // }, [localValue])
+
   if (type === "button") {
-    const label = otherProps.label
     const isSubmit = label === "Submit"
     const SubmitAction = () => {
-      // onSubmit()
+      onSubmit()
     }
     const isReset = label === "Reset"
     const ResetAction = onReset || (() => {})
@@ -92,25 +139,25 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     if (outputType === "htmlElements") {
       return (
         <button
-          value={value}
+          value={value as ButtonHTMLAttributes<HTMLButtonElement>["value"]}
           onClick={onClickAction}
           className={className}
           // {...otherProps}
         >
-          {children ? children : otherProps.label}
+          {children ? children : label}
         </button>
       )
     }
     if (outputType === "makElements") {
       return (
         <mak.button
-          value={value}
+          value={value as ButtonHTMLAttributes<HTMLButtonElement>["value"]}
           onClick={onClickAction}
           className={className}
           makClassName={makClassName}
           // {...otherProps}
         >
-          {children ? children : otherProps.label}
+          {children ? children : label}
         </mak.button>
       )
     }
@@ -122,18 +169,24 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         onChange={handleLocalChange}
         onBlur={handleBlur}
         className={className}
-        value={localValue}
-        defaultValue={defaultValue || ""}
+        value={localValue as SelectHTMLAttributes<HTMLSelectElement>["value"]}
+        defaultValue={
+          (defaultValue as SelectHTMLAttributes<HTMLSelectElement>["value"]) ||
+          ""
+        }
       >
         {placeholder && (
           <option value="" disabled>
             {placeholder as string}
           </option>
         )}
-        {options.map((option) => {
+        {(options || []).map((option) => {
           return (
-            <option key={option[valueKey]} value={option[valueKey]}>
-              {option[labelKey]}
+            <option
+              key={option[valueKey as keyof typeof option]}
+              value={option[valueKey as keyof typeof option]}
+            >
+              {option[labelKey as keyof typeof option]}
             </option>
           )
         })}
@@ -141,25 +194,35 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     )
   }
 
-  if (type === "select" && outputType === "makElements") {
+  if (
+    ["select", "multi-select"].includes(type) &&
+    outputType === "makElements"
+  ) {
     return (
       <mak.select
         onChange={handleLocalChange}
         onBlur={handleBlur}
         className={className}
         makClassName={makClassName}
-        value={localValue}
-        defaultValue={defaultValue || ""}
+        value={localValue as SelectHTMLAttributes<HTMLSelectElement>["value"]}
+        defaultValue={
+          (defaultValue as SelectHTMLAttributes<HTMLSelectElement>["value"]) ||
+          ""
+        }
+        multiple={multiple}
       >
         {placeholder && (
           <option value="" disabled>
             {placeholder as string}
           </option>
         )}
-        {options.map((option) => {
+        {(options || []).map((option) => {
           return (
-            <option key={option[valueKey]} value={option[valueKey]}>
-              {option[labelKey]}
+            <option
+              key={option[valueKey as keyof typeof option]}
+              value={option[valueKey as keyof typeof option]}
+            >
+              {option[labelKey as keyof typeof option]}
             </option>
           )
         })}
@@ -171,29 +234,57 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     return (
       <input
         type={type}
-        value={localValue}
+        value={localValue as InputHTMLAttributes<HTMLInputElement>["value"]}
         onChange={handleLocalChange}
         onBlur={handleBlur}
-        placeholder={placeholder}
         className={className}
         // {...otherProps}
       />
     )
   }
+
   if (outputType === "makElements") {
     return (
       <mak.input
         type={type}
-        value={localValue}
+        value={localValue as InputHTMLAttributes<HTMLInputElement>["value"]}
         onChange={handleLocalChange}
         onBlur={handleBlur}
-        placeholder={placeholder}
         className={className}
         makClassName={makClassName}
+        defaultValue={defaultValue as string}
         // {...otherProps}
       />
     )
   }
+
+  // if (outputType === "htmlElements") {
+  //   return (
+  //     <input
+  //       type={type}
+  //       value={localValue}
+  //       onChange={handleLocalChange}
+  //       onBlur={handleBlur}
+  //       placeholder={placeholder}
+  //       className={className}
+  //       {...otherProps}
+  //     />
+  //   )
+  // }
+  // if (outputType === "makElements") {
+  //   return (
+  //     <mak.input
+  //       type={type}
+  //       value={localValue}
+  //       onChange={handleLocalChange}
+  //       onBlur={handleBlur}
+  //       placeholder={placeholder}
+  //       className={className}
+  //       makClassName={makClassName}
+  //       {...otherProps}
+  //     />
+  //   )
+  // }
 }
 
 export default DynamicComponent

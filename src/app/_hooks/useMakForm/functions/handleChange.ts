@@ -1,18 +1,20 @@
 import { InputChangeEvent } from "../types/event-types"
-import { FormObject } from "../types/form-types"
+import { MakForm } from "../types/form-types"
+
 import { validateField } from "./validate"
 
 interface HandleChangeProps {
   event: InputChangeEvent
-  setForm: React.Dispatch<React.SetStateAction<FormObject>>
+  setForm: React.Dispatch<React.SetStateAction<MakForm>>
   setFormErrors: (errors: any) => void
+  multiple?: boolean
 }
 
 const handleChange = ({ event, setForm, setFormErrors }: HandleChangeProps) => {
+  console.log("handleChange", { event })
   // setIsSubmitted(false)
   // setIsReset(false)
   const target = event.target as HTMLInputElement
-
   const value = target?.type === "checkbox" ? target.checked : target.value
   const fieldName = target.name
 
@@ -23,17 +25,20 @@ const handleChange = ({ event, setForm, setFormErrors }: HandleChangeProps) => {
   //   setFormErrors,
   // })
 
-  setForm((prevForm: FormObject): FormObject => {
+  setForm((prevForm: MakForm): MakForm => {
+    console.log("prevForm", { target, prevForm })
     const updatedForm = {
       ...prevForm,
       [fieldName]: {
         ...prevForm[fieldName],
-        value,
+        ...target,
         // errors: validation,
       },
     }
 
-    return updatedForm as FormObject
+    console.log("updatedForm", updatedForm[fieldName])
+
+    return updatedForm as MakForm
   })
 
   // setShowErrors(true)
