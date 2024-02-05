@@ -236,7 +236,7 @@ export type MakFormErrors = {
 
 export type MakFormElement = MakFormFieldConfig & {
   errors?: MakFormElementErrors
-  inputElement?: JSX.Element
+  // inputElement?: JSX.Element
   component?: MakFormDynamicComponent
 }
 export type MakForm = {

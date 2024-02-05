@@ -32,58 +32,32 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     form,
     setForm,
     setFormErrors,
-    config,
+
     outputType,
     children,
     type,
     name,
 
     label,
-    required,
+
     defaultValue,
-    disabled,
+
     className,
     makClassName,
     value,
     placeholder,
-    readonly,
-    hide,
-    autoFocus,
-    autoComplete,
-    pattern,
-    minLength,
-    maxLength,
+
     options,
     labelKey,
     valueKey,
     multiple,
-    size,
-    searchable,
-    clearable,
-    dismissOnClick,
-    checked,
-    min,
-    max,
-    step,
-    min0,
-    max0,
-    min1,
-    max1,
-    step0,
-    step1,
-    range,
-    defaultValue0,
-    defaultValue1,
-    value0,
-    value1,
-    disabled0,
-    disabled1,
+
     onClick,
     onBlur,
     onFocus,
-    onSubmit = () => {},
+    onSubmit,
     onReset,
-    // ...otherProps
+    ...otherProps
   } = props
   // console.log(name, { props, config })
   // const updatedProps = mergeWithFallback(props, config)
@@ -110,7 +84,6 @@ const DynamicComponent = (props: DynamicComponentProps) => {
   }
 
   const handleBlur = () => {
-    console.log("MULTIPLE", multiple)
     const event = {
       target: { name, value: localValue, type },
     } as InputChangeEvent
@@ -126,23 +99,28 @@ const DynamicComponent = (props: DynamicComponentProps) => {
   //   return () => clearTimeout(timer)
   // }, [localValue])
 
-  if (type === "button") {
-    const isSubmit = label === "Submit"
-    const SubmitAction = () => {
-      onSubmit()
+  if (type === "button" || type === "submit" || type === "reset") {
+    const isSubmit = type === "submit" || label.toLowerCase() === "submit"
+    const isReset = type === "reset" || label.toLowerCase() === "reset"
+    const onSubmitAction = () => {
+      onSubmit && onSubmit()
     }
-    const isReset = label === "Reset"
-    const ResetAction = onReset || (() => {})
+    const onResetAction = () => {
+      onReset && onReset()
+    }
     const onClickAction =
-      onClick || isSubmit ? SubmitAction : isReset ? ResetAction : () => {}
+      onClick || isSubmit ? onSubmitAction : isReset ? onResetAction : () => {}
 
     if (outputType === "htmlElements") {
       return (
         <button
           value={value as ButtonHTMLAttributes<HTMLButtonElement>["value"]}
           onClick={onClickAction}
+          onReset={onResetAction}
+          onBlur={() => onBlur}
+          onFocus={() => onFocus}
           className={className}
-          // {...otherProps}
+          {...otherProps}
         >
           {children ? children : label}
         </button>
@@ -153,9 +131,12 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         <mak.button
           value={value as ButtonHTMLAttributes<HTMLButtonElement>["value"]}
           onClick={onClickAction}
+          onReset={onResetAction}
+          onBlur={() => onBlur}
+          onFocus={() => onFocus}
           className={className}
           makClassName={makClassName}
-          // {...otherProps}
+          {...otherProps}
         >
           {children ? children : label}
         </mak.button>
@@ -167,13 +148,14 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     return (
       <select
         onChange={handleLocalChange}
-        onBlur={handleBlur}
+        onBlur={onBlur || handleBlur}
         className={className}
         value={localValue as SelectHTMLAttributes<HTMLSelectElement>["value"]}
         defaultValue={
           (defaultValue as SelectHTMLAttributes<HTMLSelectElement>["value"]) ||
           ""
         }
+        {...otherProps}
       >
         {placeholder && (
           <option value="" disabled>
@@ -201,7 +183,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     return (
       <mak.select
         onChange={handleLocalChange}
-        onBlur={handleBlur}
+        onBlur={onBlur || handleBlur}
         className={className}
         makClassName={makClassName}
         value={localValue as SelectHTMLAttributes<HTMLSelectElement>["value"]}
@@ -210,6 +192,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
           ""
         }
         multiple={multiple}
+        {...otherProps}
       >
         {placeholder && (
           <option value="" disabled>
@@ -238,7 +221,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         onChange={handleLocalChange}
         onBlur={handleBlur}
         className={className}
-        // {...otherProps}
+        {...otherProps}
       />
     )
   }
@@ -253,38 +236,10 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         className={className}
         makClassName={makClassName}
         defaultValue={defaultValue as string}
-        // {...otherProps}
+        {...otherProps}
       />
     )
   }
-
-  // if (outputType === "htmlElements") {
-  //   return (
-  //     <input
-  //       type={type}
-  //       value={localValue}
-  //       onChange={handleLocalChange}
-  //       onBlur={handleBlur}
-  //       placeholder={placeholder}
-  //       className={className}
-  //       {...otherProps}
-  //     />
-  //   )
-  // }
-  // if (outputType === "makElements") {
-  //   return (
-  //     <mak.input
-  //       type={type}
-  //       value={localValue}
-  //       onChange={handleLocalChange}
-  //       onBlur={handleBlur}
-  //       placeholder={placeholder}
-  //       className={className}
-  //       makClassName={makClassName}
-  //       {...otherProps}
-  //     />
-  //   )
-  // }
 }
 
 export default DynamicComponent

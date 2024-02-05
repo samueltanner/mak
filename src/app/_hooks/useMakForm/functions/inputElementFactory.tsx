@@ -1,12 +1,23 @@
+import { DetailedHTMLProps, SelectHTMLAttributes } from "react"
 import { InputChangeEvent } from "../types/event-types"
 import {
   ButtonFieldConfig,
   DateFieldConfig,
   FieldType,
+  MakFormFieldConfig,
   NumberFieldConfig,
   SelectFieldConfig,
   TextFieldConfig,
-} from "../types/field-types"
+  ValueOptions,
+} from "../types/form-types"
+// import {
+//   ButtonFieldConfig,
+//   DateFieldConfig,
+//   FieldType,
+//   NumberFieldConfig,
+//   SelectFieldConfig,
+//   TextFieldConfig,
+// } from "../types/field-types"
 import { FormAccessor } from "../useMakForm"
 import handleChange from "./handleChange"
 
@@ -21,14 +32,14 @@ const inputElementFactory = ({
 }: CreateInputElementProps): JSX.Element | undefined => {
   const { form, setForm, setFormErrors } = formAccessor
   const config = form[name]
-  const type = form[name].type as FieldType
+  const type: FieldType = (form[name] as MakFormFieldConfig)?.type || "text"
   const placeholder = config?.placeholder
   const fieldValue = config?.value ?? config?.defaultValue
   const disabled = config?.disabled || false
   const className = `
     ${form[name]?.className} ${
-      disabled ? "cursor-not-allowed opacity-50" : "opacity-100"
-    }`
+    disabled ? "cursor-not-allowed opacity-50" : "opacity-100"
+  }`
   const label = config?.label || ""
   const onClick = (config as ButtonFieldConfig)?.onClick
   const value = config?.value as string | number
@@ -48,7 +59,6 @@ const inputElementFactory = ({
     defaultValue,
   }
 
-
   switch (type) {
     case "select":
       const options = (config as SelectFieldConfig).options || []
@@ -56,7 +66,16 @@ const inputElementFactory = ({
       const valueKey = (config as SelectFieldConfig)?.valueKey || "value"
 
       const selectJsx = () => (
-        <select {...inputProps} value={value} defaultValue={defaultValue}>
+        <select
+          {...inputProps}
+          value={value}
+          defaultValue={
+            defaultValue as DetailedHTMLProps<
+              SelectHTMLAttributes<HTMLSelectElement>,
+              HTMLSelectElement
+            >["defaultValue"]
+          }
+        >
           {/* {placeholder && (
             <option value="" disabled>
               {placeholder as string}

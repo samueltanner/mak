@@ -143,7 +143,6 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
 
     constructedForm[name] = {
       ...configOutput,
-      inputElement,
       component,
       errors: null,
     }
