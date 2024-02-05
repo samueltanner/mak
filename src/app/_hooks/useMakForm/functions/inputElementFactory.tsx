@@ -1,9 +1,10 @@
 import { DetailedHTMLProps, SelectHTMLAttributes } from "react"
-import { InputChangeEvent } from "../types/event-types"
+
 import {
   ButtonFieldConfig,
   DateFieldConfig,
   FieldType,
+  InputChangeEvent,
   MakFormFieldConfig,
   NumberFieldConfig,
   SelectFieldConfig,

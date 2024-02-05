@@ -1,5 +1,4 @@
-import { InputChangeEvent } from "../types/event-types"
-import { MakForm } from "../types/form-types"
+import { InputChangeEvent, MakForm } from "../types/form-types"
 
 import { validateField } from "./validate"
 

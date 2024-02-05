@@ -87,9 +87,6 @@ export const useMakForm = ({
 
   const [dynamicComponents, setDynamicComponents] =
     useState<MakFormDynamicComponents>(initialComponentNames())
-  // const [inputElements, setInputElements] = useState(
-  //   constructInputElements(formAccessor)
-  // )
 
   useEffect(() => {
     if (!formConfig || isEqual(form, previousFormRef.current)) return
@@ -98,7 +95,6 @@ export const useMakForm = ({
 
     setForm(constructedForm)
     setDynamicComponents(constructDynamicComponents(formAccessor))
-    // setInputElements(constructInputElements(formAccessor))
 
     previousFormRef.current = constructedForm
   }, [form, formConfig])
@@ -106,11 +102,9 @@ export const useMakForm = ({
   return {
     form,
     components: dynamicComponents,
-    // inputElements,
   } as {
     components: MakFormDynamicComponents
     form: MakForm
-    // inputElements: { [key: string]: JSX.Element }
   }
 }
 
