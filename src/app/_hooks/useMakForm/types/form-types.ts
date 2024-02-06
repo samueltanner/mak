@@ -1,5 +1,12 @@
 import { ChangeEvent } from "react"
 
+export type MakFormValidationOption =
+  | "change"
+  | "blur"
+  | "submit"
+  | "reset"
+  | "none"
+
 export type InputChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
 
 export type MakFormDynamicComponent = (
@@ -74,13 +81,14 @@ export interface BaseFieldConfig {
   hide?: boolean
   autoComplete?: string
   autoFocus?: boolean
-  pattern?: string
+  pattern?: string | RegExp
   onClick?: (props?: any) => void
   onChange?: (props?: any) => void
   onBlur?: (props?: any) => void
   onFocus?: (props?: any) => void
   onReset?: (props?: any) => void
   onSubmit?: (props?: any) => void
+  validateOn?: MakFormValidationOption
 }
 export interface ColorFieldConfig extends BaseFieldConfig {
   type: "color"
@@ -89,7 +97,6 @@ export interface TextFieldConfig extends BaseFieldConfig {
   type: "text" | "password" | "email" | "search" | "tel"
   minLength?: number
   maxLength?: number
-  pattern?: string
 }
 
 export interface PasswordFieldConfig extends TextFieldConfig {
@@ -170,7 +177,7 @@ export type MakFormInput = {
   [key: string]: MakFormFieldConfig
 }
 
-export type MakFormElementErrors = string | null | string[] | undefined
+export type MakFormElementErrors = string | undefined
 
 export type MakFormErrors = {
   [key: string]: MakFormElementErrors
@@ -178,7 +185,6 @@ export type MakFormErrors = {
 
 export type MakFormElement = MakFormFieldConfig & {
   errors?: MakFormElementErrors
-  // inputElement?: JSX.Element
   component?: MakFormDynamicComponent
 }
 export type MakForm = {
@@ -200,7 +206,7 @@ export type MakFormDynamicComponentProps = {
   hide?: boolean
   autoComplete?: string
   autoFocus?: boolean
-  pattern?: string
+  pattern?: string | RegExp
 
   minLength?: number
   maxLength?: number
@@ -235,4 +241,5 @@ export type MakFormDynamicComponentProps = {
   onFocus?: (props?: any) => void
   onReset?: (props?: any) => void
   onSubmit?: (props?: any) => void
+  validateOn?: MakFormValidationOption
 }

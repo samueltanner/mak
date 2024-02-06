@@ -1,4 +1,5 @@
-import { ComponentOutputType } from "../types/component-types"
+import { isEmptyObject } from "@/globals/global-helper-functions"
+import { MakFormComponentOutputType } from "../types/form-types"
 
 const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
@@ -59,7 +60,21 @@ function getDifference(
   }
 }
 
-const isEqual = (x: any, y: any): boolean => getDifference(x, y, true).isEqual
+const isEqual = (x: any, y: any): boolean => {
+
+  const diffResult = getDifference(x, y, true)
+
+  if (typeof diffResult === "boolean") {
+    // Directly return the boolean result
+    return diffResult
+  } else if (diffResult && typeof diffResult === "object") {
+    // Return the isEqual property if it exists
+    return diffResult.isEqual
+  } else {
+    // Default case if the result is unexpected
+    return false
+  }
+}
 
 const mergeWithFallback = (primary: any, fallback: any) => {
   const result = { ...fallback, ...primary }
@@ -79,8 +94,8 @@ export const ensureSingleElementType = ({
   useMakElements?: boolean
   useHTMLComponents?: boolean
   useMakComponents?: boolean
-}): ComponentOutputType => {
-  let elementTypeObject: { [Key in ComponentOutputType]: boolean } = {
+}): MakFormComponentOutputType => {
+  let elementTypeObject: { [Key in MakFormComponentOutputType]: boolean } = {
     makElements: useMakElements,
     htmlElements: useHTMLComponents,
     makComponents: useMakComponents,
@@ -97,8 +112,8 @@ export const ensureSingleElementType = ({
   }
 
   return Object.keys(elementTypeObject).find(
-    (key) => elementTypeObject[key as ComponentOutputType]
-  ) as ComponentOutputType
+    (key) => elementTypeObject[key as MakFormComponentOutputType]
+  ) as MakFormComponentOutputType
 }
 
 export { isEqual, isObject, mergeWithFallback, getDifference }

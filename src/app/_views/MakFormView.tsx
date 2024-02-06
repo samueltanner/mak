@@ -1,50 +1,23 @@
 import { useEffect } from "react"
 import useMakForm from "../_hooks/useMakForm/useMakForm"
 import { MakFormInput } from "../_hooks/useMakForm/types/form-types"
+import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 
 const formConfig: MakFormInput = {
-  // first_name: {
-  //   type: "text",
-  //   label: "First Name",
-  //   placeholder: "Enter first name",
-  //   required: true,
-  // },
-  // last_name: {
-  //   type: "text",
-  //   label: "Last Name",
-  //   placeholder: "Enter last name",
-  //   required: true,
-  // },
-  // pick: {
-  //   type: "select",
-  //   label: "Pick",
-  //   placeholder: "Select pick",
-  //   required: true,
-  //   options: [
-  //     { label: "one", value: 1 },
-  //     { label: "two", value: 2 },
-  //     { label: "three", value: 3 },
-  //   ],
-  // },
-  // people: {
-  //   type: "select",
-  //   label: "People",
-  //   placeholder: "Select people",
-  //   options: [
-  //     { label: "matt", value: "matt" },
-  //     { label: "brynne", value: "brynne" },
-  //     { label: "john", value: "john" },
-  //   ],
-  // },
-  // date: {
-  //   type: "date",
-  //   label: "Date",
-  //   placeholder: "Select date",
-  // },
-  // boolean: {
-  //   type: "boolean",
-  //   label: "Boolean",
-  // },
+  first_name: {
+    type: "text",
+    label: "First Name",
+    placeholder: "Enter first name",
+    required: true,
+    minLength: 2,
+  },
+  email: {
+    type: "email",
+    label: "Email",
+    // pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$",
+    validateOn: "change",
+  },
+
   multi_select: {
     type: "select",
     label: "Multiselect",
@@ -64,35 +37,68 @@ const formConfig: MakFormInput = {
     label: "Color",
     placeholder: "Select color",
   },
+  submit: {
+    type: "submit",
+    label: "Submit",
+  },
 }
 
 const MakFormView = () => {
   const {
     form,
-    components: { FirstName, Pick, LastName, People, Date, MultiSelect, Color },
-  } = useMakForm({ formConfig })
+    components: {
+      FirstName,
+      Pick,
+      LastName,
+      People,
+      Date,
+      MultiSelect,
+      Color,
+      Submit,
+      Email,
+    },
+    formErrors,
+  } = useMakForm({ formConfig, onSubmit: (input) => console.log({ form }) })
+  const {
+    first_name: firstNameError,
+    email: emailError,
+    multi_select: multiSelectError,
+    color: colorError,
+  } = formErrors
 
-  useEffect(() => {
-    console.log(form?.multi_select?.value)
-  }, [form])
   return (
-    <>
-      <div className="flex flex-col gap-2 group w-fit">
-        {/* <FirstName />
+    // <form>
+    <div className="flex flex-col gap-2 group w-fit">
+      {/* 
         <Pick />
         <People />
         <Date /> */}
-        <MultiSelect />
-        <Color makClassName="bg-red-500" />
-        <button
-          onClick={() => {
-            console.log(form)
-          }}
-        >
-          form
-        </button>
-      </div>
-    </>
+      <label htmlFor="first_name">First Name</label>
+      <FirstName />
+      {firstNameError && (
+        <div className="text-red-500 text-sm">{firstNameError}</div>
+      )}
+      <label htmlFor="email">Email</label>
+      <Email />
+      {emailError && <div className="text-red-500 text-sm">{emailError}</div>}
+      <MultiSelect />
+      <Color makClassName="bg-red-500" />
+
+      <Submit
+        makClassName="bg-primary hover:bg-primary-600"
+        onClick={() => {
+          console.log("Submit button clicked")
+        }}
+      />
+      <button
+        onClick={() => {
+          console.log(formErrors)
+        }}
+      >
+        test
+      </button>
+    </div>
+    // </form>
   )
 }
 

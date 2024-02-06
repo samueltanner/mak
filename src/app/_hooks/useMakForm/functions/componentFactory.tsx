@@ -31,8 +31,15 @@ const componentFactory = ({
   name,
   outputType,
 }: ComponentFactoryProps): MakFormDynamicComponent => {
-  const { form, setForm, setFormErrors, formErrors, formIsCurrent } =
-    formAccessor
+  const {
+    form,
+    setForm,
+    setFormErrors,
+    formErrors,
+    validateFormOn,
+    onSubmit: formOnSubmit,
+    onReset: formOnReset,
+  } = formAccessor
 
   const config = form[name] as MakFormFieldConfig
 
@@ -69,7 +76,7 @@ const componentFactory = ({
   const onFocus = config?.onFocus
   const onSubmit = config?.onSubmit
   const onReset = config?.onReset
-
+  const validateOn = config?.validateOn || validateFormOn || "submit"
   // "boolean"
   const checked = (config as BooleanFieldConfig)?.checked
 
@@ -114,7 +121,6 @@ const componentFactory = ({
     placeholder,
     disabled,
     className,
-    onClick,
     value: fieldValue,
     name,
 
@@ -152,10 +158,14 @@ const componentFactory = ({
     disabled0,
     disabled1,
 
+    onClick,
     onBlur,
     onFocus,
     onSubmit,
     onReset,
+    formOnSubmit,
+    formOnReset,
+    validateOn,
   }
   const ComponentWrapper = (props: Record<string, unknown>) => {
     if (Object.values(props).length > 0) {
@@ -171,30 +181,12 @@ const componentFactory = ({
 
   return ComponentWrapper
 }
-// return (props: Record<string, unknown>) => {
-//   if (Object.values(props).length > 0) {
-//     const updatedConfig = mergeWithFallback(props, config)
-
-//     const updatedForm = mergeWithFallback(
-//       { [name]: updatedConfig },
-//       form
-//     ) as FormObject
-//     // console.log({ updatedForm })
-//     console.log({ form, updatedForm })
-//     // if (!isEqual(form, updatedForm)) {
-//     //   setForm(updatedForm)
-//     // }
-//     // setForm(updatedForm)
-//     // setForm(mergeWithFallback(props, form))
-//   }
-//   const component = <DynamicComponent {...hookProps} {...props} />
-
-//   return component
 
 export default componentFactory
 
 const constructDynamicComponents = (formAccessor: FormAccessor) => {
-  const { form, setForm, setFormErrors, outputType } = formAccessor
+  const { form, outputType } = formAccessor
+
   return Object.keys(form || {}).reduce((acc, name) => {
     const componentName = getComponentName(name) as FieldType
     const component = componentFactory({

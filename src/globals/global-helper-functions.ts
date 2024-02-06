@@ -1,5 +1,8 @@
-export const isEmptyObject = (obj: GenericObject) =>
-  isObject(obj) && Object.keys(obj).length === 0
+export const isEmptyObject = (obj: GenericObject | undefined) => {
+  if (obj === undefined) return false
+
+  return isObject(obj) && Object.keys(obj).length === 0
+}
 
 export const isNestedObject = (obj: GenericObject) =>
   isObject(obj) && Object.values(obj).some(isObject)

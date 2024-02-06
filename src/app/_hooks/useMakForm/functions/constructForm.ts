@@ -10,13 +10,13 @@ import {
 import { FormAccessor } from "../useMakForm"
 
 import componentFactory from "./componentFactory"
-import inputElementFactory from "./inputElementFactory"
+// import inputElementFactory from "./inputElementFactory"
 
 const constructForm = (formAccessor: FormAccessor): MakForm => {
   const { form, setForm, setFormErrors, outputType } = formAccessor
   const constructedForm = {} as MakForm
 
-  Object.keys(form).forEach((name) => {
+  Object.keys(form || {}).forEach((name) => {
     const config = form[name] as MakFormElement
 
     const type = form[name]?.type || "text"
@@ -52,6 +52,7 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
     const onFocus = config?.onFocus
     const onSubmit = config?.onSubmit
     const onReset = config?.onReset
+    const validateOn = config?.validateOn
 
     // "boolean"
     const checked = (config as BooleanFieldConfig)?.checked
@@ -75,10 +76,7 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
     const value1 = (config as BoundedRangeFieldConfig)?.value1
     const disabled0 = (config as BoundedRangeFieldConfig)?.disabled0
     const disabled1 = (config as BoundedRangeFieldConfig)?.disabled1
-    const inputElement = inputElementFactory({
-      name,
-      formAccessor,
-    })
+
     const component = componentFactory({
       name,
       formAccessor,
@@ -86,9 +84,6 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
     })
 
     const configOutput = {
-      form,
-      setForm,
-      setFormErrors,
       config,
       type,
       label,
@@ -96,11 +91,10 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
       placeholder,
       disabled,
       className,
-      onClick,
+      makClassName,
       value,
       name,
 
-      makClassName,
       readonly,
       hide,
       autoFocus,
@@ -133,18 +127,20 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
       value1,
       disabled0,
       disabled1,
-      // selectFieldValue,
 
+      onClick,
       onBlur,
       onFocus,
       onSubmit,
       onReset,
+
+      validateOn,
     } as MakFormElement
 
     constructedForm[name] = {
       ...configOutput,
       component,
-      errors: null,
+      errors: undefined,
     }
   })
 

@@ -98,10 +98,6 @@ const MakUiProviderChild = ({
   paletteGenProps = defaultPaletteGenProps,
 }: MakUiProviderProps) => {
   const [styleSheet, setStyleSheet] = useState<GenericObject>({})
-  useEffect(() => {
-    console.log("updating global styles")
-    console.log(styleSheet)
-  }, [styleSheet])
 
   const paletteInputRef = React.useRef<string>()
   useEffect(() => {

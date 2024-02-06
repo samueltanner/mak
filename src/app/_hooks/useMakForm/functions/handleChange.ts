@@ -1,46 +1,71 @@
-import { InputChangeEvent, MakForm } from "../types/form-types"
+import {
+  InputChangeEvent,
+  MakForm,
+  MakFormValidationOption,
+} from "../types/form-types"
+import { FormAccessor } from "../useMakForm"
 
 import { validateField } from "./validate"
 
 interface HandleChangeProps {
+  form: FormAccessor["form"]
   event: InputChangeEvent
   setForm: React.Dispatch<React.SetStateAction<MakForm>>
   setFormErrors: (errors: any) => void
-  multiple?: boolean
+  validateOn?: MakFormValidationOption
 }
 
-const handleChange = ({ event, setForm, setFormErrors }: HandleChangeProps) => {
-  console.log("handleChange", { event })
+const handleChange = ({
+  form,
+  event,
+  setForm,
+  setFormErrors,
+  validateOn,
+}: HandleChangeProps) => {
   // setIsSubmitted(false)
   // setIsReset(false)
   const target = event.target as HTMLInputElement
+
   const value = target?.type === "checkbox" ? target.checked : target.value
   const fieldName = target.name
 
-  // const validation = validateField({
-  //   fieldName,
-  //   value,
-  //   form,
-  //   setFormErrors,
+  let validation: string | undefined = undefined
+
+  if (validateOn === "change" || validateOn === "blur") {
+    validation = validateField({
+      form,
+      fieldName,
+      value,
+      setFormErrors,
+      validateOn,
+    })?.[fieldName] as string | undefined
+  }
+
+  const newFormState = {
+    ...form, // Assume 'form' is the current state
+    [fieldName]: {
+      ...form[fieldName],
+      ...target,
+      errors: validation,
+    },
+  } as MakForm
+
+  console.log({ newFormState })
+  setForm(newFormState)
+
+  // setForm((prev: MakForm): MakForm => {
+  //   const updatedForm = {
+  //     ...prev,
+  //     [fieldName]: {
+  //       ...prev[fieldName],
+  //       ...target,
+  //       // value: target.value,
+  //       errors: validation,
+  //     },
+  //   }
+
+  //   return updatedForm as MakForm
   // })
-
-  setForm((prevForm: MakForm): MakForm => {
-    console.log("prevForm", { target, prevForm })
-    const updatedForm = {
-      ...prevForm,
-      [fieldName]: {
-        ...prevForm[fieldName],
-        ...target,
-        // errors: validation,
-      },
-    }
-
-    console.log("updatedForm", updatedForm[fieldName])
-
-    return updatedForm as MakForm
-  })
-
-  // setShowErrors(true)
 }
 
 export default handleChange

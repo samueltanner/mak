@@ -1,19 +1,23 @@
 "use client"
 import { constructDynamicComponents } from "./functions/componentFactory"
 import constructForm from "./functions/constructForm"
-import { constructInputElements } from "./functions/inputElementFactory"
-import { ensureSingleElementType, isEqual } from "./functions/helpers"
-// import { FormErrors, FormObject } from "./types/form-types"
+import {
+  ensureSingleElementType,
+  getDifference,
+  isEqual,
+} from "./functions/helpers"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getComponentName } from "./functions/componentFactory"
-// import { ComponentOutputType, DynamicComponents } from "./types/component-types"
+
 import {
   MakForm,
   MakFormComponentOutputType,
-  MakFormDynamicComponent,
   MakFormDynamicComponents,
   MakFormErrors,
+  MakFormValidationOption,
 } from "./types/form-types"
+import { isEmptyObject } from "@/globals/global-helper-functions"
+import { validateForm } from "./functions/validate"
 
 interface useMakFormProps {
   formConfig?: MakForm
@@ -22,6 +26,7 @@ interface useMakFormProps {
   useMakElements?: boolean
   useHTMLComponents?: boolean
   useMakComponents?: boolean
+  validateFormOn?: MakFormValidationOption
 }
 
 export interface FormAccessor {
@@ -34,6 +39,9 @@ export interface FormAccessor {
   previousComponentsRef: React.MutableRefObject<MakFormDynamicComponents>
   formIsCurrent: () => boolean
   outputType: MakFormComponentOutputType
+  onSubmit?: (input?: any) => void
+  onReset?: (input?: any) => void
+  validateFormOn?: MakFormValidationOption
 }
 
 export const useMakForm = ({
@@ -41,6 +49,9 @@ export const useMakForm = ({
   useMakElements = true,
   useHTMLComponents = false,
   useMakComponents = false,
+  onSubmit,
+  onReset,
+  validateFormOn = "submit",
 }: useMakFormProps) => {
   const outputType = ensureSingleElementType({
     useMakElements,
@@ -49,24 +60,39 @@ export const useMakForm = ({
   })
   const originalFormRef = useRef<MakForm>()
   const previousFormRef = useRef<MakForm>({})
-  const previousComponentsRef = useRef<MakFormDynamicComponents>({})
+  const previousComponentsRef = useRef<MakFormDynamicComponents>()
 
-  const [form, setForm] = useState<MakForm>(formConfig || {})
-  const [formErrors, setFormErrors] = useState<MakFormErrors>({})
-  // const formIsCurrent = isEqual(form, previousFormRef.current)
+  const [form, setForm] = useState<MakForm>({})
+  const [formErrors, setFormErrors] = useState<MakFormErrors>(
+    Object.entries(formConfig || {}).reduce((acc, [key, value]) => {
+      if (!["button", "submit", "reset"].includes((value as any)?.type)) {
+        ;(acc as MakFormErrors)[key] = undefined
+      }
+      return acc
+    }, {})
+  )
+
   const formIsCurrent = useCallback(() => {
     return isEqual(form, previousFormRef.current)
   }, [form, previousFormRef.current])
+
   const handleSetForm = (newForm: MakForm) => {
-    if (isEqual(form, previousFormRef.current)) return
+    // if (isEqual(form, previousFormRef.current) && !isEmptyObject(form)) return
 
     setForm(newForm)
+
     previousFormRef.current = newForm
+  }
+
+  const handleSubmit = () => {
+    console.log("submitting form", { form })
+    validateForm({ form, setFormErrors })
   }
 
   const formAccessor = {
     form,
     setForm: handleSetForm,
+    // setForm,
     formErrors,
     setFormErrors,
     originalFormRef,
@@ -74,7 +100,26 @@ export const useMakForm = ({
     previousComponentsRef,
     formIsCurrent,
     outputType,
+    onSubmit: handleSubmit,
+    onReset,
+    validateFormOn,
   } as FormAccessor
+
+  useEffect(() => {
+    if (isEmptyObject(form) && !isEmptyObject(formConfig)) {
+      const initialFormAccessor = {
+        ...formAccessor,
+        form: formConfig,
+      } as FormAccessor
+      const constructedForm = constructForm(initialFormAccessor)
+      setForm((prev) => constructedForm)
+      console.log({ constructedForm, form })
+    }
+  }, [formConfig, form])
+
+  useEffect(() => {
+    console.log({ form })
+  }, [form])
 
   const initialComponentNames = () => {
     const dummyComponents = {} as any
@@ -82,6 +127,10 @@ export const useMakForm = ({
       const name = getComponentName(fieldName)
       dummyComponents[name] = () => <div />
     })
+    if (!formConfig?.Submit) {
+      dummyComponents["Submit"] = () => <div />
+    }
+
     return dummyComponents
   }
 
@@ -102,9 +151,11 @@ export const useMakForm = ({
   return {
     form,
     components: dynamicComponents,
+    formErrors,
   } as {
     components: MakFormDynamicComponents
     form: MakForm
+    formErrors: MakFormErrors
   }
 }
 

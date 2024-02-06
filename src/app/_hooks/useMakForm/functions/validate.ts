@@ -1,137 +1,143 @@
-import { SelectFieldConfig, TextFieldConfig } from "../types/field-types"
-import { FormErrors, FormObject } from "../types/form-types"
+import {
+  BoundedRangeFieldConfig,
+  FieldType,
+  MakForm,
+  MakFormErrors,
+  MakFormFieldConfig,
+  MakFormValidationOption,
+  NumberFieldConfig,
+  TextFieldConfig,
+} from "../types/form-types"
 
 const validateField = ({
+  form,
   fieldName,
   value,
-  form,
   setFormErrors,
+  validateOn,
 }: {
+  form: MakForm
   fieldName: string
   value: any
-  form: FormObject
-  setFormErrors: React.Dispatch<React.SetStateAction<FormErrors>>
+  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
+  validateOn?: MakFormValidationOption
 }) => {
-  const config = form[fieldName]
-  const type = config.type
+  const config = form[fieldName] as MakFormFieldConfig
+  const label = config?.label
+  const type: FieldType =
+    (form[fieldName] as MakFormFieldConfig)?.type || "text"
   const required = config?.required || false
+  const pattern = RegExp(config?.pattern || ".*")
 
-  let valueToValidate
-  switch (type) {
-    case "select":
-      const defaultValue = config?.defaultValue
-      const currentValue = value
-      const selectConfig = config as SelectFieldConfig
-      const defaultOption = selectConfig.options?.find(
-        (option) => option.value === defaultValue
-      )
-      const defaultOptionValue = defaultOption?.value
-      valueToValidate = defaultOptionValue || currentValue || ""
-      break
-    case "boolean":
-      valueToValidate = value
-      break
-    case "number":
-      valueToValidate = value
-      break
-    case "button":
-      valueToValidate = true
-      break
-    case "text":
-    default:
-      valueToValidate = value || ""
-      break
+  const minLength = (config as TextFieldConfig)?.minLength
+  const maxLength = (config as TextFieldConfig)?.maxLength
+
+  const min = (config as NumberFieldConfig)?.min
+  const max = (config as NumberFieldConfig)?.max
+
+  const min0 = (config as BoundedRangeFieldConfig)?.min0
+  const max0 = (config as BoundedRangeFieldConfig)?.max0
+  const min1 = (config as BoundedRangeFieldConfig)?.min1
+  const max1 = (config as BoundedRangeFieldConfig)?.max1
+
+  const errors = {} as MakFormErrors
+
+  if (required && !value) {
+    const errorString = `${label} is required.`
+    setFormErrors((prev) => ({
+      ...prev,
+      [fieldName]: errorString,
+    }))
+    errors[fieldName] = errorString
+    return errors
   }
 
-  let errorMessage = null as string | null
-  if (required && (valueToValidate === "" || valueToValidate === null)) {
-    errorMessage = `${config.label} is required`
+  if (pattern && !pattern.test(value)) {
+    const errorString = "Invalid format."
+    setFormErrors((prev) => ({ ...prev, [fieldName]: errorString }))
+    errors[fieldName] = errorString
+    return errors
   }
-  if (typeof valueToValidate === "string" && required) {
-    const minLengthValue = (config as TextFieldConfig).minLength
-    const maxLengthValue = (config as TextFieldConfig).maxLength
 
-    let minLength =
-      minLengthValue !== undefined
-        ? typeof minLengthValue === "string"
-          ? +minLengthValue
-          : minLengthValue
-        : undefined
-
-    let maxLength =
-      maxLengthValue !== undefined
-        ? typeof maxLengthValue === "string"
-          ? +maxLengthValue
-          : maxLengthValue
-        : undefined
-
-    if (type === "text" && minLength && valueToValidate.length < minLength) {
-      errorMessage = `Minimum length is ${minLength}`
+  if (typeof value === "string") {
+    const errorString = `Minimum length is ${minLength}.`
+    if (minLength !== undefined && value.length < minLength) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [fieldName]: errorString,
+      }))
+      errors[fieldName] = errorString
+      return errors
     }
-    if (type === "text" && maxLength && valueToValidate.length > maxLength) {
-      errorMessage = `Maximum length is ${maxLength}`
-    }
-    if (typeof type === "string" && ["text", "password"].includes(type)) {
-      const pattern = (config as TextFieldConfig).pattern
-      if (
-        typeof pattern === "string" &&
-        !new RegExp(pattern).test(valueToValidate)
-      ) {
-        errorMessage = "Invalid format"
-      }
+    if (maxLength !== undefined && value.length > maxLength) {
+      const errorString = `Maximum length is ${maxLength}.`
+      setFormErrors((prev) => ({
+        ...prev,
+        [fieldName]: `Maximum length is ${maxLength}.`,
+      }))
+      errors[fieldName] = errorString
+      return errors
     }
   }
 
-  if (errorMessage) {
-    setFormErrors((prevErrors) => {
-      const updatedErrors = {
-        ...prevErrors,
-        [fieldName]: errorMessage,
-      }
-
-      return updatedErrors
-    })
-    return errorMessage
-  }
-  setFormErrors((prevErrors) => {
-    const updatedErrors = {
-      ...prevErrors,
-      [fieldName]: null,
+  if (type === "number" && typeof value === "number") {
+    const errorString = `Minimum value is ${min}.`
+    if (min !== undefined && value < min) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [fieldName]: errorString,
+      }))
+      errors[fieldName] = errorString
+      return errors
     }
+    if (max !== undefined && value > max) {
+      const errorString = `Maximum value is ${max}.`
+      setFormErrors((prev) => ({
+        ...prev,
+        [fieldName]: errorString,
+      }))
+      errors[fieldName] = errorString
+      return errors
+    }
+  }
 
-    return updatedErrors
-  })
-  return null
+  setFormErrors((prev) => ({ ...prev, [fieldName]: undefined }))
+  errors[fieldName] = undefined
+
+  return errors
 }
 
 const validateForm = ({
   form,
   setFormErrors,
 }: {
-  form: FormObject
-  setFormErrors: React.Dispatch<React.SetStateAction<FormErrors>>
+  form: MakForm
+  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
 }) => {
-  const errors: FormErrors = {}
+  const errors = {} as MakFormErrors
 
   Object.keys(form).forEach((fieldName) => {
     if (fieldName === "submit" || fieldName === "reset") return
 
     const value = form?.[fieldName]?.value || form?.[fieldName]?.defaultValue
-    const error = validateField({
+    console.log("fieldName", fieldName, "value", value)
+    const validation = validateField({
       fieldName,
       value,
       form,
       setFormErrors,
     })
 
-    if (error) {
-      errors[fieldName] = error
-      form[fieldName].errors = error
+    console.log({ validation })
+
+    if (Object.entries(validation).some(([_, error]) => error)) {
+      // errors[fieldName] = error
+      errors[fieldName] = validation[fieldName]
     } else {
-      errors[fieldName] = null
+      errors[fieldName] = undefined
     }
   })
-
+  console.log("errors", errors, "form", form)
   setFormErrors(errors)
   return errors
 }

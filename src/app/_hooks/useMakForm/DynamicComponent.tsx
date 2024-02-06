@@ -1,7 +1,10 @@
 import React, {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
+  RefObject,
   SelectHTMLAttributes,
+  useEffect,
+  useRef,
   useState,
 } from "react"
 import handleChange from "./functions/handleChange"
@@ -14,6 +17,8 @@ import {
   MakFormErrors,
   MakFormFieldConfig,
 } from "./types/form-types"
+import { FormAccessor } from "./useMakForm"
+import { validateForm, validateField } from "./functions/validate"
 
 type DynamicComponentProps = MakFormDynamicComponentProps & {
   form: MakForm
@@ -25,11 +30,14 @@ type DynamicComponentProps = MakFormDynamicComponentProps & {
   outputType: MakFormComponentOutputType
   type: FieldType
   label: string
+  formOnSubmit?: FormAccessor["onSubmit"]
+  formOnReset?: FormAccessor["onReset"]
 }
 
 const DynamicComponent = (props: DynamicComponentProps) => {
   const {
     form,
+    config,
     setForm,
     setFormErrors,
     outputType,
@@ -52,15 +60,15 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     onFocus,
     onSubmit,
     onReset,
+    formOnSubmit,
+    formOnReset,
+    validateOn,
+    pattern,
     ...otherProps
   } = props
-  // console.log(name, { props, config })
-  // const updatedProps = mergeWithFallback(props, config)
-  // const updatedForm = mergeWithFallback(form, updatedProps)
-
-  // const name = updatedProps.name
 
   const [localValue, setLocalValue] = useState(value)
+  const componentRef = useRef<HTMLElement>(null)
 
   type InputChangeEvent = React.ChangeEvent<
     HTMLSelectElement | HTMLInputElement
@@ -69,12 +77,22 @@ const DynamicComponent = (props: DynamicComponentProps) => {
   const handleLocalChange = (e: InputChangeEvent) => {
     if (multiple && e.target instanceof HTMLSelectElement) {
       const selectedOptions = e.target.selectedOptions
+
       const selectedValues = Array.from(selectedOptions).map(
         (option) => option.value
       )
       setLocalValue(selectedValues)
     } else {
       setLocalValue(e.target.value)
+    }
+    if (validateOn === "change") {
+      validateField({
+        form,
+        fieldName: name,
+        setFormErrors,
+        validateOn,
+        value: localValue,
+      })
     }
   }
 
@@ -83,54 +101,83 @@ const DynamicComponent = (props: DynamicComponentProps) => {
       target: { name, value: localValue, type },
     } as InputChangeEvent
 
-    handleChange({ event, setForm, setFormErrors })
+    handleChange({ form, event, setForm, setFormErrors, validateOn })
   }
 
   // useEffect(() => {
-  //   if (localValue === value) return
-  //   const timer = setTimeout(() => {
+  //   const currentElement = componentRef.current
+
+  //   const handleMouseEnter = () => {
+  //     console.log({ type, name }) // Log when mouse enters
+  //   }
+
+  //   const handleMouseLeave = () => {
+  //     // Additional logic for mouse leave if needed
   //     handleBlur()
-  //   }, 500)
-  //   return () => clearTimeout(timer)
-  // }, [localValue])
+  //   }
+
+  //   // Add event listeners
+  //   if (currentElement) {
+  //     currentElement.addEventListener("mouseenter", handleMouseEnter)
+  //     currentElement.addEventListener("mouseleave", handleMouseLeave)
+  //   }
+
+  //   // Cleanup function to remove event listeners
+  //   return () => {
+  //     if (currentElement) {
+  //       currentElement.removeEventListener("mouseenter", handleMouseEnter)
+  //       currentElement.removeEventListener("mouseleave", handleMouseLeave)
+  //     }
+  //   }
+  // }, [componentRef, type, name])
 
   if (type === "button" || type === "submit" || type === "reset") {
-    const isSubmit = type === "submit" || label.toLowerCase() === "submit"
-    const isReset = type === "reset" || label.toLowerCase() === "reset"
-    const onSubmitAction = () => {
-      onSubmit && onSubmit()
+    const isSubmit = type === "submit"
+    const isReset = type === "reset"
+
+    const onClickAction = () => {
+      console.log("Click action", { form, localValue })
+      if (isSubmit && !onSubmit) {
+        handleBlur()
+        // validateOn !== "none" && validateForm({ form, setFormErrors })
+        return formOnSubmit && formOnSubmit()
+      }
+      if (isSubmit && onSubmit) {
+        return onSubmit()
+      }
+      return onClick ? onClick() : () => {}
     }
-    const onResetAction = () => {
-      onReset && onReset()
-    }
-    const onClickAction =
-      onClick || isSubmit ? onSubmitAction : isReset ? onResetAction : () => {}
 
     if (outputType === "htmlElements") {
       return (
         <button
           value={value as ButtonHTMLAttributes<HTMLButtonElement>["value"]}
           onClick={onClickAction}
-          onReset={onResetAction}
-          onBlur={() => onBlur}
-          onFocus={() => onFocus}
+          onSubmit={onClickAction}
+          onReset={onReset}
+          onBlur={onBlur}
+          onFocus={onFocus}
           className={className}
+          ref={componentRef as RefObject<HTMLButtonElement>}
           {...otherProps}
         >
           {children ? children : label}
         </button>
       )
     }
+
     if (outputType === "makElements") {
       return (
         <mak.button
           value={value as ButtonHTMLAttributes<HTMLButtonElement>["value"]}
           onClick={onClickAction}
-          onReset={onResetAction}
-          onBlur={() => onBlur}
-          onFocus={() => onFocus}
+          onSubmit={onClickAction}
+          onReset={onReset}
+          onBlur={onBlur}
+          onFocus={onFocus}
           className={className}
           makClassName={makClassName}
+          ref={componentRef as RefObject<HTMLButtonElement>}
           {...otherProps}
         >
           {children ? children : label}
@@ -150,6 +197,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
           (defaultValue as SelectHTMLAttributes<HTMLSelectElement>["value"]) ||
           ""
         }
+        ref={componentRef as RefObject<HTMLSelectElement>}
         {...otherProps}
       >
         {placeholder && (
@@ -187,6 +235,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
           ""
         }
         multiple={multiple}
+        ref={componentRef as RefObject<HTMLSelectElement>}
         {...otherProps}
       >
         {placeholder && (
@@ -216,6 +265,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         onChange={handleLocalChange}
         onBlur={handleBlur}
         className={className}
+        ref={componentRef as RefObject<HTMLInputElement>}
         {...otherProps}
       />
     )
@@ -231,6 +281,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         className={className}
         makClassName={makClassName}
         defaultValue={defaultValue as string}
+        ref={componentRef as RefObject<HTMLInputElement>}
         {...otherProps}
       />
     )
