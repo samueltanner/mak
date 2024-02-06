@@ -41,31 +41,31 @@ const handleChange = ({
     })?.[fieldName] as string | undefined
   }
 
-  const newFormState = {
-    ...form, // Assume 'form' is the current state
-    [fieldName]: {
-      ...form[fieldName],
-      ...target,
-      errors: validation,
-    },
-  } as MakForm
+  // const newFormState = {
+  //   ...form, // Assume 'form' is the current state
+  //   [fieldName]: {
+  //     ...form[fieldName],
+  //     ...target,
+  //     errors: validation,
+  //   },
+  // } as MakForm
 
-  console.log({ newFormState })
-  setForm(newFormState)
+  // console.log({ newFormState })
+  // setForm(newFormState)
 
-  // setForm((prev: MakForm): MakForm => {
-  //   const updatedForm = {
-  //     ...prev,
-  //     [fieldName]: {
-  //       ...prev[fieldName],
-  //       ...target,
-  //       // value: target.value,
-  //       errors: validation,
-  //     },
-  //   }
+  setForm((prev: MakForm): MakForm => {
+    const updatedForm = {
+      ...prev,
+      [fieldName]: {
+        ...prev[fieldName],
+        ...target,
+        // value: target.value,
+        errors: validation,
+      },
+    }
 
-  //   return updatedForm as MakForm
-  // })
+    return updatedForm as MakForm
+  })
 }
 
 export default handleChange

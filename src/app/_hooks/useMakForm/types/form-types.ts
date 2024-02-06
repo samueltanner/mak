@@ -242,4 +242,5 @@ export type MakFormDynamicComponentProps = {
   onReset?: (props?: any) => void
   onSubmit?: (props?: any) => void
   validateOn?: MakFormValidationOption
+  revalidateOn?: MakFormValidationOption
 }

@@ -27,6 +27,7 @@ interface useMakFormProps {
   useHTMLComponents?: boolean
   useMakComponents?: boolean
   validateFormOn?: MakFormValidationOption
+  revalidateFormOn?: MakFormValidationOption
 }
 
 export interface FormAccessor {
@@ -42,6 +43,7 @@ export interface FormAccessor {
   onSubmit?: (input?: any) => void
   onReset?: (input?: any) => void
   validateFormOn?: MakFormValidationOption
+  revalidateFormOn?: MakFormValidationOption
 }
 
 export const useMakForm = ({
@@ -52,6 +54,7 @@ export const useMakForm = ({
   onSubmit,
   onReset,
   validateFormOn = "submit",
+  revalidateFormOn = "change",
 }: useMakFormProps) => {
   const outputType = ensureSingleElementType({
     useMakElements,
@@ -62,7 +65,7 @@ export const useMakForm = ({
   const previousFormRef = useRef<MakForm>({})
   const previousComponentsRef = useRef<MakFormDynamicComponents>()
 
-  const [form, setForm] = useState<MakForm>({})
+  const [form, setForm] = useState<MakForm>(formConfig || {})
   const [formErrors, setFormErrors] = useState<MakFormErrors>(
     Object.entries(formConfig || {}).reduce((acc, [key, value]) => {
       if (!["button", "submit", "reset"].includes((value as any)?.type)) {
@@ -77,22 +80,26 @@ export const useMakForm = ({
   }, [form, previousFormRef.current])
 
   const handleSetForm = (newForm: MakForm) => {
-    // if (isEqual(form, previousFormRef.current) && !isEmptyObject(form)) return
-
     setForm(newForm)
 
-    previousFormRef.current = newForm
+    // previousFormRef.current = newForm
   }
 
   const handleSubmit = () => {
-    console.log("submitting form", { form })
-    validateForm({ form, setFormErrors })
+    const validation = validateForm({ form, setFormErrors })
+    console.log("handlesubmuit validation", validation)
+    if (formErrors && Object.values(validation).some((error) => error)) {
+      console.log("Form has errors")
+      return
+    }
+    if (onSubmit) {
+      onSubmit(form)
+    }
   }
 
   const formAccessor = {
     form,
     setForm: handleSetForm,
-    // setForm,
     formErrors,
     setFormErrors,
     originalFormRef,
@@ -100,26 +107,22 @@ export const useMakForm = ({
     previousComponentsRef,
     formIsCurrent,
     outputType,
-    onSubmit: handleSubmit,
+    onSubmit,
     onReset,
     validateFormOn,
+    revalidateFormOn,
   } as FormAccessor
 
-  useEffect(() => {
-    if (isEmptyObject(form) && !isEmptyObject(formConfig)) {
-      const initialFormAccessor = {
-        ...formAccessor,
-        form: formConfig,
-      } as FormAccessor
-      const constructedForm = constructForm(initialFormAccessor)
-      setForm((prev) => constructedForm)
-      console.log({ constructedForm, form })
-    }
-  }, [formConfig, form])
-
-  useEffect(() => {
-    console.log({ form })
-  }, [form])
+  // useEffect(() => {
+  //   if (isEmptyObject(form) && !isEmptyObject(formConfig)) {
+  //     const initialFormAccessor = {
+  //       ...formAccessor,
+  //       form: formConfig,
+  //     } as FormAccessor
+  //     const constructedForm = constructForm(initialFormAccessor)
+  //     setForm((prev) => constructedForm)
+  //   }
+  // }, [formConfig, form])
 
   const initialComponentNames = () => {
     const dummyComponents = {} as any

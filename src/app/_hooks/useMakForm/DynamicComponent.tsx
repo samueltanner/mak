@@ -4,6 +4,7 @@ import React, {
   RefObject,
   SelectHTMLAttributes,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from "react"
@@ -48,6 +49,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     defaultValue,
     className,
     makClassName,
+    pattern,
     value,
     placeholder,
     options,
@@ -63,7 +65,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     formOnSubmit,
     formOnReset,
     validateOn,
-    pattern,
+    revalidateOn,
     ...otherProps
   } = props
 
@@ -94,6 +96,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         value: localValue,
       })
     }
+    console.log("local change", form)
   }
 
   const handleBlur = () => {
@@ -104,32 +107,25 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     handleChange({ form, event, setForm, setFormErrors, validateOn })
   }
 
-  // useEffect(() => {
-  //   const currentElement = componentRef.current
+  useEffect(() => {
+    const currentElement = componentRef.current
 
-  //   const handleMouseEnter = () => {
-  //     console.log({ type, name }) // Log when mouse enters
-  //   }
+    const handleMouseLeave = () => {
+      if (localValue !== form[name]?.value) {
+        handleBlur()
+      }
+    }
 
-  //   const handleMouseLeave = () => {
-  //     // Additional logic for mouse leave if needed
-  //     handleBlur()
-  //   }
+    if (currentElement) {
+      currentElement.addEventListener("mouseleave", handleMouseLeave)
+    }
 
-  //   // Add event listeners
-  //   if (currentElement) {
-  //     currentElement.addEventListener("mouseenter", handleMouseEnter)
-  //     currentElement.addEventListener("mouseleave", handleMouseLeave)
-  //   }
-
-  //   // Cleanup function to remove event listeners
-  //   return () => {
-  //     if (currentElement) {
-  //       currentElement.removeEventListener("mouseenter", handleMouseEnter)
-  //       currentElement.removeEventListener("mouseleave", handleMouseLeave)
-  //     }
-  //   }
-  // }, [componentRef, type, name])
+    return () => {
+      if (currentElement) {
+        currentElement.removeEventListener("mouseleave", handleMouseLeave)
+      }
+    }
+  }, [componentRef, type, name, localValue, handleBlur])
 
   if (type === "button" || type === "submit" || type === "reset") {
     const isSubmit = type === "submit"
@@ -138,8 +134,9 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     const onClickAction = () => {
       console.log("Click action", { form, localValue })
       if (isSubmit && !onSubmit) {
+        console.log("blurring")
         handleBlur()
-        // validateOn !== "none" && validateForm({ form, setFormErrors })
+        validateOn !== "none" && validateForm({ form, setFormErrors })
         return formOnSubmit && formOnSubmit()
       }
       if (isSubmit && onSubmit) {

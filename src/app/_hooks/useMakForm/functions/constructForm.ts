@@ -13,7 +13,7 @@ import componentFactory from "./componentFactory"
 // import inputElementFactory from "./inputElementFactory"
 
 const constructForm = (formAccessor: FormAccessor): MakForm => {
-  const { form, setForm, setFormErrors, outputType } = formAccessor
+  const { form, outputType } = formAccessor
   const constructedForm = {} as MakForm
 
   Object.keys(form || {}).forEach((name) => {

@@ -128,8 +128,6 @@ const validateForm = ({
       setFormErrors,
     })
 
-    console.log({ validation })
-
     if (Object.entries(validation).some(([_, error]) => error)) {
       // errors[fieldName] = error
       errors[fieldName] = validation[fieldName]
@@ -137,8 +135,8 @@ const validateForm = ({
       errors[fieldName] = undefined
     }
   })
-  console.log("errors", errors, "form", form)
-  setFormErrors(errors)
+
+  setFormErrors((prev) => errors)
   return errors
 }
 

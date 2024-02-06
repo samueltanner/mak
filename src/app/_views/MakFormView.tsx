@@ -14,8 +14,8 @@ const formConfig: MakFormInput = {
   email: {
     type: "email",
     label: "Email",
-    // pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$",
-    validateOn: "change",
+    pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$",
+    // validateOn: "change",
   },
 
   multi_select: {
