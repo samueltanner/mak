@@ -207,13 +207,14 @@ const componentFactory = ({
 export default componentFactory
 
 const constructDynamicComponents = (formAccessor: FormAccessor) => {
-  const { form } = formAccessor
+  const { form, outputType } = formAccessor
 
   return Object.keys(form || {}).reduce((acc, name) => {
     const componentName = getComponentName(name) as FieldType
     const component = componentFactory({
       name,
       formAccessor,
+      outputType,
     })
 
     return {

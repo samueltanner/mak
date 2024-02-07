@@ -6,21 +6,21 @@ const formConfig: MakFormInput = {
     type: "text",
     label: "First Name",
     placeholder: "Enter first name",
-    // required: true,
+    required: true,
     minLength: 2,
   },
   email: {
     type: "email",
     label: "Email",
-    // pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$",
-    validateOn: "change",
+    pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$",
+    revalidateOn: "change",
   },
 
   multi_select: {
     type: "select",
     label: "Multiselect",
     multiple: true,
-    // required: true,
+    required: true,
     hide: true,
     placeholder: "Select multiselect",
     options: [
@@ -39,18 +39,16 @@ const formConfig: MakFormInput = {
     type: "submit",
     label: "Submit",
   },
+  reset: {
+    type: "reset",
+    label: "Reset",
+  },
 }
 
 const MakFormView = () => {
   const {
     form,
-    components: {
-      FirstName,
-      MultiSelect,
-      Color,
-      Submit,
-      Email,
-    },
+    components: { FirstName, MultiSelect, Color, Submit, Email, Reset },
     formErrors,
   } = useMakForm({ formConfig, onSubmit: (input) => console.log({ input }) })
   const {
@@ -87,6 +85,7 @@ const MakFormView = () => {
       >
         test
       </button>
+      <Reset />
     </div>
     // </form>
   )

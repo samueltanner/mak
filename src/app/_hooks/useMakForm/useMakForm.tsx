@@ -44,6 +44,7 @@ export interface FormAccessor {
   }: {
     event: InputChangeEvent
     validateOn: MakFormValidationOption
+    revalidateOn?: MakFormValidationOption
   }) => void
   formRef: React.MutableRefObject<MakForm | undefined>
   outputType: MakFormComponentOutputType
@@ -89,7 +90,7 @@ export const useMakForm = ({
     handleChange,
     outputType,
     onSubmit: handleSubmit,
-    onReset,
+    onReset: handleReset,
     validateFormOn,
     revalidateFormOn,
     formRef,
@@ -98,9 +99,11 @@ export const useMakForm = ({
   function handleChange({
     event,
     validateOn,
+    revalidateOn,
   }: {
     event: InputChangeEvent
     validateOn: MakFormValidationOption
+    revalidateOn?: MakFormValidationOption
   }) {
     const target = event.target as HTMLInputElement
 
@@ -109,7 +112,27 @@ export const useMakForm = ({
 
     let validation: string | undefined = undefined
 
-    if (validateOn === "change" || validateOn === "blur") {
+    if (validateOn === "change" || validateFormOn === "change") {
+      validation = validateField({
+        form,
+        fieldName,
+        value,
+      })?.[fieldName] as string | undefined
+
+      setFormErrors((prev) => {
+        const updatedErrors = {
+          ...prev,
+          [fieldName]: validation,
+        }
+        return updatedErrors as MakFormErrors
+      })
+    }
+    if (
+      errorsRef.current?.[fieldName] &&
+      (revalidateFormOn === "change" || revalidateOn === "change")
+    ) {
+      console.log("handleChange", event, validateOn, revalidateOn)
+
       validation = validateField({
         form,
         fieldName,
@@ -151,11 +174,23 @@ export const useMakForm = ({
     }
   }
 
-  useEffect(() => {
+  function handleReset() {
+    if (onReset) {
+      onReset()
+    } else {
+      constructFormAndComponents()
+    }
+  }
+
+  const constructFormAndComponents = () => {
     if (!formConfig) return
     const constructedForm = constructForm(formAccessor)
-    setForm((prev) => constructedForm)
+    setForm(constructedForm)
     setDynamicComponents(constructDynamicComponents(formAccessor))
+  }
+
+  useEffect(() => {
+    constructFormAndComponents()
   }, [formConfig])
 
   useEffect(() => {

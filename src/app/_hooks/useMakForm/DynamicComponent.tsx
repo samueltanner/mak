@@ -5,7 +5,7 @@ import {
   SelectHTMLAttributes,
   useRef,
   useState,
-} from "react";
+} from "react"
 
 import { mak } from "../useMakUi/elements/ts/mak"
 import {
@@ -14,7 +14,7 @@ import {
   MakFormDynamicComponentProps,
   MakFormFieldConfig,
   MakFormValidationOption,
-} from "./types/form-types";
+} from "./types/form-types"
 import { FormAccessor } from "./useMakForm"
 
 type DynamicComponentProps = MakFormDynamicComponentProps &
@@ -76,15 +76,15 @@ const DynamicComponent = (props: DynamicComponentProps) => {
       setLocalValue(selectedValues)
       const event = {
         target: { name, value: selectedValues || value, type },
-      }
-      handleChange({ event, validateOn })
+      } as InputChangeEvent
+      handleChange({ event, validateOn, revalidateOn })
     } else {
       setLocalValue(e.target.value)
       const event = {
         target: { name, value: e.target.value || value, type },
       } as InputChangeEvent
 
-      handleChange({ event, validateOn })
+      handleChange({ event, validateOn, revalidateOn })
     }
   }
 
@@ -98,6 +98,12 @@ const DynamicComponent = (props: DynamicComponentProps) => {
       }
       if (isSubmit && onSubmit) {
         return onSubmit()
+      }
+      if (isReset && !onReset) {
+        return formOnReset && formOnReset()
+      }
+      if (isReset && onReset) {
+        return onReset()
       }
       return onClick ? onClick() : () => {}
     }
