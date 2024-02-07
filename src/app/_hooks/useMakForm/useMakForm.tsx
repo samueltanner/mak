@@ -72,7 +72,7 @@ export const useMakForm = ({
 
   const formRef = useRef<MakForm>()
   const errorsRef = useRef<MakFormErrors>({})
-
+  const beforeValidationErrorsRef = useRef<MakFormErrors>({})
   const [form, setForm] = useState<MakForm>(formConfig || {})
   const [formErrors, setFormErrors] = useState<MakFormErrors>(
     Object.entries(formConfig || {}).reduce((acc, [key, value]) => {
@@ -84,6 +84,12 @@ export const useMakForm = ({
   )
   const [dynamicComponents, setDynamicComponents] =
     useState<MakFormDynamicComponents>(getInitialComponentNames({ formConfig }))
+  const [isDirty, setIsDirty] = useState(false)
+  const [isClean, setIsClean] = useState(true)
+
+  useEffect(() => {
+    setIsClean(!isDirty)
+  }, [isDirty])
 
   const formAccessor: FormAccessor = {
     form,
@@ -105,6 +111,7 @@ export const useMakForm = ({
     validateOn: MakFormValidationOption
     revalidateOn?: MakFormValidationOption
   }) {
+    setIsDirty(true)
     const target = event.target as HTMLInputElement
 
     const value = target?.type === "checkbox" ? target.checked : target.value
@@ -131,8 +138,6 @@ export const useMakForm = ({
       errorsRef.current?.[fieldName] &&
       (revalidateFormOn === "change" || revalidateOn === "change")
     ) {
-      console.log("handleChange", event, validateOn, revalidateOn)
-
       validation = validateField({
         form,
         fieldName,
@@ -159,6 +164,10 @@ export const useMakForm = ({
       }
       return updatedForm as MakForm
     })
+
+    beforeValidationErrorsRef.current = validateForm({
+      form: formRef.current || {},
+    })
   }
 
   function handleSubmit() {
@@ -172,6 +181,7 @@ export const useMakForm = ({
     if (onSubmit) {
       onSubmit(formRef.current)
     }
+    constructFormAndComponents()
   }
 
   function handleReset() {
@@ -187,6 +197,22 @@ export const useMakForm = ({
     const constructedForm = constructForm(formAccessor)
     setForm(constructedForm)
     setDynamicComponents(constructDynamicComponents(formAccessor))
+    setIsDirty(false)
+  }
+
+  const getFormValues = () => {
+    if (!formRef.current) return
+    const formValues = Object.entries(formRef.current).reduce(
+      (acc, [key, value]) => {
+        if (value?.type !== "submit" && value?.type !== "reset") {
+          ;(acc as any)[key] = value?.value
+        }
+        return acc
+      },
+      {}
+    )
+
+    return formValues
   }
 
   useEffect(() => {
@@ -204,11 +230,27 @@ export const useMakForm = ({
   return {
     form,
     components: dynamicComponents,
-    formErrors,
+    errors: formErrors,
+    formState: {
+      errors: beforeValidationErrorsRef.current,
+      values: getFormValues(),
+      dirty: isDirty,
+      clean: isClean,
+    },
+    reset: handleReset,
+    submit: handleSubmit,
   } as {
     components: MakFormDynamicComponents
     form: MakForm
-    formErrors: MakFormErrors
+    formState: {
+      errors: MakFormErrors
+      values: any
+      dirty: boolean
+      clean: boolean
+    }
+    errors: MakFormErrors
+    reset: () => void
+    submit: () => void
   }
 }
 

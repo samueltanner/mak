@@ -21,7 +21,6 @@ const formConfig: MakFormInput = {
     label: "Multiselect",
     multiple: true,
     required: true,
-    hide: true,
     placeholder: "Select multiselect",
     options: [
       { label: "one", value: 1 },
@@ -49,14 +48,15 @@ const MakFormView = () => {
   const {
     form,
     components: { FirstName, MultiSelect, Color, Submit, Email, Reset },
-    formErrors,
+    errors,
+    formState,
   } = useMakForm({ formConfig, onSubmit: (input) => console.log({ input }) })
   const {
     first_name: firstNameError,
     email: emailError,
     multi_select: multiSelectError,
     color: colorError,
-  } = formErrors
+  } = errors
 
   return (
     // <form>
@@ -80,7 +80,7 @@ const MakFormView = () => {
       />
       <button
         onClick={() => {
-          console.log(formErrors)
+          console.log(errors)
         }}
       >
         test

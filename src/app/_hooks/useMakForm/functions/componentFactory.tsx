@@ -94,6 +94,10 @@ const componentFactory = ({
   const onFocus = config?.onFocus
   const onSubmit = config?.onSubmit
   const onReset = config?.onReset
+  const onChange = (props: any) => {
+    config?.onChange
+    handleChange
+  }
   const validateOn = config?.validateOn || validateFormOn || "submit"
   const revalidateOn = config?.revalidateOn || revalidateFormOn || "change"
   // "boolean"
@@ -144,10 +148,10 @@ const componentFactory = ({
     placeholder,
     disabled,
     className,
+    makClassName,
     value: fieldValue,
     name,
 
-    makClassName,
     readonly,
     hide,
     autoFocus,
@@ -174,6 +178,7 @@ const componentFactory = ({
     step0,
     step1,
     range,
+    defaultValue,
     defaultValue0,
     defaultValue1,
     value0,
@@ -186,6 +191,7 @@ const componentFactory = ({
     onFocus,
     onSubmit,
     onReset,
+    onChange,
     formOnSubmit,
     formOnReset,
   }

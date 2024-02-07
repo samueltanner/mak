@@ -121,6 +121,7 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
       step0,
       step1,
       range,
+      defaultValue,
       defaultValue0,
       defaultValue1,
       value0,

@@ -55,6 +55,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     onFocus,
     onSubmit,
     onReset,
+    onChange,
     formOnSubmit,
     formOnReset,
     validateOn,
@@ -86,6 +87,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
 
       handleChange({ event, validateOn, revalidateOn })
     }
+    onChange && onChange(e)
   }
 
   if (type === "button" || type === "submit" || type === "reset") {
@@ -225,6 +227,8 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         onChange={handleLocalChange}
         onBlur={onBlur}
         className={className}
+        placeholder={placeholder as string}
+        defaultValue={defaultValue as string}
         ref={componentRef as RefObject<HTMLInputElement>}
         {...otherProps}
       />
@@ -241,6 +245,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         className={className}
         makClassName={makClassName}
         defaultValue={defaultValue as string}
+        placeholder={placeholder as string}
         ref={componentRef as RefObject<HTMLInputElement>}
         {...otherProps}
       />
