@@ -3,6 +3,7 @@ import {
   BooleanFieldConfig,
   BoundedRangeFieldConfig,
   FieldType,
+  MakForm,
   MakFormComponentOutputType,
   MakFormDynamicComponent,
   MakFormFieldConfig,
@@ -20,26 +21,41 @@ export const getComponentName = (fieldName: string) => {
     .join("")
 }
 
+export const getInitialComponentNames = ({
+  formConfig,
+}: {
+  formConfig: MakForm | undefined
+}) => {
+  const dummyComponents = {} as any
+  Object.keys(formConfig || {}).forEach((fieldName) => {
+    const name = getComponentName(fieldName)
+    dummyComponents[name] = () => <div />
+  })
+  if (!formConfig?.Submit) {
+    dummyComponents["Submit"] = () => <div />
+  }
+
+  return dummyComponents
+}
+
 interface ComponentFactoryProps {
   formAccessor: FormAccessor
   name: string
-  outputType: MakFormComponentOutputType
 }
 
 const componentFactory = ({
   formAccessor,
   name,
-  outputType,
 }: ComponentFactoryProps): MakFormDynamicComponent => {
   const {
     form,
-    setForm,
-    setFormErrors,
-    previousFormRef,
-    formErrors,
+    formRef,
     validateFormOn,
+    revalidateFormOn,
     onSubmit: formOnSubmit,
     onReset: formOnReset,
+    outputType,
+    handleChange,
   } = formAccessor
 
   const config = form[name] as MakFormFieldConfig
@@ -78,6 +94,7 @@ const componentFactory = ({
   const onSubmit = config?.onSubmit
   const onReset = config?.onReset
   const validateOn = config?.validateOn || validateFormOn || "submit"
+  const revalidateOn = config?.revalidateOn || revalidateFormOn || "change"
   // "boolean"
   const checked = (config as BooleanFieldConfig)?.checked
 
@@ -112,10 +129,13 @@ const componentFactory = ({
 
   const hookProps = {
     form,
-    setForm,
-    formErrors,
-    setFormErrors,
-    previousFormRef,
+    handleChange,
+    formRef,
+    validateOn,
+    revalidateOn,
+    validateFormOn,
+    revalidateFormOn,
+
     config,
     type,
     label,
@@ -167,7 +187,6 @@ const componentFactory = ({
     onReset,
     formOnSubmit,
     formOnReset,
-    validateOn,
   }
   const ComponentWrapper = (props: Record<string, unknown>) => {
     if (Object.values(props).length > 0) {
@@ -187,14 +206,13 @@ const componentFactory = ({
 export default componentFactory
 
 const constructDynamicComponents = (formAccessor: FormAccessor) => {
-  const { form, outputType } = formAccessor
+  const { form } = formAccessor
 
   return Object.keys(form || {}).reduce((acc, name) => {
     const componentName = getComponentName(name) as FieldType
     const component = componentFactory({
       name,
       formAccessor,
-      outputType,
     })
 
     return {

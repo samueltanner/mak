@@ -8,39 +8,38 @@ import React, {
   useRef,
   useState,
 } from "react"
-import handleChange from "./functions/handleChange"
+
 import { mak } from "../useMakUi/elements/ts/mak"
 import {
   FieldType,
+  InputChangeEvent,
   MakForm,
   MakFormComponentOutputType,
   MakFormDynamicComponentProps,
   MakFormErrors,
   MakFormFieldConfig,
+  MakFormValidationOption,
 } from "./types/form-types"
 import { FormAccessor } from "./useMakForm"
 import { validateForm, validateField } from "./functions/validate"
 
-type DynamicComponentProps = MakFormDynamicComponentProps & {
-  form: MakForm
-  setForm: React.Dispatch<React.SetStateAction<MakForm>>
-  formErrors: MakFormErrors
-  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
-  config: MakFormFieldConfig
-  name: string
-  outputType: MakFormComponentOutputType
-  type: FieldType
-  label: string
-  formOnSubmit?: FormAccessor["onSubmit"]
-  formOnReset?: FormAccessor["onReset"]
-}
+type DynamicComponentProps = MakFormDynamicComponentProps &
+  FormAccessor & {
+    config: MakFormFieldConfig
+    name: string
+    type: FieldType
+    label: string
+    formOnSubmit?: FormAccessor["onSubmit"]
+    formOnReset?: FormAccessor["onReset"]
+    validateOn: MakFormValidationOption
+    revalidateOn: MakFormValidationOption
+  }
 
 const DynamicComponent = (props: DynamicComponentProps) => {
   const {
     form,
     config,
-    setForm,
-    setFormErrors,
+    handleChange,
     outputType,
     children,
     type,
@@ -66,15 +65,12 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     formOnReset,
     validateOn,
     revalidateOn,
+    formRef,
     ...otherProps
   } = props
 
   const [localValue, setLocalValue] = useState(value)
   const componentRef = useRef<HTMLElement>(null)
-
-  type InputChangeEvent = React.ChangeEvent<
-    HTMLSelectElement | HTMLInputElement
-  >
 
   const handleLocalChange = (e: InputChangeEvent) => {
     if (multiple && e.target instanceof HTMLSelectElement) {
@@ -84,27 +80,26 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         (option) => option.value
       )
       setLocalValue(selectedValues)
+      const event = {
+        target: { name, value: selectedValues, type },
+      }
+      handleChange({ event, validateOn })
     } else {
       setLocalValue(e.target.value)
+      const event = {
+        target: { name, value: e.target.value, type },
+      } as InputChangeEvent
+
+      handleChange({ event, validateOn })
     }
-    if (validateOn === "change") {
-      validateField({
-        form,
-        fieldName: name,
-        setFormErrors,
-        validateOn,
-        value: localValue,
-      })
-    }
-    console.log("local change", form)
   }
 
   const handleBlur = () => {
-    const event = {
-      target: { name, value: localValue, type },
-    } as InputChangeEvent
-
-    handleChange({ form, event, setForm, setFormErrors, validateOn })
+    console.log({ formRef })
+    // const event = {
+    //   target: { name, value: localValue, type },
+    // } as InputChangeEvent
+    // handleChange({ event, validateOn })
   }
 
   useEffect(() => {
@@ -132,11 +127,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     const isReset = type === "reset"
 
     const onClickAction = () => {
-      console.log("Click action", { form, localValue })
       if (isSubmit && !onSubmit) {
-        console.log("blurring")
-        handleBlur()
-        validateOn !== "none" && validateForm({ form, setFormErrors })
         return formOnSubmit && formOnSubmit()
       }
       if (isSubmit && onSubmit) {

@@ -1,45 +1,45 @@
-// import { createContext, useState, useContext, ReactNode, useRef } from "react"
-// import { FormObject } from "./types/form-types"
+import { createContext, useState, useContext, ReactNode, useRef } from "react"
+import { MakForm } from "./types/form-types"
 
-// interface MakFormContextType {
-//   form: FormObject
-//   setForm: (form: FormObject) => void
-//   originalFormRef: React.MutableRefObject<FormObject>
-//   previousFormRef: React.MutableRefObject<FormObject>
-// }
+interface MakFormContextType {
+  form: MakForm
+  setForm: (form: MakForm) => void
+  originalFormRef: React.MutableRefObject<MakForm>
+  previousFormRef: React.MutableRefObject<MakForm>
+}
 
-// interface MakFormProviderProps {
-//   children: ReactNode
-// }
+interface MakFormProviderProps {
+  children: ReactNode
+}
 
-// interface MakFormContextType {
-//   form: FormObject
-//   setForm: (form: FormObject) => void
-//   originalFormRef: React.MutableRefObject<FormObject>
-//   previousFormRef: React.MutableRefObject<FormObject>
-// }
+interface MakFormContextType {
+  form: MakForm
+  setForm: (form: MakForm) => void
+  originalFormRef: React.MutableRefObject<MakForm>
+  previousFormRef: React.MutableRefObject<MakForm>
+}
 
-// const defaultContextValue: MakFormContextType = {
-//   form: {},
-//   setForm: () => {},
-//   originalFormRef: { current: {} },
-//   previousFormRef: { current: {} },
-// }
+const defaultContextValue: MakFormContextType = {
+  form: {},
+  setForm: () => {},
+  originalFormRef: { current: {} },
+  previousFormRef: { current: {} },
+}
 
-// const MakFormContext = createContext<MakFormContextType>(defaultContextValue)
+const MakFormContext = createContext<MakFormContextType>(defaultContextValue)
 
-// export const MakFormProvider = ({ children }: MakFormProviderProps) => {
-//   const [form, setForm] = useState<FormObject>({})
-//   const originalFormRef = useRef<FormObject>({})
-//   const previousFormRef = useRef<FormObject>({})
+export const MakFormProvider = ({ children }: MakFormProviderProps) => {
+  const [form, setForm] = useState<MakForm>({})
+  const originalFormRef = useRef<MakForm>({})
+  const previousFormRef = useRef<MakForm>({})
 
-//   const values = { form, setForm, originalFormRef, previousFormRef }
+  const values = { form, setForm, originalFormRef, previousFormRef }
 
-//   return (
-//     <MakFormContext.Provider value={values}>{children}</MakFormContext.Provider>
-//   )
-// }
+  return (
+    <MakFormContext.Provider value={values}>{children}</MakFormContext.Provider>
+  )
+}
 
-// export const useMakFormContext = () => {
-//   return useContext(MakFormContext)
-// }
+export const useMakFormContext = () => {
+  return useContext(MakFormContext)
+}

@@ -1,5 +1,8 @@
 "use client"
-import { constructDynamicComponents } from "./functions/componentFactory"
+import {
+  constructDynamicComponents,
+  getInitialComponentNames,
+} from "./functions/componentFactory"
 import constructForm from "./functions/constructForm"
 import {
   ensureSingleElementType,
@@ -10,6 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { getComponentName } from "./functions/componentFactory"
 
 import {
+  InputChangeEvent,
   MakForm,
   MakFormComponentOutputType,
   MakFormDynamicComponents,
@@ -17,9 +21,10 @@ import {
   MakFormValidationOption,
 } from "./types/form-types"
 import { isEmptyObject } from "@/globals/global-helper-functions"
-import { validateForm } from "./functions/validate"
+import { validateField, validateForm } from "./functions/validate"
+import { MakFormProvider } from "./MakFormContext"
 
-interface useMakFormProps {
+interface MakFormProps {
   formConfig?: MakForm
   onSubmit?: (input?: any) => void
   onReset?: (input?: any) => void
@@ -32,13 +37,15 @@ interface useMakFormProps {
 
 export interface FormAccessor {
   form: MakForm
-  setForm: React.Dispatch<React.SetStateAction<MakForm>>
-  formErrors: MakFormErrors
-  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
-  originalFormRef: React.MutableRefObject<MakForm>
-  previousFormRef: React.MutableRefObject<MakForm>
-  previousComponentsRef: React.MutableRefObject<MakFormDynamicComponents>
-  formIsCurrent: () => boolean
+
+  handleChange: ({
+    event,
+    validateOn,
+  }: {
+    event: InputChangeEvent
+    validateOn: MakFormValidationOption
+  }) => void
+  formRef: React.MutableRefObject<MakForm | undefined>
   outputType: MakFormComponentOutputType
   onSubmit?: (input?: any) => void
   onReset?: (input?: any) => void
@@ -55,15 +62,15 @@ export const useMakForm = ({
   onReset,
   validateFormOn = "submit",
   revalidateFormOn = "change",
-}: useMakFormProps) => {
+}: MakFormProps) => {
   const outputType = ensureSingleElementType({
     useMakElements,
     useHTMLComponents,
     useMakComponents,
   })
-  const originalFormRef = useRef<MakForm>()
-  const previousFormRef = useRef<MakForm>({})
-  const previousComponentsRef = useRef<MakFormDynamicComponents>()
+
+  const formRef = useRef<MakForm>()
+  const errorsRef = useRef<MakFormErrors>({})
 
   const [form, setForm] = useState<MakForm>(formConfig || {})
   const [formErrors, setFormErrors] = useState<MakFormErrors>(
@@ -74,82 +81,100 @@ export const useMakForm = ({
       return acc
     }, {})
   )
+  const [dynamicComponents, setDynamicComponents] =
+    useState<MakFormDynamicComponents>(getInitialComponentNames({ formConfig }))
 
-  const formIsCurrent = useCallback(() => {
-    return isEqual(form, previousFormRef.current)
-  }, [form, previousFormRef.current])
-
-  const handleSetForm = (newForm: MakForm) => {
-    setForm(newForm)
-
-    // previousFormRef.current = newForm
-  }
-
-  const handleSubmit = () => {
-    const validation = validateForm({ form, setFormErrors })
-    console.log("handlesubmuit validation", validation)
-    if (formErrors && Object.values(validation).some((error) => error)) {
-      console.log("Form has errors")
-      return
-    }
-    if (onSubmit) {
-      onSubmit(form)
-    }
-  }
-
-  const formAccessor = {
+  const formAccessor: FormAccessor = {
     form,
-    setForm: handleSetForm,
-    formErrors,
-    setFormErrors,
-    originalFormRef,
-    previousFormRef,
-    previousComponentsRef,
-    formIsCurrent,
+    handleChange,
     outputType,
-    onSubmit,
+    onSubmit: handleSubmit,
     onReset,
     validateFormOn,
     revalidateFormOn,
-  } as FormAccessor
-
-  // useEffect(() => {
-  //   if (isEmptyObject(form) && !isEmptyObject(formConfig)) {
-  //     const initialFormAccessor = {
-  //       ...formAccessor,
-  //       form: formConfig,
-  //     } as FormAccessor
-  //     const constructedForm = constructForm(initialFormAccessor)
-  //     setForm((prev) => constructedForm)
-  //   }
-  // }, [formConfig, form])
-
-  const initialComponentNames = () => {
-    const dummyComponents = {} as any
-    Object.keys(formConfig || {}).forEach((fieldName) => {
-      const name = getComponentName(fieldName)
-      dummyComponents[name] = () => <div />
-    })
-    if (!formConfig?.Submit) {
-      dummyComponents["Submit"] = () => <div />
-    }
-
-    return dummyComponents
+    formRef,
   }
 
-  const [dynamicComponents, setDynamicComponents] =
-    useState<MakFormDynamicComponents>(initialComponentNames())
+  function handleChange({
+    event,
+    validateOn,
+  }: {
+    event: InputChangeEvent
+    validateOn: MakFormValidationOption
+  }) {
+    const target = event.target as HTMLInputElement
+
+    const value = target?.type === "checkbox" ? target.checked : target.value
+    const fieldName = target.name
+    console.log("handle change called", { fieldName, event, validateOn })
+
+    let validation: string | undefined = undefined
+
+    if (validateOn === "change" || validateOn === "blur") {
+      validation = validateField({
+        form,
+        fieldName,
+        value,
+      })?.[fieldName] as string | undefined
+      console.log({ validation })
+      setFormErrors((prev) => {
+        const updatedErrors = {
+          ...prev,
+          [fieldName]: validation,
+        }
+        return updatedErrors as MakFormErrors
+      })
+    }
+
+    setForm((prev): MakForm => {
+      const updatedForm = {
+        ...prev,
+        [fieldName]: {
+          ...prev[fieldName],
+          ...target,
+          errors: validation,
+        },
+      }
+      return updatedForm as MakForm
+    })
+  }
+
+  function handleSubmit() {
+    const validation = validateForm({ form: formRef.current || {} })
+
+    setFormErrors(validation)
+    if (formErrors && Object.values(validation).some((error) => error)) {
+      console.log("Form has errors", validation, errorsRef.current)
+      return
+    }
+    if (onSubmit) {
+      onSubmit(formRef.current)
+    }
+  }
 
   useEffect(() => {
-    if (!formConfig || isEqual(form, previousFormRef.current)) return
-
+    if (!formConfig) return
     const constructedForm = constructForm(formAccessor)
-
-    setForm(constructedForm)
+    console.log("Constructed form", constructedForm)
+    setForm((prev) => constructedForm)
     setDynamicComponents(constructDynamicComponents(formAccessor))
+  }, [formConfig])
 
-    previousFormRef.current = constructedForm
-  }, [form, formConfig])
+  useEffect(() => {
+    formRef.current = form
+    console.log("form changed, setting form ref", {
+      form,
+      formRef: formRef.current,
+    })
+  }, [form])
+
+  useEffect(() => {
+    errorsRef.current = formErrors
+    console.log("formErrors changed, setting errors ref", {
+      formErrors,
+      errorsRef: errorsRef.current,
+    })
+  }, [formErrors])
 
   return {
     form,

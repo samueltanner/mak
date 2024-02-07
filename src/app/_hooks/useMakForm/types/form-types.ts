@@ -7,7 +7,13 @@ export type MakFormValidationOption =
   | "reset"
   | "none"
 
-export type InputChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
+export type InputChangeEvent = {
+  target: {
+    name: string
+    value: string | string[] // Allow both string and string[]
+    type: string
+  }
+}
 
 export type MakFormDynamicComponent = (
   props: MakFormDynamicComponentProps
@@ -89,6 +95,7 @@ export interface BaseFieldConfig {
   onReset?: (props?: any) => void
   onSubmit?: (props?: any) => void
   validateOn?: MakFormValidationOption
+  revalidateOn?: MakFormValidationOption
 }
 export interface ColorFieldConfig extends BaseFieldConfig {
   type: "color"

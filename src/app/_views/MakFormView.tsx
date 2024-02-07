@@ -1,28 +1,26 @@
-import { useEffect } from "react"
 import useMakForm from "../_hooks/useMakForm/useMakForm"
 import { MakFormInput } from "../_hooks/useMakForm/types/form-types"
-import { mak } from "../_hooks/useMakUi/elements/ts/mak"
 
 const formConfig: MakFormInput = {
   first_name: {
     type: "text",
     label: "First Name",
     placeholder: "Enter first name",
-    required: true,
+    // required: true,
     minLength: 2,
   },
   email: {
     type: "email",
     label: "Email",
-    pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$",
-    // validateOn: "change",
+    // pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$",
+    validateOn: "change",
   },
 
   multi_select: {
     type: "select",
     label: "Multiselect",
     multiple: true,
-    required: true,
+    // required: true,
     hide: true,
     placeholder: "Select multiselect",
     options: [
@@ -48,17 +46,13 @@ const MakFormView = () => {
     form,
     components: {
       FirstName,
-      Pick,
-      LastName,
-      People,
-      Date,
       MultiSelect,
       Color,
       Submit,
       Email,
     },
     formErrors,
-  } = useMakForm({ formConfig, onSubmit: (input) => console.log({ form }) })
+  } = useMakForm({ formConfig, onSubmit: (input) => console.log({ input }) })
   const {
     first_name: firstNameError,
     email: emailError,
@@ -69,10 +63,6 @@ const MakFormView = () => {
   return (
     // <form>
     <div className="flex flex-col gap-2 group w-fit">
-      {/* 
-        <Pick />
-        <People />
-        <Date /> */}
       <label htmlFor="first_name">First Name</label>
       <FirstName />
       {firstNameError && (

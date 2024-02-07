@@ -13,14 +13,10 @@ const validateField = ({
   form,
   fieldName,
   value,
-  setFormErrors,
-  validateOn,
 }: {
   form: MakForm
   fieldName: string
   value: any
-  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
-  validateOn?: MakFormValidationOption
 }) => {
   const config = form[fieldName] as MakFormFieldConfig
   const label = config?.label
@@ -44,17 +40,17 @@ const validateField = ({
 
   if (required && !value) {
     const errorString = `${label} is required.`
-    setFormErrors((prev) => ({
-      ...prev,
-      [fieldName]: errorString,
-    }))
+    // setFormErrors((prev) => ({
+    //   ...prev,
+    //   [fieldName]: errorString,
+    // }))
     errors[fieldName] = errorString
     return errors
   }
 
   if (pattern && !pattern.test(value)) {
     const errorString = "Invalid format."
-    setFormErrors((prev) => ({ ...prev, [fieldName]: errorString }))
+    // setFormErrors((prev) => ({ ...prev, [fieldName]: errorString }))
     errors[fieldName] = errorString
     return errors
   }
@@ -62,19 +58,19 @@ const validateField = ({
   if (typeof value === "string") {
     const errorString = `Minimum length is ${minLength}.`
     if (minLength !== undefined && value.length < minLength) {
-      setFormErrors((prev) => ({
-        ...prev,
-        [fieldName]: errorString,
-      }))
+      // setFormErrors((prev) => ({
+      //   ...prev,
+      //   [fieldName]: errorString,
+      // }))
       errors[fieldName] = errorString
       return errors
     }
     if (maxLength !== undefined && value.length > maxLength) {
       const errorString = `Maximum length is ${maxLength}.`
-      setFormErrors((prev) => ({
-        ...prev,
-        [fieldName]: `Maximum length is ${maxLength}.`,
-      }))
+      // setFormErrors((prev) => ({
+      //   ...prev,
+      //   [fieldName]: `Maximum length is ${maxLength}.`,
+      // }))
       errors[fieldName] = errorString
       return errors
     }
@@ -83,49 +79,41 @@ const validateField = ({
   if (type === "number" && typeof value === "number") {
     const errorString = `Minimum value is ${min}.`
     if (min !== undefined && value < min) {
-      setFormErrors((prev) => ({
-        ...prev,
-        [fieldName]: errorString,
-      }))
+      // setFormErrors((prev) => ({
+      //   ...prev,
+      //   [fieldName]: errorString,
+      // }))
       errors[fieldName] = errorString
       return errors
     }
     if (max !== undefined && value > max) {
       const errorString = `Maximum value is ${max}.`
-      setFormErrors((prev) => ({
-        ...prev,
-        [fieldName]: errorString,
-      }))
+      // setFormErrors((prev) => ({
+      //   ...prev,
+      //   [fieldName]: errorString,
+      // }))
       errors[fieldName] = errorString
       return errors
     }
   }
 
-  setFormErrors((prev) => ({ ...prev, [fieldName]: undefined }))
   errors[fieldName] = undefined
 
   return errors
 }
 
-const validateForm = ({
-  form,
-  setFormErrors,
-}: {
-  form: MakForm
-  setFormErrors: React.Dispatch<React.SetStateAction<MakFormErrors>>
-}) => {
+const validateForm = ({ form }: { form: MakForm }) => {
   const errors = {} as MakFormErrors
 
   Object.keys(form).forEach((fieldName) => {
     if (fieldName === "submit" || fieldName === "reset") return
 
     const value = form?.[fieldName]?.value || form?.[fieldName]?.defaultValue
-    console.log("fieldName", fieldName, "value", value)
+
     const validation = validateField({
       fieldName,
       value,
       form,
-      setFormErrors,
     })
 
     if (Object.entries(validation).some(([_, error]) => error)) {
@@ -136,7 +124,7 @@ const validateForm = ({
     }
   })
 
-  setFormErrors((prev) => errors)
+  // setFormErrors((prev) => errors)
   return errors
 }
 

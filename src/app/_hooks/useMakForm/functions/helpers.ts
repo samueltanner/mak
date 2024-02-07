@@ -1,5 +1,6 @@
 import { isEmptyObject } from "@/globals/global-helper-functions"
-import { MakFormComponentOutputType } from "../types/form-types"
+import { MakForm, MakFormComponentOutputType } from "../types/form-types"
+import { getComponentName } from "./componentFactory"
 
 const isObject = (v: any): v is GenericObject =>
   v !== null && typeof v === "object" && !Array.isArray(v)
@@ -61,7 +62,6 @@ function getDifference(
 }
 
 const isEqual = (x: any, y: any): boolean => {
-
   const diffResult = getDifference(x, y, true)
 
   if (typeof diffResult === "boolean") {
