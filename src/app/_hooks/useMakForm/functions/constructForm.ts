@@ -26,7 +26,7 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
     const disabled = config?.disabled
     const className = config?.className
     const makClassName = config?.makClassName
-    const value = config?.value
+    const value = config?.value || defaultValue
     const placeholder = config?.placeholder
     const readonly = config?.readonly
     const hide = config?.hide

@@ -1,27 +1,21 @@
-import React, {
+import {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   RefObject,
   SelectHTMLAttributes,
-  useEffect,
-  useImperativeHandle,
   useRef,
   useState,
-} from "react"
+} from "react";
 
 import { mak } from "../useMakUi/elements/ts/mak"
 import {
   FieldType,
   InputChangeEvent,
-  MakForm,
-  MakFormComponentOutputType,
   MakFormDynamicComponentProps,
-  MakFormErrors,
   MakFormFieldConfig,
   MakFormValidationOption,
-} from "./types/form-types"
+} from "./types/form-types";
 import { FormAccessor } from "./useMakForm"
-import { validateForm, validateField } from "./functions/validate"
 
 type DynamicComponentProps = MakFormDynamicComponentProps &
   FormAccessor & {
@@ -81,46 +75,18 @@ const DynamicComponent = (props: DynamicComponentProps) => {
       )
       setLocalValue(selectedValues)
       const event = {
-        target: { name, value: selectedValues, type },
+        target: { name, value: selectedValues || value, type },
       }
       handleChange({ event, validateOn })
     } else {
       setLocalValue(e.target.value)
       const event = {
-        target: { name, value: e.target.value, type },
+        target: { name, value: e.target.value || value, type },
       } as InputChangeEvent
 
       handleChange({ event, validateOn })
     }
   }
-
-  const handleBlur = () => {
-    console.log({ formRef })
-    // const event = {
-    //   target: { name, value: localValue, type },
-    // } as InputChangeEvent
-    // handleChange({ event, validateOn })
-  }
-
-  useEffect(() => {
-    const currentElement = componentRef.current
-
-    const handleMouseLeave = () => {
-      if (localValue !== form[name]?.value) {
-        handleBlur()
-      }
-    }
-
-    if (currentElement) {
-      currentElement.addEventListener("mouseleave", handleMouseLeave)
-    }
-
-    return () => {
-      if (currentElement) {
-        currentElement.removeEventListener("mouseleave", handleMouseLeave)
-      }
-    }
-  }, [componentRef, type, name, localValue, handleBlur])
 
   if (type === "button" || type === "submit" || type === "reset") {
     const isSubmit = type === "submit"
@@ -178,7 +144,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     return (
       <select
         onChange={handleLocalChange}
-        onBlur={onBlur || handleBlur}
+        onBlur={onBlur}
         className={className}
         value={localValue as SelectHTMLAttributes<HTMLSelectElement>["value"]}
         defaultValue={
@@ -214,7 +180,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     return (
       <mak.select
         onChange={handleLocalChange}
-        onBlur={onBlur || handleBlur}
+        onBlur={onBlur}
         className={className}
         makClassName={makClassName}
         value={localValue as SelectHTMLAttributes<HTMLSelectElement>["value"]}
@@ -251,7 +217,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         type={type}
         value={localValue as InputHTMLAttributes<HTMLInputElement>["value"]}
         onChange={handleLocalChange}
-        onBlur={handleBlur}
+        onBlur={onBlur}
         className={className}
         ref={componentRef as RefObject<HTMLInputElement>}
         {...otherProps}
@@ -265,7 +231,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
         type={type}
         value={localValue as InputHTMLAttributes<HTMLInputElement>["value"]}
         onChange={handleLocalChange}
-        onBlur={handleBlur}
+        onBlur={onBlur}
         className={className}
         makClassName={makClassName}
         defaultValue={defaultValue as string}

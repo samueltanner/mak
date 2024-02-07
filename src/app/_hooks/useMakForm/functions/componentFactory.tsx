@@ -41,6 +41,7 @@ export const getInitialComponentNames = ({
 interface ComponentFactoryProps {
   formAccessor: FormAccessor
   name: string
+  outputType: MakFormComponentOutputType
 }
 
 const componentFactory = ({

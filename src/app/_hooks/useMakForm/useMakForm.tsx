@@ -106,7 +106,6 @@ export const useMakForm = ({
 
     const value = target?.type === "checkbox" ? target.checked : target.value
     const fieldName = target.name
-    console.log("handle change called", { fieldName, event, validateOn })
 
     let validation: string | undefined = undefined
 
@@ -116,7 +115,7 @@ export const useMakForm = ({
         fieldName,
         value,
       })?.[fieldName] as string | undefined
-      console.log({ validation })
+
       setFormErrors((prev) => {
         const updatedErrors = {
           ...prev,
@@ -155,25 +154,16 @@ export const useMakForm = ({
   useEffect(() => {
     if (!formConfig) return
     const constructedForm = constructForm(formAccessor)
-    console.log("Constructed form", constructedForm)
     setForm((prev) => constructedForm)
     setDynamicComponents(constructDynamicComponents(formAccessor))
   }, [formConfig])
 
   useEffect(() => {
     formRef.current = form
-    console.log("form changed, setting form ref", {
-      form,
-      formRef: formRef.current,
-    })
   }, [form])
 
   useEffect(() => {
     errorsRef.current = formErrors
-    console.log("formErrors changed, setting errors ref", {
-      formErrors,
-      errorsRef: errorsRef.current,
-    })
   }, [formErrors])
 
   return {
