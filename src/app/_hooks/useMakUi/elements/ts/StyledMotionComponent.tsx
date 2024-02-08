@@ -1,9 +1,13 @@
 import { HTMLMotionProps, MotionProps, motion } from "framer-motion"
 import styled from "@emotion/styled"
-import { forwardRef } from "react"
+import { forwardRef, useMemo } from "react"
 import { GenericObject, MakUiVerboseTheme } from "../../types/ui-types"
 import { ComponentWrapperResponse } from "../../types/component-types"
 import { formatJsonToHtmlString } from "../../functions/helpers"
+
+const BaseStyledComponent = styled.div<any>(({ styleObject }) => ({
+  ...styleObject,
+}))
 
 const StyledMotionComponent = forwardRef(
   (
@@ -48,25 +52,19 @@ const StyledMotionComponent = forwardRef(
       Component as keyof typeof motion
     ] as React.ComponentType<any>
 
-    const BaseStyledComponent = styled(MotionComponent)<any>(
-      ({ styleObject }) => {
-        return {
-          ...styleObject,
-        }
-      }
-    )
+    const memoizedMotionProps = useMemo(() => motionProps, [motionProps])
 
     const formattedStyleString = formatJsonToHtmlString(styleObject)
 
     return (
       <BaseStyledComponent
-        as={Component}
+        as={MotionComponent}
         styleObject={styleObject}
         className={props.className}
         data-mak-class={props.makClassName}
         data-mak-style={formattedStyleString}
         ref={ref}
-        {...motionProps}
+        {...memoizedMotionProps}
         {...restProps}
       />
     )

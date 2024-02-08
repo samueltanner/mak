@@ -1,8 +1,11 @@
-import {
+import React, {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   RefObject,
   SelectHTMLAttributes,
+  cloneElement,
+  isValidElement,
+  memo,
   useRef,
   useState,
 } from "react"
@@ -11,6 +14,7 @@ import { mak } from "../useMakUi/elements/ts/mak"
 import {
   FieldType,
   InputChangeEvent,
+  MakFormChildrenProps,
   MakFormDynamicComponentProps,
   MakFormFieldConfig,
   MakFormValidationOption,
@@ -29,13 +33,15 @@ type DynamicComponentProps = MakFormDynamicComponentProps &
     revalidateOn: MakFormValidationOption
   }
 
-const DynamicComponent = (props: DynamicComponentProps) => {
+const DynamicComponentStruct = (props: DynamicComponentProps) => {
   const {
     form,
     config,
+    children,
+    customComponent,
+
     handleChange,
     outputType,
-    children,
     type,
     name,
     label,
@@ -66,6 +72,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
 
   const [localValue, setLocalValue] = useState(value)
   const componentRef = useRef<HTMLElement>(null)
+  // const ResolvedChildren = children || customComponent
 
   const handleLocalChange = (e: InputChangeEvent) => {
     if (multiple && e.target instanceof HTMLSelectElement) {
@@ -88,6 +95,23 @@ const DynamicComponent = (props: DynamicComponentProps) => {
       handleChange({ event, validateOn, revalidateOn })
     }
     onChange && onChange(e)
+  }
+
+  const resolvedChildrenProps = {
+    ...props,
+    handleChange: handleLocalChange,
+  } as MakFormChildrenProps
+  if (customComponent) {
+    console.log("if resolvedChildren")
+
+    if (typeof customComponent === "function") {
+      const CustomComponent = customComponent
+      return <CustomComponent {...resolvedChildrenProps} />
+    }
+  }
+
+  if (children && typeof children === "function") {
+    return children(resolvedChildrenProps)
   }
 
   if (type === "button" || type === "submit" || type === "reset") {
@@ -252,5 +276,7 @@ const DynamicComponent = (props: DynamicComponentProps) => {
     )
   }
 }
+
+const DynamicComponent = memo(DynamicComponentStruct)
 
 export default DynamicComponent

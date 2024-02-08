@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react"
+import { FormAccessor } from "../useMakForm"
 
 export type MakFormValidationOption =
   | "change"
@@ -96,6 +96,8 @@ export interface BaseFieldConfig {
   onSubmit?: (props?: any) => void
   validateOn?: MakFormValidationOption
   revalidateOn?: MakFormValidationOption
+  children?: React.ReactNode
+  customComponent?: React.ReactNode
 }
 export interface ColorFieldConfig extends BaseFieldConfig {
   type: "color"
@@ -201,7 +203,11 @@ export type MakForm = {
 }
 
 export type MakFormDynamicComponentProps = {
-  children?: React.ReactNode
+  children?:
+    | React.ReactNode
+    | ((props: MakFormChildrenProps) => React.ReactNode)
+  customComponent?: React.ElementType<MakFormChildrenProps>
+
   required?: boolean
   defaultValue?: ValueOptions
   disabled?: boolean
@@ -251,3 +257,16 @@ export type MakFormDynamicComponentProps = {
   validateOn?: MakFormValidationOption
   revalidateOn?: MakFormValidationOption
 }
+
+export type MakFormChildrenProps = MakFormDynamicComponentProps &
+  FormAccessor & {
+    config: MakFormFieldConfig
+    name: string
+    type: FieldType
+    label: string
+    formOnSubmit?: FormAccessor["onSubmit"]
+    formOnReset?: FormAccessor["onReset"]
+    validateOn: MakFormValidationOption
+    revalidateOn: MakFormValidationOption
+    handleChange: (e?: any) => void
+  }

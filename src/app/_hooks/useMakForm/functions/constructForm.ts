@@ -19,6 +19,9 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
   Object.keys(form || {}).forEach((name) => {
     const config = form[name] as MakFormElement
 
+    const children = config?.children
+    const customComponent = config?.customComponent
+
     const type = form[name]?.type || "text"
     const label = config?.label
     const required = config?.required
@@ -85,6 +88,9 @@ const constructForm = (formAccessor: FormAccessor): MakForm => {
 
     const configOutput = {
       config,
+      children,
+      customComponent,
+
       type,
       label,
       required,

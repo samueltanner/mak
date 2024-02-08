@@ -196,10 +196,6 @@ const componentFactory = ({
     formOnReset,
   }
   const ComponentWrapper = (props: Record<string, unknown>) => {
-    if (Object.values(props).length > 0) {
-      // ... existing logic for updating configuration
-    }
-
     return (
       <DynamicComponent outputType={outputType} {...hookProps} {...props} />
     )

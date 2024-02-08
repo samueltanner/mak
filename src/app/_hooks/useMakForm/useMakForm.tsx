@@ -62,7 +62,7 @@ export const useMakForm = ({
   onSubmit,
   onReset,
   validateFormOn = "submit",
-  revalidateFormOn = "change",
+  revalidateFormOn = "none",
 }: MakFormProps) => {
   const outputType = ensureSingleElementType({
     useMakElements,
@@ -175,7 +175,6 @@ export const useMakForm = ({
 
     setFormErrors(validation)
     if (formErrors && Object.values(validation).some((error) => error)) {
-      console.log("Form has errors", validation, errorsRef.current)
       return
     }
     if (onSubmit) {

@@ -9,6 +9,7 @@ import StyledComponent from "./StyledComponent"
 import { isEmptyObject } from "../../../../../globals/global-helper-functions"
 import StyledMotionComponent from "./StyledMotionComponent"
 import { mergeDefaultConfig } from "../../functions/helpers"
+import MotionComponent from "./MotionComponent"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
