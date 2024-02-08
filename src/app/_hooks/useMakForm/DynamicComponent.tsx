@@ -1,10 +1,8 @@
-import React, {
+import {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   RefObject,
   SelectHTMLAttributes,
-  cloneElement,
-  isValidElement,
   memo,
   useRef,
   useState,
@@ -20,6 +18,7 @@ import {
   MakFormValidationOption,
 } from "./types/form-types"
 import { FormAccessor } from "./useMakForm"
+import { getValueObjectsArray } from "./functions/helpers"
 
 type DynamicComponentProps = MakFormDynamicComponentProps &
   FormAccessor & {
@@ -50,6 +49,7 @@ const DynamicComponentStruct = (props: DynamicComponentProps) => {
     makClassName,
     pattern,
     value,
+    valueObjects,
     placeholder,
     options,
     labelKey,
@@ -72,7 +72,6 @@ const DynamicComponentStruct = (props: DynamicComponentProps) => {
 
   const [localValue, setLocalValue] = useState(value)
   const componentRef = useRef<HTMLElement>(null)
-  // const ResolvedChildren = children || customComponent
 
   const handleLocalChange = (e: InputChangeEvent) => {
     if (multiple && e.target instanceof HTMLSelectElement) {
@@ -100,6 +99,8 @@ const DynamicComponentStruct = (props: DynamicComponentProps) => {
   const resolvedChildrenProps = {
     ...props,
     handleChange: handleLocalChange,
+    value: localValue,
+    valueObjects: getValueObjectsArray(localValue, options || []),
   } as MakFormChildrenProps
   if (customComponent) {
     console.log("if resolvedChildren")
@@ -111,6 +112,12 @@ const DynamicComponentStruct = (props: DynamicComponentProps) => {
   }
 
   if (children && typeof children === "function") {
+    console.log(
+      "valueObjects",
+      { localValue, valueObjects, options },
+      getValueObjectsArray(localValue, options || [])
+    )
+
     return children(resolvedChildrenProps)
   }
 

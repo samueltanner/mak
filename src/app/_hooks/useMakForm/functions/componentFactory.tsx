@@ -12,6 +12,7 @@ import {
   TextFieldConfig,
 } from "../types/form-types"
 import { FormAccessor } from "../useMakForm"
+import { getValueObjectsArray } from "./helpers"
 
 export const getComponentName = (fieldName: string) => {
   const words = fieldName.split(/[\s-_]+/)
@@ -82,6 +83,7 @@ const componentFactory = ({
 
   // "select" | "radio" | "multi-select" | "searchable-select"
   const options = (config as SelectFieldConfig)?.options
+  const valueObjects = getValueObjectsArray(value || defaultValue, options)
   const labelKey = (config as SelectFieldConfig)?.labelKey || "label"
   const valueKey = (config as SelectFieldConfig)?.valueKey || "value"
   const multiple = (config as SelectFieldConfig)?.multiple
@@ -183,6 +185,7 @@ const componentFactory = ({
     defaultValue1,
     value0,
     value1,
+    valueObjects,
     disabled0,
     disabled1,
 

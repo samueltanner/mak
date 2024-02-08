@@ -120,32 +120,6 @@ const MakFormView = () => {
         }}
       />
 
-      {/* <mak.ul
-        motion={{
-          initial: "hidden",
-          animate: showDropDown ? "visible" : "exit",
-          exit: "exit",
-          variants: menuVariants,
-        }}
-        className="overflow-hidden"
-        makClassName="bg-primary"
-      >
-        {formConfig.multi_select?.options?.map((option) => {
-          const keyVal = JSON.stringify(option)
-          if (searchValue && !keyVal.includes(searchValue)) return null
-          return (
-            <li
-            // value={option.value}
-            // onClick={(e) => {
-            //   handleChange(e)
-            // }}
-            >
-              {option.label}
-            </li>
-          )
-        })}
-      </mak.ul> */}
-
       <label htmlFor="first_name">First Name</label>
       <FirstName />
       {firstNameError && (
@@ -156,8 +130,8 @@ const MakFormView = () => {
       {emailError && <div className="text-red-500 text-sm">{emailError}</div>}
       <MultiSelect>
         {(props) => {
-          const { options, handleChange } = props
-
+          const { options, handleChange, value, valueObjects } = props
+          // console.log({ options, handleChange, value, valueObjects })
           return (
             <span className="group">
               <mak.input
@@ -172,10 +146,9 @@ const MakFormView = () => {
                 }}
                 onChange={(e) => {
                   console.log("onChange")
-                  console.log({ showDropDown })
                   setSearchValue(e.target.value)
                 }}
-                value={formState?.values?.multi_select || searchValue}
+                value={searchValue}
               />
               <AnimatePresence>
                 <mak.ul
@@ -194,9 +167,10 @@ const MakFormView = () => {
                       return null
                     return (
                       <mak.li
-                        value={option.value}
+                        value={option.value!}
                         onClick={(e) => {
                           handleChange(e)
+                          setSearchValue(e.target.value)
                         }}
                         className="cursor-pointer capitalize px-2 py-1 rounded-md fade-in-out"
                         makClassName="hover:bg-primary-500/20"

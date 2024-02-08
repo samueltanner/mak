@@ -28,7 +28,11 @@ export type MakFormComponentOutputType =
   | "htmlElements"
   | "makComponents"
 
-export type OptionType = { [key: string]: string | number }
+export type OptionType = {
+  label: string
+  value: string | number
+  [key: string]: string | number | undefined
+}
 
 export type ValueOptions =
   | string
@@ -214,6 +218,7 @@ export type MakFormDynamicComponentProps = {
   makClassName?: string
   className?: string
   value?: ValueOptions
+  valueObjects?: OptionType[]
   placeholder?: string
   readonly?: boolean
   hide?: boolean

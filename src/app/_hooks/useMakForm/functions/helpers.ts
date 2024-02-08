@@ -116,4 +116,19 @@ export const ensureSingleElementType = ({
   ) as MakFormComponentOutputType
 }
 
-export { isEqual, isObject, mergeWithFallback, getDifference }
+const getValueObjectsArray = (value: any, options: any[]) => {
+  if (!value || options.length === 0) return []
+  value = Array.isArray(value) ? value : [value]
+  return options?.filter((option) => {
+    if (Array.isArray(value as any[]) && option?.value) {
+      return (value as any[])?.includes(option?.value)
+    }
+  })
+}
+export {
+  isEqual,
+  isObject,
+  mergeWithFallback,
+  getDifference,
+  getValueObjectsArray,
+}
