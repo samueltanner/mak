@@ -131,7 +131,7 @@ const MakFormView = () => {
       <MultiSelect>
         {(props) => {
           const { options, handleChange, value, valueObjects } = props
-          // console.log({ options, handleChange, value, valueObjects })
+
           return (
             <span className="group">
               <mak.input
@@ -170,7 +170,7 @@ const MakFormView = () => {
                         value={option.value!}
                         onClick={(e) => {
                           handleChange(e)
-                          setSearchValue(e.target.value)
+                          setSearchValue((e.target as HTMLInputElement).value)
                         }}
                         className="cursor-pointer capitalize px-2 py-1 rounded-md fade-in-out"
                         makClassName="hover:bg-primary-500/20"

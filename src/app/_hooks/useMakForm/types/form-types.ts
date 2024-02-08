@@ -10,7 +10,7 @@ export type MakFormValidationOption =
 export type InputChangeEvent = {
   target: {
     name: string
-    value: string | string[] // Allow both string and string[]
+    value: string | string[] | number | boolean | number[]
     type: string
   }
 }
