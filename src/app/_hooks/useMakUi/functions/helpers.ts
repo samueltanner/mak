@@ -1263,10 +1263,12 @@ export const parseClassNameToStyleObject = ({
   className = "",
   makClassName = undefined,
   activeTheme,
+  currentThemeMode,
 }: {
   className?: string
   makClassName?: string
   activeTheme: MakUiVerboseTheme
+  currentThemeMode: MakUiThemeKey
 }) => {
   const makRegex = /mak\((.*?)\)/g
   const whiteSpaceRegex = /[ \t\r\n]+/
@@ -1304,6 +1306,7 @@ export const parseClassNameToStyleObject = ({
     {
       makClassName,
       activeTheme,
+      currentThemeMode,
     }
   )
 
@@ -1349,9 +1352,11 @@ const separateTwModifiers = (className: string) => {
 export const parseMakClassNames = ({
   makClassName,
   activeTheme,
+  currentThemeMode,
 }: {
   makClassName?: string
   activeTheme: MakUiVerboseTheme
+  currentThemeMode: MakUiThemeKey
 }) => {
   makClassName = makClassName?.replace(/\s+/g, " ").trim()
   if (!makClassName || makClassName === "") return {}
@@ -1458,16 +1463,22 @@ export const parseMakClassNames = ({
         }
         if (typeof modifierKey === "function") {
           if (!selector) {
-            if (modifierIdentifier) {
-            }
             const escapedClassName = className.replace(
               /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
               "\\$&"
             )
             selector = `\\:${escapedClassName}`
             altSelector = modifierIdentifier ? `\\/${modifierIdentifier}` : ""
+            console.log({
+              twModifierGroup,
+              twModifier,
+              modifierIdentifier,
+              selector,
+              altSelector,
+            })
           }
           modifierKey = modifierKey(selector, altSelector)
+          console.log({ modifierKey })
           modifierMap.set(modifierKey, {
             [utilityKey]: color,
           })

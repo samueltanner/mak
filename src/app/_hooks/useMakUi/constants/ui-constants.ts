@@ -322,6 +322,7 @@ export const tailwindToCssModifierObject: {
 } = {
   //styles applied directly to element
   //tw eg. hover:bg-red-500
+  dark: '[data-theme="dark"] &',
   hover: "&:hover",
   focus: "&:focus",
   "focus-within": "&:focus-within",

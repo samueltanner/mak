@@ -148,6 +148,7 @@ export const componentWrapperLogic = ({
     className: resolvedClassName,
     makClassName: resolvedMakClassName,
     activeTheme,
+    currentThemeMode: makUi.theme,
   })
 
   const response: ComponentWrapperResponse & TypeProps = {

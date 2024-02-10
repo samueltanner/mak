@@ -1,13 +1,8 @@
 import useMakForm from "../_hooks/useMakForm/useMakForm"
 import { MakFormInput } from "../_hooks/useMakForm/types/form-types"
 import { mak } from "../_hooks/useMakUi/elements/ts/mak"
-import { useEffect, useMemo, useRef, useState } from "react"
-import {
-  AnimatePresence,
-  useAnimate,
-  useAnimationControls,
-  motion,
-} from "framer-motion"
+import { useState } from "react"
+import { AnimatePresence } from "framer-motion"
 
 const formConfig: MakFormInput = {
   first_name: {
@@ -81,6 +76,7 @@ const MakFormView = () => {
       x: 0,
       originX: 0,
       originY: 0,
+      zIndex: -100,
     },
     visible: {
       opacity: 1,
@@ -88,6 +84,7 @@ const MakFormView = () => {
       zIndex: 30,
       transition: { duration: 0.3 },
       marginTop: 8,
+      padding: 4,
     },
     exit: {
       opacity: 0,
@@ -95,7 +92,9 @@ const MakFormView = () => {
       x: 0,
       originX: 0,
       originY: 0,
+      marginTop: 0,
       transition: { duration: 0.3 },
+      zIndex: -100,
     },
   }
 
@@ -158,7 +157,7 @@ const MakFormView = () => {
                     exit: "exit",
                     variants: menuVariants,
                   }}
-                  className="overflow-hidden rounded-md border-2 p-2"
+                  className="overflow-hidden rounded-md border-2"
                   makClassName="bg-theme|secondary border-theme|tertiary text-primary"
                 >
                   {options?.map((option) => {

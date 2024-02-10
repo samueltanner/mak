@@ -22,7 +22,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/app/_hooks/useMakUi/components/*"]
+      "@components/*": ["./src/app/_hooks/useMakUi/components/*"],
+      "@mak": ["./src/app/_hooks/useMakUi/elements/ts/mak.tsx"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

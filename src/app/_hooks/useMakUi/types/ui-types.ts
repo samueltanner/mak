@@ -82,14 +82,19 @@ export type MakUiVariantRootKey =
   | "customRoot"
 
 export type MakUiVariantKey =
-  | MakUiThemeVariantKey
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "custom"
+  | "light"
+  | "dark"
   | "success"
   | "error"
   | "danger"
   | "warning"
   | "info"
-  | "light"
-  | "dark"
+  | "white"
+  | "black"
 
 export type MakUiCustomInteractionStateKey = "base" | "click"
 

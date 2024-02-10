@@ -103,8 +103,6 @@ const DynamicComponentStruct = (props: DynamicComponentProps) => {
     valueObjects: getValueObjectsArray(localValue, options || []),
   } as MakFormChildrenProps
   if (customComponent) {
-    console.log("if resolvedChildren")
-
     if (typeof customComponent === "function") {
       const CustomComponent = customComponent
       return <CustomComponent {...resolvedChildrenProps} />
@@ -112,12 +110,6 @@ const DynamicComponentStruct = (props: DynamicComponentProps) => {
   }
 
   if (children && typeof children === "function") {
-    console.log(
-      "valueObjects",
-      { localValue, valueObjects, options },
-      getValueObjectsArray(localValue, options || [])
-    )
-
     return children(resolvedChildrenProps)
   }
 

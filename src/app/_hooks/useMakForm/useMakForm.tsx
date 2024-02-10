@@ -1,16 +1,11 @@
-"use client"
+"use client";
 import {
   constructDynamicComponents,
   getInitialComponentNames,
 } from "./functions/componentFactory"
 import constructForm from "./functions/constructForm"
-import {
-  ensureSingleElementType,
-  getDifference,
-  isEqual,
-} from "./functions/helpers"
-import { useCallback, useEffect, useRef, useState } from "react"
-import { getComponentName } from "./functions/componentFactory"
+import { ensureSingleElementType } from "./functions/helpers";
+import { useEffect, useRef, useState } from "react";
 
 import {
   InputChangeEvent,
@@ -20,9 +15,7 @@ import {
   MakFormErrors,
   MakFormValidationOption,
 } from "./types/form-types"
-import { isEmptyObject } from "@/globals/global-helper-functions"
 import { validateField, validateForm } from "./functions/validate"
-import { MakFormProvider } from "./MakFormContext"
 
 interface MakFormProps {
   formConfig?: MakForm

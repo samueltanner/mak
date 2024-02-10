@@ -9,7 +9,6 @@ import StyledComponent from "./StyledComponent"
 import { isEmptyObject } from "../../../../../globals/global-helper-functions"
 import StyledMotionComponent from "./StyledMotionComponent"
 import { mergeDefaultConfig } from "../../functions/helpers"
-import MotionComponent from "./MotionComponent"
 
 type HTMLMakComponentProps<K extends keyof JSX.IntrinsicElements> =
   MakUiElementProps & {
@@ -41,6 +40,7 @@ const MakComponent = memo(
 
       const { styleObject, twClassName, makClassName, ...responseRest } =
         response
+
       const { baseClassObject = {}, pseudoClassObject = {} } = styleObject
 
       useEffect(() => {
@@ -73,6 +73,7 @@ const MakComponent = memo(
         ...baseClassObject,
         ...pseudoClassObject,
       }
+
       const isMotionObject = motion && !isEmptyObject(motion)
 
       if (isMotionObject) {
@@ -82,7 +83,6 @@ const MakComponent = memo(
             styleObject={inlineStyles}
             as={component}
             motionProps={motion}
-            // className={resolvedClassName}
             {...allProps}
           />
         )
@@ -93,7 +93,6 @@ const MakComponent = memo(
           ref={ref}
           styleObject={inlineStyles}
           as={component}
-          // className={resolvedClassName}
           {...allProps}
         />
       )

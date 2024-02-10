@@ -6,6 +6,7 @@ import { MakUiProvider } from "./_hooks/useMakUi/context/MakUiContext"
 import { MakUiFlexiblePaletteInput } from "./_hooks/useMakUi/types/ui-types"
 import ThemeWrapper from "./_views/ThemeWrapper"
 import { MakUiComponentConfig } from "./_hooks/useMakUi/types/component-types"
+import { predefinedPalette } from "./predefinedPalette"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -34,6 +35,8 @@ const palette: MakUiFlexiblePaletteInput = {
   },
 }
 
+const paletteOverride = predefinedPalette
+
 const componentConfig: MakUiComponentConfig = {
   button: {
     className:
@@ -51,6 +54,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <MakUiProvider
           paletteGenProps={{
+            // paletteOverride,
             palette,
             enableDarkMode: true,
             altBlack: "#242424",

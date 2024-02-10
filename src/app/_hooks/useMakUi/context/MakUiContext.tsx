@@ -29,7 +29,8 @@ import { deepMerge, isEmptyObject } from "@/globals/global-helper-functions"
 import styled from "@emotion/styled"
 
 type PaletteGeneratorProps = {
-  palette: MakUiFlexiblePaletteInput
+  palette?: MakUiFlexiblePaletteInput
+  paletteOverride?: MakUiVerbosePalette | Partial<MakUiVerbosePalette>
   themeShades?: MakUiThemeShades
   enableLightMode?: boolean
   enableDarkMode?: boolean
@@ -44,6 +45,7 @@ type PaletteGeneratorProps = {
 type MakUiProviderProps = {
   children: React.ReactNode
   palette?: MakUiFlexiblePaletteInput
+  paletteOverride?: MakUiVerbosePalette
   componentConfig?: MakUiComponentConfig
   buttonConfig?: MakUiRootComponentConfig
   themeShades?: MakUiThemeShades
@@ -82,7 +84,7 @@ const defaultPaletteGenProps: PaletteGeneratorProps = {
   enableLightMode: true,
   enableDarkMode: true,
   enableCustomMode: false,
-  shadeStep: 100 as ShadeStep,
+  shadeStep: 50 as ShadeStep,
   includeBlackAndWhite: true,
   includeNearAbsolutes: true,
   altBlack: "#000000",
@@ -98,7 +100,9 @@ const MakUiProviderChild = ({
   paletteGenProps = defaultPaletteGenProps,
 }: MakUiProviderProps) => {
   const [styleSheet, setStyleSheet] = useState<GenericObject>({})
-
+  useEffect(() => {
+    console.log("styleSheet", styleSheet)
+  }, [styleSheet])
   const paletteInputRef = React.useRef<string>()
   useEffect(() => {
     if (paletteInputRef.current !== JSON.stringify(paletteInput)) {
@@ -116,6 +120,7 @@ const MakUiProviderChild = ({
 
   const {
     palette: paletteGenInput,
+    paletteOverride,
     themeShades,
     enableLightMode,
     enableDarkMode,
@@ -127,7 +132,9 @@ const MakUiProviderChild = ({
     altWhite,
   } = mergedPaletteGenProps
 
-  paletteInput = !isEmptyObject(paletteGenInput)
+  paletteInput = paletteOverride
+    ? paletteOverride
+    : !isEmptyObject(paletteGenInput)
     ? paletteGenInput
     : paletteInput
     ? paletteInput
@@ -137,8 +144,9 @@ const MakUiProviderChild = ({
   const darkModeInPalette = stringifiedPalette.includes("dark:")
   const customModeInPalette = stringifiedPalette.includes("custom:")
   const lightModeInPalette =
-    stringifiedPalette.includes("light:") ||
-    Object.values(paletteInput).some((val) => !val.includes(":"))
+    !paletteOverride &&
+    (stringifiedPalette.includes("light:") ||
+      Object.values(paletteInput || {}).some((val) => !val.includes(":")))
   const enabledThemeModes = [
     enableLightMode || lightModeInPalette ? "light" : null,
     enableDarkMode || darkModeInPalette ? "dark" : null,
@@ -207,6 +215,12 @@ const MakUiProviderChild = ({
   }, [JSON.stringify(componentConfigInput)])
 
   const palettesMemo = useMemo(() => {
+    if (paletteOverride)
+      return {
+        simplePalette: paletteOverride as MakUiSimplePalette,
+        verbosePalette: paletteOverride as MakUiVerbosePalette,
+      }
+    console.log("generating palette")
     const { verbose, simple } =
       paletteFactory({
         paletteInput: paletteInput as MakUiFlexiblePaletteInput,
@@ -223,7 +237,7 @@ const MakUiProviderChild = ({
       simplePalette: simple as MakUiSimplePalette,
       verbosePalette: verbose as MakUiVerbosePalette,
     }
-  }, [paletteInputRef])
+  }, [paletteInputRef, paletteOverride])
 
   const [simpleTheme, setSimpleTheme] = useState<MakUiSimpleTheme>(
     {} as MakUiSimpleTheme
@@ -261,7 +275,6 @@ const MakUiProviderChild = ({
     simpleTheme,
     verboseTheme,
     componentConfig,
-    themeMode,
     setTheme: setThemeMode,
     theme,
     formattingThemes,
@@ -293,7 +306,6 @@ interface MakUiContext {
   isLight: boolean
   isCustom: boolean
   enabledThemeModes: MakUiThemeKey[]
-
   simplePalette: MakUiSimplePalette
   verbosePalette: MakUiVerbosePalette
   simpleTheme: MakUiSimpleTheme
