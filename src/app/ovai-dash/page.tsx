@@ -5,11 +5,7 @@ import ThemeButton from "../_components/ThemeButton"
 import styled from "@emotion/styled"
 
 const DarkButton = styled.button({
-  '[data-theme="dark"] &': {
-    "@media (min-width: 768px)": {
-      "&:hover": { color: "rgba(239,68,68,0.5)" },
-    },
-  },
+  ".peer:checked .peer-checked:bg-red-500": { backgroundColor: "#ef4444" },
 })
 
 const OVAIDashPage = () => {
@@ -57,9 +53,12 @@ const Tabs = () => {
           className="flex flex-col gap-1 items-center justify-center group"
         >
           {/* <mak.button makClassName="dark:text-tertiary-300">{tab}</mak.button> */}
-          <DarkButton className="dark:md:hover:text-danger-500/50">
-            hi
-          </DarkButton>
+          <input type="checkbox" className="peer" id="tab-1" />
+          <mak.button makClassName="dark:peer-hover:bg-danger-500">
+            mak button hi
+          </mak.button>
+          <button className="peer-checked:bg-purple-500">basic button</button>
+          {/* <DarkButton>hi</DarkButton> */}
         </mak.div>
       ))}
     </div>

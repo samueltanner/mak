@@ -45,6 +45,7 @@ import {
   makUiThemesSet,
   makUiVariants,
   makUiVariantsSet,
+  mediaQueries,
   tailwindToCssModifierObject,
   tailwindVariants,
   tailwindVariantsSet,
@@ -1318,33 +1319,44 @@ export const parseClassNameToStyleObject = ({
   return { styleObject, twClassName, makClassName }
 }
 
-const separateTwModifiers = (className: string) => {
-  if (!className || typeof className !== "string") {
+const separateTwModifiers = (className: string | undefined) => {
+  if (!className || typeof className !== "string")
     return {
       className,
       modifiersArray: [],
       modifiers: "",
+      media: undefined,
     }
-  }
-
-  // Updated regex to handle brackets
-  const regex = /^([^\[]+)(?:\[(.*?)\])?:([^:]+)$/
+  // Regex to capture the last segment after the last colon and the rest before it
+  const regex = /^(.*?):([^:]+)$/
   const match = className.match(regex)
+  let media: string | undefined = undefined
 
   if (match) {
     const modifiers = match[1]
-    let bracketContent = match[2] ? [...match[2].split(",")] : []
-    bracketContent = bracketContent.map((b) => b?.trim())
+    const finalClassName = match[2]
+
+    // Splitting modifiers on colon, but keeping group-* and peer-* together with their /<identifier>
+    const modifiersSet = new Set(modifiers.split(/(?<!\/\w+):/))
+    for (const mediaQuery of Object.keys(mediaQueries)) {
+      if (modifiersSet.has(mediaQuery)) {
+        media = mediaQuery
+      }
+    }
+    const modifiersArray = [...modifiersSet.values()]
+
     return {
-      modifiers: modifiers,
-      modifiersArray: [modifiers, ...bracketContent],
-      className: match[3],
+      modifiers,
+      modifiersArray,
+      media,
+      className: finalClassName,
     }
   } else {
     return {
       modifiers: "",
       modifiersArray: [],
-      className: className,
+      media,
+      className,
     }
   }
 }
@@ -1364,13 +1376,14 @@ export const parseMakClassNames = ({
   const makClassNamesArray = makClassName?.split(" ") || []
   const styleMap = new Map<string, string | GenericObject>()
   const modifierMap = new Map<string, string | GenericObject>()
+  const modifierSet = new Set<GenericObject>()
   const unresolvedClasses: string[] = []
 
   if (makClassNamesArray.length > 0) {
     for (const makClassName of makClassNamesArray) {
-      const { className, modifiers, modifiersArray } =
+      const { className, modifiers, modifiersArray, media } =
         separateTwModifiers(makClassName)
-
+      const classNameObj = {} as GenericObject
       let key: string = "backgroundColor"
       let paletteVariant: MakUiPaletteKey | undefined = undefined
       let modifier: string | undefined = undefined
@@ -1429,7 +1442,7 @@ export const parseMakClassNames = ({
         color = activeTheme?.[resolvedVariant]?.[variant]?.[shade]
         if (!color) {
           let twKey = mcn
-          twKey = twKey.split("-").slice(1).join("-")
+          twKey = twKey!.split("-").slice(1).join("-")
           if (twKey.charAt(0) === "#") {
             color = twKey
           } else {
@@ -1448,43 +1461,39 @@ export const parseMakClassNames = ({
       }
 
       if (modifiersArray.length) {
-        let twModifierGroup = modifiersArray[0]
-        let selector = modifiersArray?.[1]
-        let altSelector = modifiersArray?.[2]
+        let modifierCSSKeysArray: string[] = []
         const utilityKey = keyMap[paletteVariant]
-        const [twModifier, modifierIdentifier] = twModifierGroup.split("/")
-        let modifierKey = tailwindToCssModifierObject?.[twModifier]
 
-        if (typeof modifierKey === "string") {
-          modifierMap.set(modifierKey, {
-            [utilityKey]: color,
-          })
-          continue
-        }
-        if (typeof modifierKey === "function") {
-          if (!selector) {
-            const escapedClassName = className.replace(
+        const rootCSS = { [utilityKey]: color }
+
+        modifiersArray.forEach((modifier) => {
+          let modifierKey = tailwindToCssModifierObject?.[modifier]
+          if (typeof modifierKey === "string") {
+            modifierCSSKeysArray.push(modifierKey)
+          }
+          if (typeof modifierKey === "function") {
+            let modifierAndClassNameString = `.${modifiersArray.join(
+              ":"
+            )}:${className}`
+
+            const escapedClassName = modifierAndClassNameString.replace(
               /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
               "\\$&"
             )
-            selector = `\\:${escapedClassName}`
-            altSelector = modifierIdentifier ? `\\/${modifierIdentifier}` : ""
-            console.log({
-              twModifierGroup,
-              twModifier,
-              modifierIdentifier,
-              selector,
-              altSelector,
-            })
-          }
-          modifierKey = modifierKey(selector, altSelector)
-          console.log({ modifierKey })
-          modifierMap.set(modifierKey, {
-            [utilityKey]: color,
-          })
 
-          continue
-        }
+            const selector = `${escapedClassName}`
+            const resolvedModifierFn = modifierKey(selector, "")
+            modifierCSSKeysArray.push(resolvedModifierFn)
+          }
+        })
+
+        ensureNestedObject({
+          parent: classNameObj,
+          keys: modifierCSSKeysArray,
+          value: rootCSS,
+        })
+
+        modifierSet.add(classNameObj)
       } else if (paletteVariant && color) {
         key = keyMap[paletteVariant]
         styleMap.set(key, color)
@@ -1494,7 +1503,11 @@ export const parseMakClassNames = ({
     }
   }
 
-  const pseudoClassObject = Object.fromEntries(modifierMap)
+  const modifierArray = Array.from(modifierSet)
+
+  const mergedModifiers = deepMerge(...modifierArray)
+
+  const pseudoClassObject = mergedModifiers
   const baseClassObject = Object.fromEntries(styleMap)
   const unresolved = unresolvedClasses.length
     ? unresolvedClasses.join(" ")
