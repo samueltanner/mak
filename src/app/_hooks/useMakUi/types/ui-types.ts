@@ -93,8 +93,8 @@ export type MakUiVariantKey =
   | "danger"
   | "warning"
   | "info"
-  | "white"
-  | "black"
+  // | "white"
+  // | "black"
 
 export type MakUiCustomInteractionStateKey = "base" | "click"
 

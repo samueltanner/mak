@@ -100,9 +100,7 @@ const MakUiProviderChild = ({
   paletteGenProps = defaultPaletteGenProps,
 }: MakUiProviderProps) => {
   const [styleSheet, setStyleSheet] = useState<GenericObject>({})
-  useEffect(() => {
-    console.log("styleSheet", styleSheet)
-  }, [styleSheet])
+
   const paletteInputRef = React.useRef<string>()
   useEffect(() => {
     if (paletteInputRef.current !== JSON.stringify(paletteInput)) {

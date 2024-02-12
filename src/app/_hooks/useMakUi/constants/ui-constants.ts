@@ -154,8 +154,8 @@ export const makUiDefaultColors: MakUiDefaultColors = {
   custom: "zinc",
   light: "white",
   dark: "black",
-  white: "white",
-  black: "black",
+  // white: "white",
+  // black: "black",
 }
 
 export const makUiDefaultPalette: MakUiDefaultPalette = {

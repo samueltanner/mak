@@ -44,7 +44,11 @@ const MakComponent = memo(
       const { baseClassObject = {}, pseudoClassObject = {} } = styleObject
 
       useEffect(() => {
-        if ((resolvedMakClassName?.includes("group-") || resolvedMakClassName?.includes("peer-")) && styleSheet) {
+        if (
+          (resolvedMakClassName?.includes("group-") ||
+            resolvedMakClassName?.includes("peer-")) &&
+          styleSheet
+        ) {
           const updatedStyleSheet = {
             ...styleSheet,
           }
@@ -73,8 +77,6 @@ const MakComponent = memo(
         ...baseClassObject,
         ...pseudoClassObject,
       }
-
-      console.log(component, "inlineStyles", inlineStyles)
 
       const isMotionObject = motion && !isEmptyObject(motion)
 
