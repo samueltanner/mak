@@ -16,8 +16,9 @@ const StyledComponent = forwardRef(
     }: {
       as: keyof JSX.IntrinsicElements
       styleObject: GenericObject
-      className?: string
+      makTwClassName?: string
       makClassName?: string
+      twClassName?: string
       ref?: React.Ref<any>
     },
     ref
@@ -28,7 +29,8 @@ const StyledComponent = forwardRef(
       <BaseStyledComponent
         as={Component}
         styleObject={styleObject}
-        className={props.className}
+        className={props.makTwClassName}
+        data-class={props.twClassName}
         data-mak-class={props.makClassName}
         data-mak-style={formattedStyleString}
         ref={ref}

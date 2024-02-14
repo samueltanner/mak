@@ -21,8 +21,9 @@ const StyledMotionComponent = forwardRef(
       styleObject: GenericObject
       ref?: React.Ref<any>
       motionProps?: MotionProps
-      className?: string
+      makTwClassName?: string
       makClassName?: string
+      twClassName?: string
       componentTheme?: ComponentWrapperResponse["componentTheme"]
       componentBorder?: ComponentWrapperResponse["componentBorder"]
       componentText?: ComponentWrapperResponse["componentText"]
@@ -60,7 +61,8 @@ const StyledMotionComponent = forwardRef(
       <BaseStyledComponent
         as={MotionComponent}
         styleObject={styleObject}
-        className={props.className}
+        className={props.makTwClassName}
+        data-class={props.twClassName}
         data-mak-class={props.makClassName}
         data-mak-style={formattedStyleString}
         ref={ref}

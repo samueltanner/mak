@@ -45,18 +45,9 @@ type PaletteGeneratorProps = {
 type MakUiProviderProps = {
   children: React.ReactNode
   palette?: MakUiFlexiblePaletteInput
-  paletteOverride?: MakUiVerbosePalette
   componentConfig?: MakUiComponentConfig
-  buttonConfig?: MakUiRootComponentConfig
-  themeShades?: MakUiThemeShades
-  stateShades?: MakUiStateShades
   enableSystem?: boolean
   defaultTheme?: MakUiThemeKey
-  enableDarkMode?: boolean
-  enableCustomMode?: boolean
-  enabledStates?: MakUiInteractionStateKey[]
-  shadeStep?: ShadeStep
-  includeBlackAndWhite?: boolean
   paletteGenProps?: PaletteGeneratorProps
 }
 
@@ -93,8 +84,8 @@ const defaultPaletteGenProps: PaletteGeneratorProps = {
 
 const MakUiProviderChild = ({
   children,
-  componentConfig: componentConfigInput,
   palette: paletteInput,
+  componentConfig: componentConfigInput,
   enableSystem = true,
   defaultTheme = "light",
   paletteGenProps = defaultPaletteGenProps,
@@ -218,7 +209,7 @@ const MakUiProviderChild = ({
         simplePalette: paletteOverride as MakUiSimplePalette,
         verbosePalette: paletteOverride as MakUiVerbosePalette,
       }
-    console.log("generating palette")
+
     const { verbose, simple } =
       paletteFactory({
         paletteInput: paletteInput as MakUiFlexiblePaletteInput,

@@ -13,12 +13,13 @@ import {
   MakFormComponentOutputType,
   MakFormDynamicComponents,
   MakFormErrors,
+  MakFormInput,
   MakFormValidationOption,
 } from "./types/form-types"
 import { validateField, validateForm } from "./functions/validate"
 
 interface MakFormProps {
-  formConfig?: MakForm
+  formConfig?: MakFormInput
   onSubmit?: (input?: any) => void
   onReset?: (input?: any) => void
   useMakElements?: boolean

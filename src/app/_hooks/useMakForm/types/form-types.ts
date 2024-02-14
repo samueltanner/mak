@@ -103,16 +103,16 @@ export interface BaseFieldConfig {
   children?: React.ReactNode
   customComponent?: React.ReactNode
 }
-export interface ColorFieldConfig extends BaseFieldConfig {
-  type: "color"
-}
 export interface TextFieldConfig extends BaseFieldConfig {
-  type: "text" | "password" | "email" | "search" | "tel"
+  type: "text" | "email" | "search" | "tel"
   minLength?: number
   maxLength?: number
 }
 
-export interface PasswordFieldConfig extends TextFieldConfig {
+export interface ColorFieldConfig extends BaseFieldConfig {
+  type: "color"
+}
+export interface PasswordFieldConfig extends BaseFieldConfig {
   type: "password"
 }
 
