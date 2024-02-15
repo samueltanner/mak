@@ -1375,7 +1375,6 @@ export const parseMakClassNames = ({
 
   const makClassNamesArray = makClassName?.split(" ") || []
   const styleMap = new Map<string, string | GenericObject>()
-  const modifierMap = new Map<string, string | GenericObject>()
   const modifierSet = new Set<GenericObject>()
   const unresolvedClasses: string[] = []
 
@@ -1386,7 +1385,7 @@ export const parseMakClassNames = ({
       const classNameObj = {} as GenericObject
       let key: string = "backgroundColor"
       let paletteVariant: MakUiPaletteKey | undefined = undefined
-      let modifier: string | undefined = undefined
+
       let variant: MakUiVariantKey = "primary"
       let shade: Shade | undefined = undefined
       let mcn: string | undefined
@@ -1406,7 +1405,6 @@ export const parseMakClassNames = ({
         divide: "borderColor",
       }
 
-      modifier = modifiers
       mcn = className
       opacity = mcn?.split("/")[1]
       mcn = mcn?.split("/")[0]

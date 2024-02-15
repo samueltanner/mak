@@ -9,108 +9,108 @@ const config: Config = {
     "./app/**/*.{js,jsx,ts,tsx}",
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
-  safelist: [
-    "dark",
-    {
-      pattern: /^(bg|border|ring|text|)-(white|black)/,
-    },
-    {
-      // Backgrounds
-      pattern:
-        /^bg-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
-      variants: [
-        "dark",
-        "hover",
-        "disabled",
-        "group-hover",
-        "peer-checked",
-        "before",
+  // safelist: [
+  //   "dark",
+  //   {
+  //     pattern: /^(bg|border|ring|text|)-(white|black)/,
+  //   },
+  //   {
+  //     // Backgrounds
+  //     pattern:
+  //       /^bg-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+  //     variants: [
+  //       "dark",
+  //       "hover",
+  //       "disabled",
+  //       "group-hover",
+  //       "peer-checked",
+  //       "before",
 
-        "after",
+  //       "after",
 
-        "after:peer-checked",
+  //       "after:peer-checked",
 
-        "peer-disabled",
-        "checked",
-      ],
-    },
-    {
-      // Borders
-      pattern:
-        /^border-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
-      variants: [
-        "dark",
-        "hover",
-        "disabled",
-        "group-hover",
-        "peer-checked",
-        "peer-disabled",
-        "checked",
-      ],
-    },
-    {
-      // Ring Color
-      pattern:
-        /^ring-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
-      variants: [
-        "dark",
-        "hover",
-        "disabled",
-        "group-hover",
-        "peer-checked",
-        "peer-disabled",
-        "checked",
-      ],
-    },
-    {
-      // Text Color
-      pattern:
-        /^text-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
-      variants: [
-        "dark",
-        "hover",
-        "disabled",
-        "group-hover",
-        "peer-checked",
-        "peer-disabled",
-        "checked",
-      ],
-    },
-    // {
-    //   pattern:
-    //     /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-    //   variants: ["hover", "focus", "disabled"],
-    // },
-    // {
-    //   pattern: /bg-(white|black)/,
-    //   variants: ["hover", "focus", "disabled"],
-    // },
-    // {
-    //   pattern:
-    //     /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-    //   variants: ["hover", "focus", "disabled"],
-    // },
-    // {
-    //   pattern:
-    //     /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-    //   variants: ["hover", "focus", "disabled"],
-    // },
-    // {
-    //   pattern:
-    //     /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-    //   variants: ["hover", "focus", "disabled"],
-    // },
-    // {
-    //   pattern:
-    //     /ring-offset-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-    //   variants: ["hover", "focus", "disabled"],
-    // },
-    // {
-    //   pattern:
-    //     /outline-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
-    //   variants: ["hover", "focus", "disabled"],
-    // },
-  ],
+  //       "peer-disabled",
+  //       "checked",
+  //     ],
+  //   },
+  //   {
+  //     // Borders
+  //     pattern:
+  //       /^border-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+  //     variants: [
+  //       "dark",
+  //       "hover",
+  //       "disabled",
+  //       "group-hover",
+  //       "peer-checked",
+  //       "peer-disabled",
+  //       "checked",
+  //     ],
+  //   },
+  //   {
+  //     // Ring Color
+  //     pattern:
+  //       /^ring-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+  //     variants: [
+  //       "dark",
+  //       "hover",
+  //       "disabled",
+  //       "group-hover",
+  //       "peer-checked",
+  //       "peer-disabled",
+  //       "checked",
+  //     ],
+  //   },
+  //   {
+  //     // Text Color
+  //     pattern:
+  //       /^text-(mak-teal|sky|blue|purple|fuchsia|zinc|green|emerald|red|yellow)-[^/]+$/,
+  //     variants: [
+  //       "dark",
+  //       "hover",
+  //       "disabled",
+  //       "group-hover",
+  //       "peer-checked",
+  //       "peer-disabled",
+  //       "checked",
+  //     ],
+  //   },
+  //   // {
+  //   //   pattern:
+  //   //     /bg-(black|blue|green|orange|red|mak-teal|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+  //   //   variants: ["hover", "focus", "disabled"],
+  //   // },
+  //   // {
+  //   //   pattern: /bg-(white|black)/,
+  //   //   variants: ["hover", "focus", "disabled"],
+  //   // },
+  //   // {
+  //   //   pattern:
+  //   //     /text-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+  //   //   variants: ["hover", "focus", "disabled"],
+  //   // },
+  //   // {
+  //   //   pattern:
+  //   //     /border-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+  //   //   variants: ["hover", "focus", "disabled"],
+  //   // },
+  //   // {
+  //   //   pattern:
+  //   //     /ring-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+  //   //   variants: ["hover", "focus", "disabled"],
+  //   // },
+  //   // {
+  //   //   pattern:
+  //   //     /ring-offset-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+  //   //   variants: ["hover", "focus", "disabled"],
+  //   // },
+  //   // {
+  //   //   pattern:
+  //   //     /outline-(black|blue|green|orange|red|mak-teal|white|yellow|zinc|purple)-(50|100|200|300|400|500|600|700|800|900|950)/,
+  //   //   variants: ["hover", "focus", "disabled"],
+  //   // },
+  // ],
   theme: {
     extend: {
       colors: {

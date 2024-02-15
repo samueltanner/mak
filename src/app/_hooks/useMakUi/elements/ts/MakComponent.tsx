@@ -1,5 +1,4 @@
-// MakComponent.tsx
-/** @jsxImportSource @emotion/react */
+"use client"
 
 import { forwardRef, ReactNode, useMemo, memo, useEffect } from "react"
 import { useMakUi } from "../../context/MakUiContext"
@@ -61,7 +60,10 @@ const MakComponent = memo(
         }
       }, [setStyleSheet, pseudoClassObject])
 
-      const resolvedCombinedClassName = [resolvedClassName, resolvedMakClassName]
+      const resolvedCombinedClassName = [
+        resolvedClassName,
+        resolvedMakClassName,
+      ]
         .join(" ")
         .trim()
 
@@ -78,6 +80,13 @@ const MakComponent = memo(
         ...baseClassObject,
         ...pseudoClassObject,
       }
+
+      console.log({
+        makTwClassName: resolvedCombinedClassName,
+        twClassName: resolvedClassName,
+        makClassName: resolvedMakClassName,
+        inlineStyles,
+      })
 
       const isMotionObject = motion && !isEmptyObject(motion)
 
