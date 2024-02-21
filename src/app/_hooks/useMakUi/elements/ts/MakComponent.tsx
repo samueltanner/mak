@@ -81,13 +81,6 @@ const MakComponent = memo(
         ...pseudoClassObject,
       }
 
-      console.log({
-        makTwClassName: resolvedCombinedClassName,
-        twClassName: resolvedClassName,
-        makClassName: resolvedMakClassName,
-        inlineStyles,
-      })
-
       const isMotionObject = motion && !isEmptyObject(motion)
 
       if (isMotionObject) {

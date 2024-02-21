@@ -13,7 +13,9 @@ export const isObject = (v: any): v is GenericObject =>
   !Array.isArray(v) &&
   typeof v !== "string"
 
-export const deepMerge = (...objects: (GenericObject | undefined)[]) => {
+export const deepMerge = (
+  ...objects: (GenericObject | string | undefined)[]
+) => {
   const result = {}
 
   const merge = (target: GenericObject, source: GenericObject) => {

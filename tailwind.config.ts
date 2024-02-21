@@ -132,7 +132,7 @@ const config: Config = {
         },
       },
       dropShadow: {
-        "hard-sm": "2.5px 2.5px 1px rgba(0, 0, 0, 0.25)",
+        "hard-sm": "0px 6px 6px rgba(0, 0, 0, 0.25)",
       },
       boxShadow: {
         "hard-sm": "inset 0px 0px 3.5px rgba(0, 0, 0, 0.5)",

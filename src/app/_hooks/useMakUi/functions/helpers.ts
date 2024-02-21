@@ -1327,7 +1327,6 @@ const separateTwModifiers = (className: string | undefined) => {
       modifiers: "",
       media: undefined,
     }
-  // Regex to capture the last segment after the last colon and the rest before it
   const regex = /^(.*?):([^:]+)$/
   const match = className.match(regex)
   let media: string | undefined = undefined
@@ -1336,7 +1335,6 @@ const separateTwModifiers = (className: string | undefined) => {
     const modifiers = match[1]
     const finalClassName = match[2]
 
-    // Splitting modifiers on colon, but keeping group-* and peer-* together with their /<identifier>
     const modifiersSet = new Set(modifiers.split(/(?<!\/\w+):/))
     for (const mediaQuery of Object.keys(mediaQueries)) {
       if (modifiersSet.has(mediaQuery)) {
@@ -1361,6 +1359,298 @@ const separateTwModifiers = (className: string | undefined) => {
   }
 }
 
+export const extractMakVars = ({
+  className,
+  activeTheme,
+}: {
+  className?: string
+  activeTheme: MakUiVerboseTheme
+}) => {
+  let paletteVariant: MakUiPaletteKey | undefined = undefined
+  let variant: MakUiVariantKey = "primary"
+  let shade: Shade | undefined = undefined
+  let mcn: string | undefined
+  let opacity = undefined
+  let color
+  let altPaletteVariant: MakUiPaletteKey | undefined = undefined
+  mcn = className
+  opacity = mcn?.split("/")[1]
+  mcn = mcn?.split("/")[0]
+
+  variant =
+    (mcn?.split(`${paletteVariant}-`)?.[1] as MakUiVariantKey) || "primary"
+  paletteVariant =
+    (mcn?.split("-")[0] as MakUiPaletteKey) || ("bg" as MakUiPaletteKey)
+  variant =
+    (mcn?.split("-")[1] as MakUiVariantKey) || ("primary" as MakUiVariantKey)
+
+  if (variant.includes("|")) {
+    const splitVariant = variant.split("|")
+    variant = splitVariant[1] as MakUiVariantKey
+    altPaletteVariant = splitVariant[0] as MakUiPaletteKey
+  }
+
+  let shadeString = mcn?.split("-")[2]
+  if (!shadeString) {
+    if (variant === "light") {
+      shadeString = "100"
+    } else if (variant === "dark") {
+      shadeString = "900"
+    } else {
+      shadeString = "500"
+    }
+  }
+  shade = Number(shadeString) as Shade
+
+  let resolvedVariant = altPaletteVariant || paletteVariant
+
+  if (resolvedVariant !== "theme") {
+    color = activeTheme?.[resolvedVariant]?.[variant]?.[shade]
+    const colorString = mcn?.split(`${paletteVariant}-`)[1]
+    if (colorString === "transparent") {
+      color = "rgb(0,0,0,0)"
+    }
+
+    if (!color) {
+      let twKey = mcn
+      twKey = twKey!.split("-").slice(1).join("-")
+      if (twKey.charAt(0) === "#") {
+        color = twKey
+      } else {
+        const twColor = twColors[twKey]
+        color = twColor
+      }
+    }
+  } else {
+    color = activeTheme.theme?.[variant as keyof MakUiVerboseThemeVariant]
+  }
+
+  if (opacity && color) {
+    color = chroma(color)
+      .alpha(Number(opacity) / 100)
+      .css()
+  }
+  return {
+    paletteVariant,
+    mcn,
+    opacity,
+    shade,
+    color,
+    altPaletteVariant,
+  }
+}
+
+export const findSubstring = ({
+  string,
+  substrings,
+}: {
+  string?: string
+  substrings: string[]
+}): string | undefined => {
+  if (!string) return undefined
+
+  for (let substring of substrings) {
+    if (string.includes(substring)) {
+      return substring
+    }
+  }
+  return undefined
+}
+
+const extractGradientInstruction = (gradientInstructions: string[]) => {
+  const instructionsSet: Set<GenericObject> = new Set()
+  const linearGradientDirections: { [key: string]: string } = {
+    t: "to top,",
+    tr: "to top right,",
+    r: "to right,",
+    br: "to bottom right,",
+    b: "to bottom,",
+    bl: "to bottom left,",
+    l: "to left,",
+    tl: "to top left,",
+  }
+
+  for (const gradientInstruction of gradientInstructions) {
+    const classNameObj = {}
+    const { modifiersArray, className: demodifiedInstruction } =
+      separateTwModifiers(gradientInstruction)
+    const gradientType =
+      findSubstring({
+        string: demodifiedInstruction,
+        substrings: ["linear", "conic", "radial"],
+      }) || "linear"
+    let direction: string | undefined = undefined
+    const utilityKey = "background-image"
+    const namespace = `--gradient-stops`
+
+    if (demodifiedInstruction?.includes("deg")) {
+      direction = demodifiedInstruction
+        .split("-")
+        ?.find((substring) => substring.includes("deg"))
+        ?.replace(/[\[\]{}]/g, "")
+    }
+    if (demodifiedInstruction && !direction && gradientType === "linear") {
+      const splitInstruction = demodifiedInstruction?.split("-")
+      const twDirection = splitInstruction[splitInstruction.length - 1]
+      direction = linearGradientDirections?.[twDirection]
+    }
+    const rootCSS = `${gradientType}-gradient(${direction} var(${namespace}))`
+    // if (modifiersArray.length) {
+    let modifierCSSKeysArray: string[] = []
+
+    modifiersArray.forEach((modifier) => {
+      let modifierKey = tailwindToCssModifierObject?.[modifier]
+      if (typeof modifierKey === "string") {
+        modifierCSSKeysArray.push(modifierKey)
+      }
+      if (typeof modifierKey === "function") {
+        const className = demodifiedInstruction?.split("bg-")[1]
+        let resolvedModifierFn = modifierKey(className as string, "")
+        modifierCSSKeysArray.push(resolvedModifierFn)
+      }
+    })
+    ensureNestedObject({
+      parent: classNameObj,
+      keys: [...modifierCSSKeysArray, utilityKey],
+      value: rootCSS,
+    })
+
+    instructionsSet.add(classNameObj)
+  }
+  return instructionsSet
+}
+
+const extractGradientModifiers = ({
+  gradientModifiers,
+  activeTheme,
+}: {
+  gradientModifiers: string[]
+  activeTheme: MakUiVerboseTheme
+}) => {
+  const gradientModifierOptions = ["bg-gradient", "from-", "to-", "via-"]
+
+  const gradientModifiersSet = new Set(gradientModifiers)
+
+  const fromColorModifiers = gradientModifiers.filter((modifier) => {
+    return modifier.includes("from-") && !modifier.includes("%")
+  })
+
+  const orderedModifierArray = [...gradientModifiersSet, ...fromColorModifiers]
+
+  let rootCSSObj = {}
+  const parsedModifierSet = new Set()
+  const colorNamespaceSet: Set<string> = new Set()
+  for (const twGradientModifier of orderedModifierArray) {
+    let { className, modifiersArray } = separateTwModifiers(twGradientModifier)
+    const classNameObj = {} as GenericObject
+    let gradientModifier =
+      findSubstring({
+        string: className,
+        substrings: gradientModifierOptions,
+      }) || ""
+    const demodifiedClassName = className?.split(gradientModifier)[1]
+    className = `bg-${demodifiedClassName}`
+    gradientModifier = gradientModifier.split("-")[0]
+    let { color } = extractMakVars({ className, activeTheme })
+    let position: string | undefined = demodifiedClassName?.includes("%")
+      ? demodifiedClassName
+      : undefined
+    position = position?.replace(/[\[\]]/g, "")
+    const namespace = `--gradient-${gradientModifier}${
+      position ? "-position" : ""
+    }`
+    const originalModifier = `${gradientModifier}-${demodifiedClassName}`
+    let namespaceValue: string | GenericObject = position
+      ? position
+      : `${color} var(--gradient-${gradientModifier}-position, ${
+          gradientModifier === "from"
+            ? "0%"
+            : gradientModifier === "to"
+            ? "100%"
+            : ""
+        })`
+    if (!position) colorNamespaceSet.add(gradientModifier)
+
+    const rootCSS = { [namespace]: namespaceValue }
+    if (!position) {
+      rootCSSObj = {
+        ...rootCSSObj,
+        ...rootCSS,
+      }
+    }
+    let modifierCSSKeysArray: string[] = []
+
+    modifiersArray.forEach((modifier) => {
+      let modifierKey = tailwindToCssModifierObject?.[modifier]
+      if (typeof modifierKey === "string") {
+        modifierCSSKeysArray.push(modifierKey)
+      }
+      if (typeof modifierKey === "function") {
+        const escapedOriginalModifier = originalModifier.replace(
+          /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
+          "\\$&"
+        )
+        const resolvedModifierFn = modifierKey(escapedOriginalModifier)
+        modifierCSSKeysArray.push(resolvedModifierFn)
+      }
+    })
+
+    // modifierCSSKeysArray.length && console.log(modifierCSSKeysArray, {rootCSSObj})
+    const escapedClassName = `&.${twGradientModifier.replace(
+      /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
+      "\\$&"
+    )}`
+
+    if (fromColorModifiers.includes(twGradientModifier)) {
+      const gradientStops = `var(--gradient-from),${
+        colorNamespaceSet.has("via") ? "var(--gradient-via)," : ""
+      } var(--gradient-to)`
+      if (!Object.keys(rootCSSObj).includes("--gradient-to")) {
+        const gradientTo = {
+          ["--gradient-to"]: "rgba(0,0,0,0) var(--gradient-to-position, 100%)",
+        }
+        rootCSSObj = {
+          ...rootCSSObj,
+          ...gradientTo,
+        }
+      }
+
+      const fromNameSpace = {
+        "--gradient-stops": gradientStops,
+        ...rootCSSObj,
+      }
+
+      ensureNestedObject({
+        parent: classNameObj,
+        keys: modifiersArray.length
+          ? [...modifierCSSKeysArray]
+          : [escapedClassName],
+        value: fromNameSpace,
+      })
+
+      parsedModifierSet.add(classNameObj)
+
+      continue
+    }
+    if (modifiersArray.length) {
+      ensureNestedObject({
+        parent: classNameObj,
+        keys: [...modifierCSSKeysArray, namespace],
+        value: namespaceValue,
+      })
+    } else {
+      ensureNestedObject({
+        parent: classNameObj,
+        keys: [...modifierCSSKeysArray, escapedClassName, namespace],
+        value: namespaceValue,
+      })
+    }
+
+    parsedModifierSet.add(classNameObj)
+  }
+  return parsedModifierSet
+}
+
 export const parseMakClassNames = ({
   makClassName,
   activeTheme,
@@ -1373,90 +1663,62 @@ export const parseMakClassNames = ({
   makClassName = makClassName?.replace(/\s+/g, " ").trim()
   if (!makClassName || makClassName === "") return {}
 
-  const makClassNamesArray = makClassName?.split(" ") || []
+  let makClassNamesArray = makClassName?.split(" ") || []
+  const makClassNamesSet = new Set(makClassNamesArray)
   const styleMap = new Map<string, string | GenericObject>()
-  const modifierSet = new Set<GenericObject>()
+  const modifierSet = new Set<GenericObject | string>()
   const unresolvedClasses: string[] = []
 
+  const keyMap: { [key: string]: string } = {
+    bg: "backgroundColor",
+    text: "color",
+    border: "borderColor",
+    theme: "backgroundColor",
+    color: "backgroundColor",
+    outline: "outlineColor",
+    ring: "outlineColor",
+    "ring-offset": "boxShadow",
+    divide: "borderColor",
+  }
+  const gradientModifierOptions = ["bg-gradient", "from-", "to-", "via-"]
+
   if (makClassNamesArray.length > 0) {
-    for (const makClassName of makClassNamesArray) {
-      const { className, modifiers, modifiersArray, media } =
-        separateTwModifiers(makClassName)
+    const gradientInstructions: string[] = makClassNamesArray.filter((cn) =>
+      cn.includes("bg-gradient")
+    )
+    gradientInstructions.forEach((i) => makClassNamesSet.delete(i))
+
+    const parsedGradientInstructions =
+      extractGradientInstruction(gradientInstructions)
+
+    Array.from(parsedGradientInstructions).forEach((instruction) =>
+      modifierSet.add(instruction)
+    )
+
+    const gradientModifiers = makClassNamesArray.filter((cn) => {
+      return (
+        !gradientInstructions.includes(cn) &&
+        findSubstring({ string: cn, substrings: gradientModifierOptions })
+      )
+    })
+    gradientModifiers.forEach((m) => makClassNamesSet.delete(m))
+
+    const parsedGradientModifiers = extractGradientModifiers({
+      gradientModifiers,
+      activeTheme,
+    })
+
+    Array.from(parsedGradientModifiers).forEach((parsedModifier) =>
+      modifierSet.add(parsedModifier as string)
+    )
+
+    for (const makClassName of Array.from(makClassNamesSet)) {
+      let { className, modifiersArray } = separateTwModifiers(makClassName)
+
       const classNameObj = {} as GenericObject
       let key: string = "backgroundColor"
-      let paletteVariant: MakUiPaletteKey | undefined = undefined
 
-      let variant: MakUiVariantKey = "primary"
-      let shade: Shade | undefined = undefined
-      let mcn: string | undefined
-      let opacity = undefined
-      let color
-      let altPaletteVariant: MakUiPaletteKey | undefined = undefined
-
-      const keyMap = {
-        bg: "backgroundColor",
-        text: "color",
-        border: "borderColor",
-        theme: "backgroundColor",
-        color: "backgroundColor",
-        outline: "outlineColor",
-        ring: "outlineColor",
-        "ring-offset": "boxShadow",
-        divide: "borderColor",
-      }
-
-      mcn = className
-      opacity = mcn?.split("/")[1]
-      mcn = mcn?.split("/")[0]
-
-      variant =
-        (mcn?.split(`${paletteVariant}-`)?.[1] as MakUiVariantKey) || "primary"
-      paletteVariant =
-        (mcn?.split("-")[0] as MakUiPaletteKey) || ("bg" as MakUiPaletteKey)
-      variant =
-        (mcn?.split("-")[1] as MakUiVariantKey) ||
-        ("primary" as MakUiVariantKey)
-
-      if (variant.includes("|")) {
-        const splitVariant = variant.split("|")
-        variant = splitVariant[1] as MakUiVariantKey
-        altPaletteVariant = splitVariant[0] as MakUiPaletteKey
-      }
-
-      let shadeString = mcn?.split("-")[2]
-      if (!shadeString) {
-        if (variant === "light") {
-          shadeString = "100"
-        } else if (variant === "dark") {
-          shadeString = "900"
-        } else {
-          shadeString = "500"
-        }
-      }
-      shade = Number(shadeString) as Shade
-
-      let resolvedVariant = altPaletteVariant || paletteVariant
-      if (resolvedVariant !== "theme") {
-        color = activeTheme?.[resolvedVariant]?.[variant]?.[shade]
-        if (!color) {
-          let twKey = mcn
-          twKey = twKey!.split("-").slice(1).join("-")
-          if (twKey.charAt(0) === "#") {
-            color = twKey
-          } else {
-            const twColor = twColors[twKey]
-            color = twColor
-          }
-        }
-      } else {
-        color = activeTheme.theme?.[variant as keyof MakUiVerboseThemeVariant]
-      }
-
-      if (opacity && color) {
-        color = chroma(color)
-          .alpha(Number(opacity) / 100)
-          .css()
-      }
+      let { paletteVariant, color } = extractMakVars({ className, activeTheme })
 
       if (modifiersArray.length) {
         let modifierCSSKeysArray: string[] = []
@@ -1470,7 +1732,7 @@ export const parseMakClassNames = ({
             modifierCSSKeysArray.push(modifierKey)
           }
           if (typeof modifierKey === "function") {
-            let modifierAndClassNameString = `.${modifiersArray.join(
+            let modifierAndClassNameString = `&.${modifiersArray.join(
               ":"
             )}:${className}`
 
@@ -1502,6 +1764,7 @@ export const parseMakClassNames = ({
   }
 
   const modifierArray = Array.from(modifierSet)
+  console.log({ modifierArray })
 
   const mergedModifiers = deepMerge(...modifierArray)
 
@@ -1510,6 +1773,9 @@ export const parseMakClassNames = ({
   const unresolved = unresolvedClasses.length
     ? unresolvedClasses.join(" ")
     : undefined
+
+  console.log({ pseudoClassObject })
+
   return {
     pseudoClassObject,
     baseClassObject,

@@ -328,14 +328,16 @@ export const mediaQueries = {
 export const tailwindToCssModifierObject: {
   [key: string]:
     | string
-    | ((selector: string) => string)
+    | ((selector?: string, altSelector?: string) => string)
     | ((selector: string, altSelector: string) => string)
     | ((n: string) => string)
 } = {
   //styles applied directly to element
   //tw eg. hover:bg-red-500
   dark: '[data-theme="dark"] &',
-  hover: "&:hover",
+  light: '[data-theme="light"] &',
+  custom: '[data-theme="custom"] &',
+  hover: (selector: string) => (selector ? `&.hover\\:${selector}:hover` : "&:hover"),
   focus: "&:focus",
   "focus-within": "&:focus-within",
   "focus-visible": "&:focus-visible",
