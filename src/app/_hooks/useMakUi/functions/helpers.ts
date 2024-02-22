@@ -1764,7 +1764,6 @@ export const parseMakClassNames = ({
   }
 
   const modifierArray = Array.from(modifierSet)
-  console.log({ modifierArray })
 
   const mergedModifiers = deepMerge(...modifierArray)
 
@@ -1773,8 +1772,6 @@ export const parseMakClassNames = ({
   const unresolved = unresolvedClasses.length
     ? unresolvedClasses.join(" ")
     : undefined
-
-  console.log({ pseudoClassObject })
 
   return {
     pseudoClassObject,

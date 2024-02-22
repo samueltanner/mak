@@ -25,24 +25,15 @@ import styled from "@emotion/styled"
 //       "var(--gradient-to-color) var(--gradient-to-position, 100%)",
 //   },
 // }
-const StyledGradient = styled.div({
-  "background-image": "linear-gradient(to right, var(--gradient-stops))",
-  "&.from-secondary": {
-    "--gradient-stops": "var(--gradient-from), var(--gradient-to)",
-    "--gradient-from": "#00EAB3 var(--gradient-from-position, 0%)",
-    "--gradient-to": "#0BA5EC var(--gradient-to-position, 100%)",
+const StyledGradient = styled.button({
+  "@media (min-width: 768px)": {
+    "&.md\\:hover\\:focus\\:bg-primary-500:hover:focus": {
+      backgroundColor: "#731AFF",
+    },
   },
-  "&.to-danger": {
-    "--gradient-to": "#EE4444 var(--gradient-to-position, 100%)",
-  },
-  "&.to-80\\%": {
-    "--gradient-to-position": "80%",
-  },
-  "&.hover\\:to-info:hover": {
-    "--gradient-to": "#0BA5EC var(--gradient-to-position, 100%)",
-  },
-  "&.hover\\:to-20\\%:hover": {
-    "--gradient-to-position": "20%",
+
+  "&.disabled\\:bg-warning-500:disabled": {
+    backgroundColor: "#FFCC66",
   },
 })
 
@@ -50,7 +41,7 @@ const GradientView = () => {
   const { verboseTheme } = useMakUi()
 
   return (
-    <div className="flex h-full w-full items-center justify-center flex-col gap-4">
+    <div className="group flex h-full w-full items-center justify-center flex-col gap-4">
       tw
       <span className="flex h-20 w-80 bg-gradient-to-r from-purple-500 from-[-100%]" />
       {/* mak */}
@@ -59,12 +50,14 @@ const GradientView = () => {
       <mak.span
         className="fade-in-out flex h-20 w-80"
         makClassName="bg-gradient-to-r from-primary-500 from-10% to-dark-200 to-80%"
-        // makClassName="bg-primary hover:bg-secondary"
+        // makClassName="bg-primary :bg-secondary"
       /> */}
       styled 2
-      <mak.span makClassName="flex h-20 w-80 bg-gradient-to-r from-tertiary-700 from-60% hover:from-20% to-warning to-90% hover:to-120% hover:to-info" />
+      <mak.span makClassName="flex h-20 w-80 bg-gradient-to-r from-tertiary-700 light:from-danger-500 dark:hover:from-info" />
       {/* styled gradient */}
-      <StyledGradient className="flex h-20 w-80 from-secondary bg-gradient-to-r to-danger to-80% hover:to-info hover:to-20%" />
+      <StyledGradient className="flex h-20 w-80 bg-blue-500 md:hover:focus:bg-primary-500 focus:border-[4px]">
+        hi
+      </StyledGradient>
     </div>
   )
 }

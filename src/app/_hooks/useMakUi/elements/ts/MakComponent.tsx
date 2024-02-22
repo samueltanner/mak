@@ -52,9 +52,13 @@ const MakComponent = memo(
             ...styleSheet,
           }
           Object.entries(pseudoClassObject).forEach(([key, value]) => {
+            console.log("key", key)
+            console.log("value", value)
             if (!styleSheet[key]) {
               updatedStyleSheet[key] = value
+
               setStyleSheet(updatedStyleSheet)
+              console.log("updatedStyleSheet", updatedStyleSheet)
             }
           })
         }
