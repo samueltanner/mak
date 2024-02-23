@@ -37,10 +37,8 @@ const MakComponent = memo(
         })
       }, [props, makUi])
 
-      const { styleObject, twClassName, makClassName, ...responseRest } =
+      const { makCSSObject, twClassName, makClassName, ...responseRest } =
         response
-
-      const { baseClassObject = {}, pseudoClassObject = {} } = styleObject
 
       useEffect(() => {
         if (
@@ -51,22 +49,20 @@ const MakComponent = memo(
           const updatedStyleSheet = {
             ...styleSheet,
           }
-          Object.entries(pseudoClassObject).forEach(([key, value]) => {
-            console.log("key", key)
-            console.log("value", value)
-            if (!styleSheet[key]) {
+          Object.entries(makCSSObject).forEach(([key, value]) => {
+            if (key.match(/(group)|(peer)/g) && !styleSheet[key]) {
               updatedStyleSheet[key] = value
 
               setStyleSheet(updatedStyleSheet)
-              console.log("updatedStyleSheet", updatedStyleSheet)
             }
           })
         }
-      }, [setStyleSheet, pseudoClassObject])
+      }, [setStyleSheet, makCSSObject])
 
       const resolvedCombinedClassName = [
-        resolvedClassName,
-        resolvedMakClassName,
+        resolvedClassName || "",
+        resolvedMakClassName || "",
+        makClassName || "",
       ]
         .join(" ")
         .trim()
@@ -81,8 +77,7 @@ const MakComponent = memo(
       }
 
       const inlineStyles = {
-        ...baseClassObject,
-        ...pseudoClassObject,
+        ...makCSSObject,
       }
 
       const isMotionObject = motion && !isEmptyObject(motion)

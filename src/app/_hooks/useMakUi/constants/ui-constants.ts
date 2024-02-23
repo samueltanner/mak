@@ -123,6 +123,57 @@ export const makUiInteractionStates: MakUiInteractionStateKey[] = [
   "visited",
 ]
 
+export const twModifierSet = new Set<string>([
+  "hover",
+  "focus",
+  "focus-within",
+  "focus-visible",
+  "active",
+  "visited",
+  "target",
+  "first",
+  "last",
+  "only",
+  "odd",
+  "even",
+  "first-of-type",
+  "last-of-type",
+  "only-of-type",
+  "empty",
+  "disabled",
+  "enabled",
+  "checked",
+  "indeterminate",
+  "default",
+  "required",
+  "valid",
+  "invalid",
+  "in-range",
+  "out-of-range",
+  "placeholder-shown",
+  "autofill",
+  "read-only",
+  "before",
+  "after",
+  "first-letter",
+  "first-line",
+  "marker",
+  "selection",
+  "file",
+  "backdrop",
+  "placeholder",
+  "fullscreen",
+  "last-child",
+  "link",
+  "not-checked",
+  "only-child",
+  "optional",
+  "read-write",
+  "first-child",
+  "has",
+  "is",
+])
+
 export const makUiCustomInteractionStates: MakUiCustomInteractionStateKey[] = [
   "base",
   "click",
@@ -313,7 +364,12 @@ export const defaultComponentConfig: MakUiComponentConfig = {
   input: defaultInputConfig,
 }
 
-export const mediaQueries = {
+export const mediaQueries: {
+  [key: string]: string
+} = {
+  dark: '[data-theme="dark"] &',
+  light: '[data-theme="light"] &',
+  custom: '[data-theme="custom"] &',
   "2xs": "@media (min-width: 320px)",
   xs: "@media (min-width: 480px)",
   sm: "@media (min-width: 640px)",
@@ -323,6 +379,18 @@ export const mediaQueries = {
   "2xl": "@media (min-width: 1536px)",
   "3xl": "@media (min-width: 1920px)",
   "4xl": "@media (min-width: 2560px)",
+}
+
+export const twToCssKeyMap: { [key: string]: string } = {
+  bg: "backgroundColor",
+  text: "color",
+  border: "borderColor",
+  theme: "backgroundColor",
+  color: "backgroundColor",
+  outline: "outlineColor",
+  ring: "outlineColor",
+  "ring-offset": "boxShadow",
+  divide: "borderColor",
 }
 
 export const tailwindToCssModifierObject: {
@@ -337,7 +405,8 @@ export const tailwindToCssModifierObject: {
   dark: '[data-theme="dark"] &',
   light: '[data-theme="light"] &',
   custom: '[data-theme="custom"] &',
-  hover: (selector: string) => (selector ? `&.hover\\:${selector}:hover` : "&:hover"),
+  hover: (selector: string) =>
+    selector ? `&.hover\\:${selector}:hover` : "&:hover",
   focus: "&:focus",
   "focus-within": "&:focus-within",
   "focus-visible": "&:focus-visible",

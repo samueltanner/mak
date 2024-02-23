@@ -141,18 +141,18 @@ export const componentWrapperLogic = ({
   }
 
   const {
-    styleObject,
+    makCSSObject,
     twClassName,
     makClassName: makClassNames,
   } = parseClassNameToStyleObject({
     className: resolvedClassName,
     makClassName: resolvedMakClassName,
     activeTheme,
-    currentThemeMode: makUi.theme,
+    // currentThemeMode: makUi.theme,
   })
 
   const response: ComponentWrapperResponse & TypeProps = {
-    styleObject,
+    makCSSObject,
     componentTheme: themePalette,
     componentText: textPalette,
     componentColor: colorPalette,

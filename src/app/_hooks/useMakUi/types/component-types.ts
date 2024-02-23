@@ -57,7 +57,7 @@ export type VariantWithShadeAndOpacity = `${MakUiVariantKey}-${Shade}/${number}`
 export type ThemeVariantWithOpacity = `${MakUiThemeVariantKey}-${number}`
 export type FalsyValue = false | null | undefined
 export type TypeProps = {
-  type?: string 
+  type?: string
   useConfig?: boolean
   //theme
   darkMode?: boolean
@@ -227,10 +227,7 @@ export type ClassObject =
   | undefined
 
 export type ComponentWrapperResponse = {
-  styleObject: {
-    baseClassObject: ClassObject
-    pseudoClassObject: ClassObject
-  }
+  makCSSObject: ClassObject
   componentTheme: MakUiVerboseThemeVariant
   componentText: MakUiVerboseVariant
   componentColor: MakUiVerboseVariant

@@ -49,6 +49,8 @@ import {
   tailwindToCssModifierObject,
   tailwindVariants,
   tailwindVariantsSet,
+  twModifierSet,
+  twToCssKeyMap,
 } from "../constants/ui-constants"
 import {
   ClassObject,
@@ -1089,133 +1091,133 @@ export const extractInitialPalette = ({
   return paletteObject as MakUiVerbosePalette
 }
 
-const parseMakClassName = (string: string) => {
-  const makClassNameObj: ParsedClassNameResponse = {
-    theme: undefined,
-    palette: "color",
-    variant: "primary",
-    themeVariant: "primary",
-    state: undefined,
-    twVariant: "bg",
-    opacity: undefined,
-    string,
-  }
+// const parseMakClassName = (string: string) => {
+//   const makClassNameObj: ParsedClassNameResponse = {
+//     theme: undefined,
+//     palette: "color",
+//     variant: "primary",
+//     themeVariant: "primary",
+//     state: undefined,
+//     twVariant: "bg",
+//     opacity: undefined,
+//     string,
+//   }
 
-  if (string.includes("ring-offset")) {
-    makClassNameObj.twVariant = "ring-offset"
-  }
+//   if (string.includes("ring-offset")) {
+//     makClassNameObj.twVariant = "ring-offset"
+//   }
 
-  const delimiters = /group-offset:|ring-offset:|[:\/.-]+/
-  const splitString = string.split(delimiters)
+//   const delimiters = /group-offset:|ring-offset:|[:\/.-]+/
+//   const splitString = string.split(delimiters)
 
-  let opacity
-  if (string.includes("/")) {
-    opacity = string.split("/")[1]
-    makClassNameObj.opacity = opacity
-  }
+//   let opacity
+//   if (string.includes("/")) {
+//     opacity = string.split("/")[1]
+//     makClassNameObj.opacity = opacity
+//   }
 
-  splitString.forEach((str) => {
-    if (makUiThemesSet.has(str as MakUiThemeKey)) {
-      makClassNameObj.theme = str as MakUiThemeKey
-    }
+//   splitString.forEach((str) => {
+//     if (makUiThemesSet.has(str as MakUiThemeKey)) {
+//       makClassNameObj.theme = str as MakUiThemeKey
+//     }
 
-    if (makUiVariantsSet.has(str as MakUiVariantKey)) {
-      makClassNameObj.variant = str as MakUiVariantKey
-    }
+//     if (makUiVariantsSet.has(str as MakUiVariantKey)) {
+//       makClassNameObj.variant = str as MakUiVariantKey
+//     }
 
-    if (makUiPalettesSet.has(str as MakUiPaletteKey)) {
-      makClassNameObj.palette = str as MakUiPaletteKey
-    }
+//     if (makUiPalettesSet.has(str as MakUiPaletteKey)) {
+//       makClassNameObj.palette = str as MakUiPaletteKey
+//     }
 
-    if (makUiStatesSet.has(str as MakUiStateKey)) {
-      makClassNameObj.state = str as MakUiStateKey
-    }
+//     if (makUiStatesSet.has(str as MakUiStateKey)) {
+//       makClassNameObj.state = str as MakUiStateKey
+//     }
 
-    if (tailwindVariantsSet.has(str as TailwindUtilityClass)) {
-      if (makClassNameObj.twVariant !== "ring-offset") {
-        makClassNameObj.twVariant = str as TailwindUtilityClass
-      }
-    } else if (str === "color") {
-      makClassNameObj.twVariant = "bg"
-    }
+//     if (tailwindVariantsSet.has(str as TailwindUtilityClass)) {
+//       if (makClassNameObj.twVariant !== "ring-offset") {
+//         makClassNameObj.twVariant = str as TailwindUtilityClass
+//       }
+//     } else if (str === "color") {
+//       makClassNameObj.twVariant = "bg"
+//     }
 
-    if (makUiThemeVariantsSet.has(str as MakUiThemeVariantKey)) {
-      makClassNameObj.themeVariant = str as MakUiThemeVariantKey
-    }
-  })
+//     if (makUiThemeVariantsSet.has(str as MakUiThemeVariantKey)) {
+//       makClassNameObj.themeVariant = str as MakUiThemeVariantKey
+//     }
+//   })
 
-  return makClassNameObj
-}
+//   return makClassNameObj
+// }
 
-export const getTwConfigSafelist = ({
-  simplePalette,
-  enabledTwVariants,
-}: {
-  simplePalette: MakUiSimplePalette
-  enabledTwVariants: string[]
-}) => {
-  const twVariants = tailwindVariants
-  const variantsArray: string[] = []
-  twVariants.forEach((variant) => {
-    const variantString = `(${variant})`
-    variantsArray.push(variantString)
-  })
-  const variantsString = `(${variantsArray.join("|")})`
+// export const getTwConfigSafelist = ({
+//   simplePalette,
+//   enabledTwVariants,
+// }: {
+//   simplePalette: MakUiSimplePalette
+//   enabledTwVariants: string[]
+// }) => {
+//   const twVariants = tailwindVariants
+//   const variantsArray: string[] = []
+//   twVariants.forEach((variant) => {
+//     const variantString = `(${variant})`
+//     variantsArray.push(variantString)
+//   })
+//   const variantsString = `(${variantsArray.join("|")})`
 
-  const safeList = []
+//   const safeList = []
 
-  const paletteMap: Map<string, Set<number>> = new Map()
+//   const paletteMap: Map<string, Set<number>> = new Map()
 
-  const recursiveCollectClassNames = (
-    obj: GenericObject,
-    result: GenericObject = {}
-  ): GenericObject => {
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if (typeof obj[key] === "object" && obj[key] !== null) {
-          recursiveCollectClassNames(obj[key], result)
-        } else {
-          const value = obj[key] // Changed to obj[key] instead of result[key]
-          if (value && typeof value === "string") {
-            const { color, shade } = twColorHelper({
-              colorString: value,
-            }) as TWColorHelperResponse
+//   const recursiveCollectClassNames = (
+//     obj: GenericObject,
+//     result: GenericObject = {}
+//   ): GenericObject => {
+//     for (const key in obj) {
+//       if (obj.hasOwnProperty(key)) {
+//         if (typeof obj[key] === "object" && obj[key] !== null) {
+//           recursiveCollectClassNames(obj[key], result)
+//         } else {
+//           const value = obj[key] // Changed to obj[key] instead of result[key]
+//           if (value && typeof value === "string") {
+//             const { color, shade } = twColorHelper({
+//               colorString: value,
+//             }) as TWColorHelperResponse
 
-            if (paletteMap.has(color!)) {
-              const shadesSet = paletteMap.get(color!)
-              shadesSet?.add(shade!)
-            } else {
-              paletteMap.set(color!, new Set([shade!]))
-            }
-          }
-          result[key] = obj[key]
-        }
-      }
-    }
-    return result
-  }
+//             if (paletteMap.has(color!)) {
+//               const shadesSet = paletteMap.get(color!)
+//               shadesSet?.add(shade!)
+//             } else {
+//               paletteMap.set(color!, new Set([shade!]))
+//             }
+//           }
+//           result[key] = obj[key]
+//         }
+//       }
+//     }
+//     return result
+//   }
 
-  recursiveCollectClassNames(simplePalette)
+//   recursiveCollectClassNames(simplePalette)
 
-  for (const [color, shades] of paletteMap.entries()) {
-    const shadesArray = Array.from(shades)
-    shadesArray.sort((a, b) => a - b)
-    const shadesString = shadesArray.join("|")
-    const regex = `/${variantsString}-(${color})-(${shadesString})/`
-    const safeListObject = {
-      pattern: regex,
-      variants: enabledTwVariants,
-    }
-    safeList.push(safeListObject)
-  }
+//   for (const [color, shades] of paletteMap.entries()) {
+//     const shadesArray = Array.from(shades)
+//     shadesArray.sort((a, b) => a - b)
+//     const shadesString = shadesArray.join("|")
+//     const regex = `/${variantsString}-(${color})-(${shadesString})/`
+//     const safeListObject = {
+//       pattern: regex,
+//       variants: enabledTwVariants,
+//     }
+//     safeList.push(safeListObject)
+//   }
 
-  safeList.push({
-    pattern: `/${variantsString}-(white|black)/`,
-    variants: enabledTwVariants,
-  })
+//   safeList.push({
+//     pattern: `/${variantsString}-(white|black)/`,
+//     variants: enabledTwVariants,
+//   })
 
-  return safeList
-}
+//   return safeList
+// }
 
 export const objectToClassName = ({
   ...args
@@ -1264,12 +1266,10 @@ export const parseClassNameToStyleObject = ({
   className = "",
   makClassName = undefined,
   activeTheme,
-  currentThemeMode,
 }: {
   className?: string
   makClassName?: string
   activeTheme: MakUiVerboseTheme
-  currentThemeMode: MakUiThemeKey
 }) => {
   const makRegex = /mak\((.*?)\)/g
   const whiteSpaceRegex = /[ \t\r\n]+/
@@ -1303,57 +1303,91 @@ export const parseClassNameToStyleObject = ({
     ? twClassNamesArray.join(" ")
     : undefined
 
-  const { baseClassObject, pseudoClassObject, unresolved } = parseMakClassNames(
-    {
-      makClassName,
-      activeTheme,
-      currentThemeMode,
-    }
-  )
+  const makCSSObject = parseMakClassNames({
+    makClassName,
+    activeTheme,
+  })
 
-  const styleObject: {
-    baseClassObject: ClassObject
-    pseudoClassObject: ClassObject
-  } = { baseClassObject, pseudoClassObject }
-
-  return { styleObject, twClassName, makClassName }
+  return { makCSSObject, twClassName, makClassName }
 }
 
 const separateTwModifiers = (className: string | undefined) => {
   if (!className || typeof className !== "string")
     return {
-      className,
-      modifiersArray: [],
       modifiers: "",
-      media: undefined,
+      modifiersArray: [],
+      mediaQueriesArray: [],
+      relationalModifiersArray: [],
+      className,
     }
+
+  const hasSet = new Set<string>()
+
+  if (className.includes("has-")) {
+    const hasMatch = className.match(`^${"has-"}\\[(.+?)\\]`)
+    if (hasMatch) {
+      const pseudoClass = `has(${hasMatch[1]})`
+      hasSet.add(pseudoClass)
+    }
+  }
+
   const regex = /^(.*?):([^:]+)$/
   const match = className.match(regex)
-  let media: string | undefined = undefined
+  const relationalModifiers = ["group-", "peer-", "parent-"]
 
   if (match) {
     const modifiers = match[1]
     const finalClassName = match[2]
+    const modifiersSet = new Set(modifiers.split(/(?<!\[[^\]]*):/))
+    const mediaQueriesSet = new Set()
+    const relationalModifiersSet = new Set()
 
-    const modifiersSet = new Set(modifiers.split(/(?<!\/\w+):/))
-    for (const mediaQuery of Object.keys(mediaQueries)) {
-      if (modifiersSet.has(mediaQuery)) {
-        media = mediaQuery
+    modifiersSet.forEach((m) => {
+      !twModifierSet.has(m) && modifiersSet.delete(m)
+      mediaQueries?.[m] && modifiersSet.delete(m)
+      mediaQueries?.[m] && mediaQueriesSet.add(m)
+
+      if (relationalModifiers.some((rm) => m.includes(rm))) {
+        modifiersSet.delete(m)
+
+        let relation = findSubstring({
+          string: m,
+          substrings: relationalModifiers,
+        })
+        const modifier = m.split(relation || " ")[1]
+        relation = relation?.replace("-", "")
+        const hasMatch = modifier.match(`^${"has-"}\\[(.+?)\\]`)
+        const peerTilde = relation === "peer" ? " ~ " : " "
+        let parsedModifier = ""
+        if (hasMatch) {
+          parsedModifier = `.${relation}:has(${hasMatch[1]})${peerTilde}`
+        } else {
+          parsedModifier = `.${relation}:${modifier.replace(
+            /[\[\]\:]/g,
+            ""
+          )}${peerTilde}`
+        }
+        relationalModifiersSet.add(parsedModifier)
       }
-    }
-    const modifiersArray = [...modifiersSet.values()]
+    })
+
+    const modifiersArray = [...modifiersSet.values(), ...hasSet.values()]
+    const mediaQueriesArray = [...mediaQueriesSet.values()]
+    const relationalModifiersArray = [...relationalModifiersSet.values()]
 
     return {
       modifiers,
       modifiersArray,
-      media,
+      mediaQueriesArray,
+      relationalModifiersArray,
       className: finalClassName,
     }
   } else {
     return {
       modifiers: "",
-      modifiersArray: [],
-      media,
+      modifiersArray: [...hasSet.values()],
+      mediaQueriesArray: [],
+      relationalModifiersArray: [],
       className,
     }
   }
@@ -1406,11 +1440,6 @@ export const extractMakVars = ({
 
   if (resolvedVariant !== "theme") {
     color = activeTheme?.[resolvedVariant]?.[variant]?.[shade]
-    const colorString = mcn?.split(`${paletteVariant}-`)[1]
-    if (colorString === "transparent") {
-      color = "rgb(0,0,0,0)"
-    }
-
     if (!color) {
       let twKey = mcn
       twKey = twKey!.split("-").slice(1).join("-")
@@ -1440,7 +1469,7 @@ export const extractMakVars = ({
   }
 }
 
-export const findSubstring = ({
+const findSubstring = ({
   string,
   substrings,
 }: {
@@ -1457,327 +1486,253 @@ export const findSubstring = ({
   return undefined
 }
 
-const extractGradientInstruction = (gradientInstructions: string[]) => {
-  const instructionsSet: Set<GenericObject> = new Set()
-  const linearGradientDirections: { [key: string]: string } = {
-    t: "to top,",
-    tr: "to top right,",
-    r: "to right,",
-    br: "to bottom right,",
-    b: "to bottom,",
-    bl: "to bottom left,",
-    l: "to left,",
-    tl: "to top left,",
-  }
-
-  for (const gradientInstruction of gradientInstructions) {
-    const classNameObj = {}
-    const { modifiersArray, className: demodifiedInstruction } =
-      separateTwModifiers(gradientInstruction)
-    const gradientType =
-      findSubstring({
-        string: demodifiedInstruction,
-        substrings: ["linear", "conic", "radial"],
-      }) || "linear"
-    let direction: string | undefined = undefined
-    const utilityKey = "background-image"
-    const namespace = `--gradient-stops`
-
-    if (demodifiedInstruction?.includes("deg")) {
-      direction = demodifiedInstruction
-        .split("-")
-        ?.find((substring) => substring.includes("deg"))
-        ?.replace(/[\[\]{}]/g, "")
-    }
-    if (demodifiedInstruction && !direction && gradientType === "linear") {
-      const splitInstruction = demodifiedInstruction?.split("-")
-      const twDirection = splitInstruction[splitInstruction.length - 1]
-      direction = linearGradientDirections?.[twDirection]
-    }
-    const rootCSS = `${gradientType}-gradient(${direction} var(${namespace}))`
-    // if (modifiersArray.length) {
-    let modifierCSSKeysArray: string[] = []
-
-    modifiersArray.forEach((modifier) => {
-      let modifierKey = tailwindToCssModifierObject?.[modifier]
-      if (typeof modifierKey === "string") {
-        modifierCSSKeysArray.push(modifierKey)
-      }
-      if (typeof modifierKey === "function") {
-        const className = demodifiedInstruction?.split("bg-")[1]
-        let resolvedModifierFn = modifierKey(className as string, "")
-        modifierCSSKeysArray.push(resolvedModifierFn)
-      }
-    })
-    ensureNestedObject({
-      parent: classNameObj,
-      keys: [...modifierCSSKeysArray, utilityKey],
-      value: rootCSS,
-    })
-
-    instructionsSet.add(classNameObj)
-  }
-  return instructionsSet
-}
-
-const extractGradientModifiers = ({
-  gradientModifiers,
+const constructCSSClassNameObject = ({
+  makClassName,
   activeTheme,
+  rootClassObject,
+  returnAllVars,
 }: {
-  gradientModifiers: string[]
+  makClassName: string
   activeTheme: MakUiVerboseTheme
+  rootClassObject?: GenericObject
+  returnAllVars?: boolean
 }) => {
-  const gradientModifierOptions = ["bg-gradient", "from-", "to-", "via-"]
+  let {
+    className,
+    modifiersArray,
+    mediaQueriesArray,
+    relationalModifiersArray,
+  } = separateTwModifiers(makClassName)
+  let { paletteVariant, color } = extractMakVars({ className, activeTheme })
 
-  const gradientModifiersSet = new Set(gradientModifiers)
+  let joinedRelationalModifiers = relationalModifiersArray.length
+    ? relationalModifiersArray.join(" ")
+    : "&"
+  let joinedModifiers = modifiersArray.length
+    ? `:${modifiersArray.join(":")}`
+    : ""
 
-  const fromColorModifiers = gradientModifiers.filter((modifier) => {
-    return modifier.includes("from-") && !modifier.includes("%")
+  const escapedClassName = makClassName.replace(
+    /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
+    "\\$&"
+  )
+
+  const classNameString = `${joinedRelationalModifiers}.${escapedClassName}${joinedModifiers}`
+
+  const mediaQueryKeys: string[] = []
+
+  mediaQueriesArray.forEach((mq) => {
+    mediaQueryKeys.push(mediaQueries[mq as string])
   })
 
-  const orderedModifierArray = [...gradientModifiersSet, ...fromColorModifiers]
+  const cssKey = twToCssKeyMap?.[paletteVariant] || "backgroundColor"
 
-  let rootCSSObj = {}
-  const parsedModifierSet = new Set()
-  const colorNamespaceSet: Set<string> = new Set()
-  for (const twGradientModifier of orderedModifierArray) {
-    let { className, modifiersArray } = separateTwModifiers(twGradientModifier)
-    const classNameObj = {} as GenericObject
-    let gradientModifier =
-      findSubstring({
-        string: className,
-        substrings: gradientModifierOptions,
-      }) || ""
-    const demodifiedClassName = className?.split(gradientModifier)[1]
-    className = `bg-${demodifiedClassName}`
-    gradientModifier = gradientModifier.split("-")[0]
-    let { color } = extractMakVars({ className, activeTheme })
-    let position: string | undefined = demodifiedClassName?.includes("%")
-      ? demodifiedClassName
-      : undefined
-    position = position?.replace(/[\[\]]/g, "")
-    const namespace = `--gradient-${gradientModifier}${
-      position ? "-position" : ""
-    }`
-    const originalModifier = `${gradientModifier}-${demodifiedClassName}`
-    let namespaceValue: string | GenericObject = position
-      ? position
-      : `${color} var(--gradient-${gradientModifier}-position, ${
-          gradientModifier === "from"
-            ? "0%"
-            : gradientModifier === "to"
-            ? "100%"
-            : ""
-        })`
-    if (!position) colorNamespaceSet.add(gradientModifier)
+  const classNameObject = {}
 
-    const rootCSS = { [namespace]: namespaceValue }
-    if (!position) {
-      rootCSSObj = {
-        ...rootCSSObj,
-        ...rootCSS,
-      }
+  ensureNestedObject({
+    parent: classNameObject,
+    keys: [
+      ...mediaQueryKeys,
+      classNameString,
+      rootClassObject ? undefined : cssKey,
+    ],
+    value: rootClassObject || color,
+  })
+
+  if (returnAllVars) {
+    return {
+      className,
+      modifiersArray,
+      mediaQueriesArray,
+      relationalModifiersArray,
+      paletteVariant,
+      color,
+      classNameObject,
     }
-    let modifierCSSKeysArray: string[] = []
+  }
+  return classNameObject
+}
 
-    modifiersArray.forEach((modifier) => {
-      let modifierKey = tailwindToCssModifierObject?.[modifier]
-      if (typeof modifierKey === "string") {
-        modifierCSSKeysArray.push(modifierKey)
-      }
-      if (typeof modifierKey === "function") {
-        const escapedOriginalModifier = originalModifier.replace(
-          /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
-          "\\$&"
-        )
-        const resolvedModifierFn = modifierKey(escapedOriginalModifier)
-        modifierCSSKeysArray.push(resolvedModifierFn)
-      }
+const parseGradientClassNames = ({
+  makClassName,
+  activeTheme,
+}: {
+  makClassName: string
+  activeTheme: MakUiVerboseTheme
+}) => {
+  const gradientModifiers =
+    makClassName.match(
+      /([^ ]+:)?(bg-((linear-)|(conic-)|(radial-))?gradient-?[^ ]*)|(([^ ]+:)?((from)|(to)|(via))-[^ ]+)/g
+    ) || []
+
+  const linearGradientDirections: { [key: string]: string } = {
+    "to-t": "to top",
+    "to-tr": "to top right",
+    "to-r": "to right",
+    "to-br": "to bottom right",
+    "to-b": "to bottom",
+    "to-bl": "to bottom left",
+    "to-l": "to left",
+    "to-tl": "to top left",
+  }
+
+  const gradientModifierObject: {
+    [key: string]: string[]
+  } = {
+    instructions:
+      makClassName?.match(
+        /([^ ]+:)?(bg-((linear-)|(conic-)|(radial-))?gradient-?[^ ]*)/g
+      ) || [],
+    fromPositions:
+      makClassName?.match(/([^ ]+:)?((from))-\[?[^\s\]]+((%)|(deg)){1}\]?/g) ||
+      [],
+    fromColors:
+      makClassName?.match(
+        /(?<=^|\s)(?![^ ]*bg-gradient-)([^ ]+:)?(?:from)-[a-z0-9-]+(?:\/[0-9]+)?(?=\s|$)/g
+      ) || [],
+    viaPositions:
+      makClassName?.match(/([^ ]+:)?via-\[?[^\s\]]+((%)|(deg)){1}\]?/g) || [],
+    viaColors:
+      makClassName?.match(
+        /(?<=^|\s)(?![^ ]*bg-gradient-)([^ ]+:)?(?:via)-[a-z0-9-]+(?:\/[0-9]+)?(?=\s|$)/g
+      ) || [],
+    toPositions:
+      makClassName?.match(/([^ ]+:)?to-\[?[^\s\]]+((%)|(deg)){1}\]?/g) || [],
+    toColors:
+      makClassName?.match(
+        /(?<=^|\s)(?![^ ]*bg-gradient-)([^ ]+:)?(?:to)-[a-z0-9-]+(?:\/[0-9]+)?(?=\s|$)/g
+      ) || [],
+  }
+
+  for (const gm of gradientModifiers) {
+    makClassName = makClassName?.replace(gm, "").trim()
+  }
+
+  const gradientClassSet = new Set<GenericObject>()
+
+  for (let instruction of gradientModifierObject.instructions) {
+    const gradientType =
+      instruction.match(/(linear|conic|radial)/)?.[0] || "linear"
+    const direction =
+      instruction.match(
+        /((to-t)|(to-tr)|(to-r)|(to-br)|(to-b)|(to-bl)|(to-l)|(to-tl))/g
+      )?.[0] || "to-b"
+    const gradientDirection =
+      gradientType === "linear"
+        ? `${linearGradientDirections?.[direction]}, `
+        : gradientType === "radial, "
+        ? "circle, "
+        : ""
+    const gradientInstruction = `${gradientType}-gradient(${gradientDirection}var(--gradient-stops))`
+
+    const instructionClassObject = constructCSSClassNameObject({
+      makClassName: instruction,
+      activeTheme,
+      rootClassObject: {
+        backgroundImage: gradientInstruction,
+      },
     })
 
-    // modifierCSSKeysArray.length && console.log(modifierCSSKeysArray, {rootCSSObj})
-    const escapedClassName = `&.${twGradientModifier.replace(
-      /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
-      "\\$&"
-    )}`
-
-    if (fromColorModifiers.includes(twGradientModifier)) {
-      const gradientStops = `var(--gradient-from),${
-        colorNamespaceSet.has("via") ? "var(--gradient-via)," : ""
-      } var(--gradient-to)`
-      if (!Object.keys(rootCSSObj).includes("--gradient-to")) {
-        const gradientTo = {
-          ["--gradient-to"]: "rgba(0,0,0,0) var(--gradient-to-position, 100%)",
-        }
-        rootCSSObj = {
-          ...rootCSSObj,
-          ...gradientTo,
-        }
-      }
-
-      const fromNameSpace = {
-        "--gradient-stops": gradientStops,
-        ...rootCSSObj,
-      }
-
-      ensureNestedObject({
-        parent: classNameObj,
-        keys: modifiersArray.length
-          ? [...modifierCSSKeysArray]
-          : [escapedClassName],
-        value: fromNameSpace,
-      })
-
-      parsedModifierSet.add(classNameObj)
-
-      continue
-    }
-    if (modifiersArray.length) {
-      ensureNestedObject({
-        parent: classNameObj,
-        keys: [...modifierCSSKeysArray, namespace],
-        value: namespaceValue,
-      })
-    } else {
-      ensureNestedObject({
-        parent: classNameObj,
-        keys: [...modifierCSSKeysArray, escapedClassName, namespace],
-        value: namespaceValue,
-      })
-    }
-
-    parsedModifierSet.add(classNameObj)
+    gradientClassSet.add(instructionClassObject)
   }
-  return parsedModifierSet
+
+  const hasViaValues =
+    gradientModifierObject.viaColors.length > 0 ||
+    gradientModifierObject.viaPositions.length > 0
+
+  for (let terminus of ["from", "via", "to"]) {
+    for (let twPosition of gradientModifierObject[`${terminus}Positions`]) {
+      if (!gradientModifierObject[`${terminus}Positions`].length) continue
+      const positionLocation = twPosition
+        .replace(/[\[\]]/g, "")
+        .replace("to-", "")
+      const positionClassObject = constructCSSClassNameObject({
+        makClassName: twPosition,
+        activeTheme,
+        rootClassObject: {
+          [`--gradient-${terminus}-position`]: positionLocation,
+        },
+      })
+
+      gradientClassSet.add(positionClassObject)
+    }
+  }
+
+  for (let terminus of ["from", "via", "to"]) {
+    for (let twColor of gradientModifierObject[`${terminus}Colors`]) {
+      let { className } = separateTwModifiers(twColor)
+      className = className?.replace(terminus, "bg")
+      const { color } = extractMakVars({ className, activeTheme })
+      let rootClassObject: GenericObject = {}
+      if (terminus === "from") {
+        rootClassObject = {
+          "--gradient-stops": `var(--gradient-${terminus}),${
+            hasViaValues ? " var(--gradient-via)," : ""
+          } var(--gradient-to)`,
+          "--gradient-from": `${color} var(--gradient-from-position, 0%)`,
+          "--gradient-to": `var(--gradient-to-color, rgb(0,0,0,0)) var(--gradient-to-position, 100%)`,
+        }
+
+        if (hasViaValues) {
+          rootClassObject = {
+            ...rootClassObject,
+            "--gradient-via": `var(--gradient-via-color) var(--gradient-via-position, 50%)`,
+          }
+        }
+      } else {
+        rootClassObject = {
+          [`--gradient-${terminus}-color`]: color,
+        }
+      }
+      const colorClassObject = constructCSSClassNameObject({
+        makClassName: twColor,
+        activeTheme,
+        rootClassObject,
+      })
+
+      gradientClassSet.add(colorClassObject)
+    }
+  }
+
+  return {
+    gradientClassSet,
+    makClassName,
+  }
 }
 
 export const parseMakClassNames = ({
   makClassName,
   activeTheme,
-  currentThemeMode,
 }: {
   makClassName?: string
   activeTheme: MakUiVerboseTheme
-  currentThemeMode: MakUiThemeKey
-}) => {
+}): ClassObject => {
   makClassName = makClassName?.replace(/\s+/g, " ").trim()
   if (!makClassName || makClassName === "") return {}
 
-  let makClassNamesArray = makClassName?.split(" ") || []
-  const makClassNamesSet = new Set(makClassNamesArray)
-  const styleMap = new Map<string, string | GenericObject>()
-  const modifierSet = new Set<GenericObject | string>()
-  const unresolvedClasses: string[] = []
+  const resp = parseGradientClassNames({ makClassName, activeTheme })
+  makClassName = resp.makClassName
+  const gradientClassSet = resp.gradientClassSet
+  let makClassNamesArray =
+    makClassName === "" ? [] : makClassName?.split(" ") || []
 
-  const keyMap: { [key: string]: string } = {
-    bg: "backgroundColor",
-    text: "color",
-    border: "borderColor",
-    theme: "backgroundColor",
-    color: "backgroundColor",
-    outline: "outlineColor",
-    ring: "outlineColor",
-    "ring-offset": "boxShadow",
-    divide: "borderColor",
-  }
-  const gradientModifierOptions = ["bg-gradient", "from-", "to-", "via-"]
+  let cssObjectSet = new Set<GenericObject | string>(gradientClassSet)
 
   if (makClassNamesArray.length > 0) {
-    const gradientInstructions: string[] = makClassNamesArray.filter((cn) =>
-      cn.includes("bg-gradient")
-    )
-    gradientInstructions.forEach((i) => makClassNamesSet.delete(i))
-
-    const parsedGradientInstructions =
-      extractGradientInstruction(gradientInstructions)
-
-    Array.from(parsedGradientInstructions).forEach((instruction) =>
-      modifierSet.add(instruction)
-    )
-
-    const gradientModifiers = makClassNamesArray.filter((cn) => {
-      return (
-        !gradientInstructions.includes(cn) &&
-        findSubstring({ string: cn, substrings: gradientModifierOptions })
-      )
-    })
-    gradientModifiers.forEach((m) => makClassNamesSet.delete(m))
-
-    const parsedGradientModifiers = extractGradientModifiers({
-      gradientModifiers,
-      activeTheme,
-    })
-
-    Array.from(parsedGradientModifiers).forEach((parsedModifier) =>
-      modifierSet.add(parsedModifier as string)
-    )
-
-    for (const makClassName of Array.from(makClassNamesSet)) {
-      let { className, modifiersArray } = separateTwModifiers(makClassName)
-
-      const classNameObj = {} as GenericObject
-      let key: string = "backgroundColor"
-
-      let { paletteVariant, color } = extractMakVars({ className, activeTheme })
-
-      if (modifiersArray.length) {
-        let modifierCSSKeysArray: string[] = []
-        const utilityKey = keyMap[paletteVariant]
-
-        const rootCSS = { [utilityKey]: color }
-
-        modifiersArray.forEach((modifier) => {
-          let modifierKey = tailwindToCssModifierObject?.[modifier]
-          if (typeof modifierKey === "string") {
-            modifierCSSKeysArray.push(modifierKey)
-          }
-          if (typeof modifierKey === "function") {
-            let modifierAndClassNameString = `&.${modifiersArray.join(
-              ":"
-            )}:${className}`
-
-            const escapedClassName = modifierAndClassNameString.replace(
-              /([:\|\[\]{}()+>~!@#$%^&*=/"'`;,\\])/g,
-              "\\$&"
-            )
-
-            const selector = `${escapedClassName}`
-            const resolvedModifierFn = modifierKey(selector, "")
-            modifierCSSKeysArray.push(resolvedModifierFn)
-          }
-        })
-
-        ensureNestedObject({
-          parent: classNameObj,
-          keys: modifierCSSKeysArray,
-          value: rootCSS,
-        })
-
-        modifierSet.add(classNameObj)
-      } else if (paletteVariant && color) {
-        key = keyMap[paletteVariant]
-        styleMap.set(key, color)
-      } else {
-        unresolvedClasses.push(makClassName)
-      }
+    for (const makClassName of makClassNamesArray) {
+      const classNameObj = constructCSSClassNameObject({
+        makClassName,
+        activeTheme,
+      })
+      cssObjectSet.add(classNameObj)
     }
   }
 
-  const modifierArray = Array.from(modifierSet)
+  const cssObjectArray = Array.from(cssObjectSet)
 
-  const mergedModifiers = deepMerge(...modifierArray)
+  const makCSSObject = deepMerge(...(cssObjectArray as GenericObject[]))
 
-  const pseudoClassObject = mergedModifiers
-  const baseClassObject = Object.fromEntries(styleMap)
-  const unresolved = unresolvedClasses.length
-    ? unresolvedClasses.join(" ")
-    : undefined
-
-  return {
-    pseudoClassObject,
-    baseClassObject,
-    unresolved,
-  }
+  return makCSSObject
 }
 
 export const ensureUtilityClass = (utility: string, className: string) => {
