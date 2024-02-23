@@ -20,7 +20,7 @@ const GradientView = () => {
         // makClassName="bg-primary :bg-secondary"
       /> */}
       styled 2
-      <mak.span makClassName="flex h-20 w-80 bg-gradient-to-r from-tertiary-700 light:from-danger-500 dark:hover:from-info" />
+      <mak.span makClassName="flex h-20 w-80 bg-gradient-to-r from-tertiary-700 light:from-danger-500 dark:hover:from-info " />
     </div>
   )
 }

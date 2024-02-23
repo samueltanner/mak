@@ -66,9 +66,7 @@ export const MakUiProvider = (props: MakUiProviderProps) => {
 }
 
 const GlobalStyleSheetWrapper = styled.div<GenericObject>(({ styleSheet }) => ({
-  ".group:hover .group-hover\\:bg-primary-500": {
-    backgroundColor: "#731AFF",
-  },
+  ...styleSheet,
 }))
 
 const defaultPaletteGenProps: PaletteGeneratorProps = {
